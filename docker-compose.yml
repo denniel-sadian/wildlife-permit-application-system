@@ -1,0 +1,44 @@
+version: "3.9"
+   
+services:
+  app:
+    build: .
+    command: python manage.py runserver 0.0.0.0:${PORT:-8000}
+    volumes:
+      - .:/app
+    ports:
+      - ${PORT:-8000}:${PORT:-8000}
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-queenladygaga}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-["*"]}
+      DEBUG: ${DEBUG:-true}
+      PORT: ${PORT:-8080}
+      DB_ENGINE: ${DB_ENGINE:-django.db.backends.postgresql}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-biodiversity_db}
+      DB_USER: ${DB_USER:-denr}
+      DB_PASSWORD: ${DB_PASSWORD:-denr}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-sadiandenniel@gmail.com}
+      EMAIL_HOST: ${EMAIL_HOST:-mail}
+      EMAIL_PORT: ${EMAIL_PORT:-1025}
+    depends_on:
+      - db
+      - mail
+
+  db:
+    image: postgres
+    volumes:
+      - biodiversity_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME:-biodiversity_db}
+      POSTGRES_USER: ${DB_USER:-denr}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-denr}
+
+  mail:
+    image: mailhog/mailhog
+    ports:
+      - 8025:8025
+
+volumes:
+  biodiversity_db:
