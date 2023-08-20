@@ -64,13 +64,6 @@ class User(AbstractUser):
         return self.subclass.__class__.__name__
 
 
-class RegistrationToken(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='registration_tokens')
-    token = models.CharField(max_length=50)
-    created_at = models.DateField(auto_now_add=True)
-
-
 class Client(User):
 
     class Meta:

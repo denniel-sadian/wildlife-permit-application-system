@@ -1,0 +1,2 @@
+Username: {{ user.username }}
+Temporary Password: {{ temporary_password }}

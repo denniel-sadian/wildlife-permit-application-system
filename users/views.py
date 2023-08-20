@@ -2,10 +2,11 @@ import uuid
 
 from django.urls import reverse_lazy
 from django.views.generic import FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Client
-from .models import RegistrationToken
 from .forms import ClientRegistrationForm
+from .emails import RegistrationEmailView
 
 
 class ClientRegistrationView(FormView):
@@ -16,11 +17,10 @@ class ClientRegistrationView(FormView):
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
         client: Client = form.instance
-        client.is_active = False
-        client.set_password(form.instance.password)
+        temporary_password = str(uuid.uuid4())
+        client.set_password(temporary_password)
         client.save()
 
-        token = RegistrationToken(user=client, token=str(uuid.uuid4()))
-        token.save()
+        RegistrationEmailView(client, temporary_password).send()
 
         return super().form_valid(form)
