@@ -6,7 +6,7 @@ from model_utils.managers import InheritanceManager
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-class Manager(UserManager, InheritanceManager):
+class ObjectManager(UserManager, InheritanceManager):
     """Manager for User model."""
 
     def create_superuser(self, username, password, **extra_fields):
@@ -19,8 +19,7 @@ class Manager(UserManager, InheritanceManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self._create_user(
-            username, email=None, password=password, **extra_fields)
+        return self._create_user(username, password=password, **extra_fields)
 
     def get_by_natural_key(self, username):
         """Return `User` with matching natural key."""
@@ -35,12 +34,19 @@ class User(AbstractUser):
         CLIENT = 'CLIENT', 'Client'
         ADMIN = 'ADMIN', 'Admin'
 
-    objects = Manager()
+    class Gender(models.TextChoices):
+        MALE = 'MALE', 'Male'
+        FEMALE = 'FEMALE', 'Female'
+
+    objects = ObjectManager()
 
     role = models.CharField(choices=Role.choices, max_length=50)
-    email = models.EmailField(unique=True, blank=False)
-    first_name = models.CharField(max_length=30, blank=False)
-    last_name = models.CharField(max_length=30, blank=False)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    gender = models.CharField(choices=Gender.choices, max_length=10)
+    email = models.EmailField(unique=True)
+    phone_number = PhoneNumberField(max_length=14)
+    is_initial_password_changed = models.BooleanField(default=False)
 
     @property
     def subclass(self):
@@ -56,9 +62,36 @@ class User(AbstractUser):
 
 
 class Client(User):
+
+    class Meta:
+        verbose_name = 'Client'
+
     address = models.CharField(max_length=255)
-    contact_number = PhoneNumberField(max_length=14)
+    business_name = models.CharField(max_length=255)
+    agreed_to_terms_and_conditions = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        self.role = User.Role.CLIENT
+        self.is_active = False
+        super().save(*args, **kwargs)
 
 
 class Admin(User):
-    new_field = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = 'Admin'
+
+    def save(self, *args, **kwargs):
+        self.role = User.Role.ADMIN
+        self.is_staff = True
+        super().save(*args, **kwargs)
+
+
+class Permittee(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    address = models.TextField()
+    farm_name = models.CharField(max_length=255)
+    farm_address = models.TextField()
+    permittee_photo = models.ImageField(upload_to='uploaded-media/')
+    farm_photo = models.ImageField(upload_to='uploaded-media/')

@@ -1,5 +1,5 @@
 version: "3.9"
-   
+
 services:
   app:
     build: .
@@ -27,7 +27,7 @@ services:
       - mail
 
   db:
-    image: postgres
+    image: postgres:13
     volumes:
       - biodiversity_db:/var/lib/postgresql/data
     environment:

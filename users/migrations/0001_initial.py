@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
             managers=[
-                ('objects', users.models.Manager()),
+                ('objects', users.models.ObjectManager()),
             ],
         ),
         migrations.CreateModel(
@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
             },
             bases=('users.user',),
             managers=[
-                ('objects', users.models.Manager()),
+                ('objects', users.models.ObjectManager()),
             ],
         ),
         migrations.CreateModel(
@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
             },
             bases=('users.user',),
             managers=[
-                ('objects', users.models.Manager()),
+                ('objects', users.models.ObjectManager()),
             ],
         ),
     ]

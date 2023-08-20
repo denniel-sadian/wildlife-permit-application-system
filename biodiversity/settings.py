@@ -48,8 +48,10 @@ INSTALLED_APPS = [
 
     'guardian',
     'phonenumber_field',
+    'django_yubin',
 
-    'users'
+    'users',
+    'permits'
 ]
 
 MIDDLEWARE = [
@@ -98,6 +100,13 @@ DATABASES = {
 }
 
 AUTH_USER_MODEL = 'users.User'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend'
+)
+
+ANONYMOUS_USER_NAME = None
 
 
 # Default primary key field type
