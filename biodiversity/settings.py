@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django_yubin',
 
     'users',
+    'animals',
     'permits'
 ]
 
