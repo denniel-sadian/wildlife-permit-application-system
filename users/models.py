@@ -75,7 +75,6 @@ class Client(User):
 
     def save(self, *args, **kwargs):
         self.role = Role.CLIENT
-        self.is_active = False
         super().save(*args, **kwargs)
 
 

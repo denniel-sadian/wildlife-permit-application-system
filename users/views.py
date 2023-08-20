@@ -1,6 +1,7 @@
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
+from .models import Client
 from .forms import ClientRegistrationForm
 
 
@@ -11,5 +12,8 @@ class ClientRegistrationView(FormView):
 
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
-        form.save()
+        client: Client = form.instance
+        client.is_active = False
+        client.set_password(form.instance.password)
+        client.save()
         return super().form_valid(form)
