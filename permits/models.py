@@ -23,7 +23,7 @@ class PermitType(models.TextChoices):
 class Permit(models.Model):
     permit_no = models.CharField(max_length=255)
     status = models.CharField(choices=Status.choices, max_length=50)
-    validity = models.DateField(null=True, blank=True)
+    valid_until = models.DateField(null=True, blank=True)
     created_at = models.DateField(auto_now_add=True)
 
     objects = InheritanceManager()

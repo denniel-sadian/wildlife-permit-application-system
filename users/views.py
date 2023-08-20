@@ -1,7 +1,10 @@
+import uuid
+
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
 from .models import Client
+from .models import RegistrationToken
 from .forms import ClientRegistrationForm
 
 
@@ -16,4 +19,8 @@ class ClientRegistrationView(FormView):
         client.is_active = False
         client.set_password(form.instance.password)
         client.save()
+
+        token = RegistrationToken(user=client, token=str(uuid.uuid4()))
+        token.save()
+
         return super().form_valid(form)
