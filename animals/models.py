@@ -11,6 +11,9 @@ class Species(models.Model):
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=5, choices=Type.choices)
 
+    def __str__(self):
+        return self.name
+
 
 class SubSpecies(models.Model):
     main_species = models.ForeignKey(

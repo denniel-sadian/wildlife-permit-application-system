@@ -1,0 +1,259 @@
+body {
+    margin: 0px;
+    padding: 0px;
+    width: 100vw;
+    height: 100vh;
+    font-family: "Nunito", sans-serif !important;
+}
+
+/* NAV BAR */
+
+nav {
+    width: 100%;
+    position: fixed;
+    top: 0px;
+}
+
+nav a {
+    text-decoration: none;
+}
+
+.nav-cont {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1100px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+.nav-cont .brand {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+}
+
+.nav-cont .brand > * {
+    display: flex;
+    align-items: center;
+}
+
+.nav-btn-cont {
+    display: none !important;
+}
+
+.nav-cont .brand img {
+    width: 50px;
+    height: 50px;
+}
+
+.nav-cont .brand span {
+    font-family: "Roboto Slab", serif !important;
+    font-weight: 800;
+    font-size: 25px;
+    padding-left: 8px;
+}
+
+.nav-cont .links {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px;
+}
+
+.nav-cont .links > a {
+    display: flex;
+    align-items: center;
+    padding: 0px 20px;
+    transition: 0.3s;
+}
+
+.nav-cont .links > a:hover {
+    background-color: rgba(255, 255, 255, 0.288);
+    border: none;
+    border-radius: 32px;
+}
+
+nav .name {
+    font-family: "Roboto Slab", serif !important;
+    text-transform: capitalize;
+}
+
+nav .current-tab {
+    border-bottom: 2px solid white;
+    font-weight: bold;
+}
+
+/* CONTENT */
+.page {
+    padding-top: 66px;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+}
+
+.page .content {
+    width: 100vw;
+    height: 100%;
+}
+
+/* FOOTER */
+footer {
+    width: 100%;
+}
+
+footer .cont {
+    padding: 50px 20px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1100px;
+    width: 100%;
+}
+
+footer .cont h2 {
+    font-family: "Roboto Slab", serif !important;
+    font-weight: 800;
+    font-size: 20px;
+}
+
+/* UI */
+
+.w3-btn {
+    font-weight: bold;
+}
+
+.text-box,
+.file-input {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.text-box span,
+.file-input span {
+    font-family: "Nunito", sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+}
+.file-input a {
+    color: gray;
+}
+
+.text-box > *:nth-child(2) {
+    border: 1px solid gray;
+    border-radius: 6px;
+    height: 40px;
+    padding: 0px 8px;
+}
+
+.buttons {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.buttons > * {
+    margin-left: 8px;
+}
+
+.search-box {
+    width: 100%;
+    padding: 10px 0px;
+}
+
+.search-box form {
+    padding: 0px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+
+.search-box form input {
+    border-radius: 32px 0px 0px 32px;
+    border: 2px solid #4caf50;
+    width: 100%;
+}
+
+.search-box form button {
+    border-radius: 0px 32px 32px 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+    width: 100%;
+}
+
+.paginator {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.paginator > * {
+    padding: 4px;
+}
+
+.paginator > .w3-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+}
+
+.list-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+}
+
+table th,
+table .emp {
+    font-family: "Roboto Slab", serif !important;
+    text-align: left;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+table * {
+    white-space: nowrap;
+}
+
+/*  MOBILE */
+
+@media only screen and (max-width: 1000px) {
+    .nav-cont {
+        grid-template-columns: 1fr;
+    }
+
+    .brand {
+        display: grid !important;
+        grid-template-columns: 1fr auto;
+    }
+
+    .nav-btn-cont {
+        display: flex !important;
+    }
+
+    .nav-cont .links {
+        flex-direction: column;
+        display: none;
+    }
+
+    .links > a {
+        height: 50px;
+        align-items: left;
+    }
+
+    nav .current-tab {
+        border-bottom: none;
+        font-weight: bold;
+        background-color: #87ceeb;
+        color: #2196f3;
+    }
+}

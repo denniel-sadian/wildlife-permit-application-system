@@ -15,8 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
+
+TITLE = 'Biodiversity Administration'
+admin.site.site_header = TITLE
+admin.site.site_title = TITLE
+admin.site.index_title = TITLE
 
 urlpatterns = [
-    path('', include('users.urls')),
+    path('users/', include('users.urls')),
     path('admin/', admin.site.urls),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) if settings.DEBUG else []

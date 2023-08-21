@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block styles %}
+<style>
+    .page {
+        background-color: rgb(231, 231, 231);
+    }
+
+    main {
+        padding: 100px 20px;
+    }
+
+    form {
+        border-radius: 10px;
+        width: 100%;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 20px;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 50px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    form h2 {
+        font-family: 'Roboto Slab', serif !important;
+        font-weight: 800;
+        font-size: 30px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <form action="{% url 'login' %}" method="POST" class="w3-white">
+        {% csrf_token %}
+        <h2><i class="fa fa-sign-in"></i> Sign-in to your account</h2>
+        {% if form.errors %}
+        <div class="w3-panel w3-pale-red w3-padding w3-border-left w3-border-pink">Your username and password didn't match. Please try again.</div>
+        {% endif %}
+        <div class="text-box">
+            <span>Username:</span>
+            <input type="text" name="username" required>
+        </div>
+        <div class="text-box">
+            <span>Password:</span>
+            <input type="password" name="password" required>
+        </div>
+        <div class="buttons">
+            <a href="/register.php" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Register</a>
+            <input type="submit" class="w3-btn w3-blue w3-round-large" name="submit" value="Login">
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+        <p><a href="{% url 'password_reset' %}" class="w3-text-blue">Lost password?</a></p>
+    </form>
+</main>
+{% endblock %}
