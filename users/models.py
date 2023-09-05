@@ -54,14 +54,16 @@ class User(AbstractUser):
     @property
     def subclass(self):
         """Return the User subclass instance."""
-        if self._subclass is None:
+        try:
+            return self._subclass
+        except AttributeError:
             self._subclass = self.__class__.objects.get_subclass(id=self.id)
         return self._subclass
 
     @property
     def type(self):
         """Return the type of the user."""
-        return self.subclass.__class__.__name__
+        return self.subclass.__class__
 
 
 class Client(User):
