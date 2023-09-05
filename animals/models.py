@@ -12,7 +12,7 @@ class Species(models.Model):
     type = models.CharField(max_length=5, choices=Type.choices)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class SubSpecies(models.Model):
@@ -21,3 +21,6 @@ class SubSpecies(models.Model):
     common_name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255)
     population = models.IntegerField()
+
+    def __str__(self):
+        return str(self.main_species.name + ' - ' + self.common_name)
