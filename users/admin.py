@@ -1,11 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Client, Admin
+from .models import Client, Admin, Permittee
 
 
-@admin.register(Admin)
-class AdminAdmin(UserAdmin):
+class BaseUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
@@ -30,13 +29,19 @@ class AdminAdmin(UserAdmin):
     )
 
 
+@admin.register(Admin)
+class AdminAdmin(BaseUserAdmin):
+    pass
+
+
 @admin.register(Client)
-class ClientAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name',
-                    'last_name', 'is_active', 'last_login')
-    fieldsets = (
-        ('Authentication', {'fields': ('username', 'password', 'is_active')}),
-        ('Personal Information', {'fields': (
-            'first_name', 'last_name', 'business_name', 'email', 'phone_number')}),
-        ('Important dates', {'fields': ('date_joined',)})
-    )
+class ClientAdmin(BaseUserAdmin):
+    pass
+
+
+@admin.register(Permittee)
+class PermitteeAdmin(admin.ModelAdmin):
+    list_display = ('last_name', 'first_name',
+                    'address', 'farm_name', 'farm_address')
+    search_fields = list_display
+    ordering = list_display
