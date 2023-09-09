@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Registration{% endblock %}
+
+{% block styles %}
+<style>
+    .page {
+        background-color: rgb(231, 231, 231);
+    }
+
+    main {
+        padding: 100px 20px;
+    }
+
+    form {
+        border-radius: 10px;
+        width: 100%;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 20px;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 50px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    form h2 {
+        font-family: 'Roboto Slab', serif !important;
+        font-weight: 800;
+        font-size: 30px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="w3-light-gray">
+    <form action="" method="POST" class="w3-white">
+        {% csrf_token %}
+        <h2><i class="fa fa-user-plus"></i> Register a client account</h2>
+
+        {% include 'ui/inputbox.html' with field=form.username %}
+        {% include 'ui/inputbox.html' with field=form.first_name %}
+        {% include 'ui/inputbox.html' with field=form.last_name %}
+        {% include 'ui/inputbox.html' with field=form.gender %}
+        {% include 'ui/inputbox.html' with field=form.business_name %}
+        {% include 'ui/inputbox.html' with field=form.address %}
+        {% include 'ui/inputbox.html' with field=form.email %}
+        {% include 'ui/inputbox.html' with field=form.phone_number %}
+        {% include 'ui/checkbox.html' with field=form.agreed_to_terms_and_conditions %}
+
+
+        <div class="buttons">
+            <a href="{% url 'login' %}" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Login</a>
+            <input type="submit" class="w3-btn w3-blue w3-round-large" name="submit" value="Register">
+        </div>
+    </form>
+</main>
+{% endblock %}
