@@ -11,9 +11,9 @@ from .emails import RegistrationEmailView
 
 
 class ClientRegistrationView(FormView):
-    template_name = 'users/client_registration_form.html'
+    template_name = 'users/registration.html'
     form_class = ClientRegistrationForm
-    success_url = reverse_lazy('client-registration')
+    success_url = reverse_lazy('home')
 
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
