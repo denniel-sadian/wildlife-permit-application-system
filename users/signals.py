@@ -23,7 +23,7 @@ def post_save_admin(sender, instance: Admin, created, **kwargs):
 @receiver(user_logged_in)
 def client_first_login(sender, user, request, **kwargs):
     """Clients' login signal."""
-    if user.type is Client and not user.is_initial_password_changed:
+    if user.type is Client.__name__ and not user.is_initial_password_changed:
         # TODO: Get all attached concerns in the temporary permittee record and attach them to the new client
         found_temp_permittee = Permittee.objects.filter(
             first_name__icontains=user.first_name, last_name__icontains=user.last_name)
