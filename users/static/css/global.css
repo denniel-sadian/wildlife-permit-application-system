@@ -148,6 +148,12 @@ footer .cont h2 {
     padding: 0px 8px;
 }
 
+.errorlist {
+    margin: 4px 0px 0px 0px;
+    color: #f44336;
+    font-size: 12px;
+}
+
 .buttons {
     margin-top: 20px;
     width: 100%;
