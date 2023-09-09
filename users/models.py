@@ -63,7 +63,10 @@ class User(AbstractUser):
     @property
     def type(self):
         """Return the type of the user."""
-        return self.subclass.__class__
+        return self.subclass.__class__.__name__
+
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name
 
 
 class Client(User):
