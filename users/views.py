@@ -2,6 +2,7 @@ import uuid
 
 from django.urls import reverse_lazy
 from django.views.generic import FormView
+from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Client
@@ -24,3 +25,7 @@ class ClientRegistrationView(FormView):
         RegistrationEmailView(client, temporary_password).send()
 
         return super().form_valid(form)
+
+
+class HomeView(TemplateView):
+    template_name = "users/index.html"
