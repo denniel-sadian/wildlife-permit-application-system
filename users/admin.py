@@ -12,7 +12,7 @@ class BaseUserAdmin(UserAdmin):
         }),
     )
     list_display = ('username', 'email', 'first_name',
-                    'last_name', 'is_active', 'last_login')
+                    'last_name', 'is_active', 'date_joined', 'last_login')
     fieldsets = (
         ('Authentication', {'fields': ('username', 'password')}),
         ('Personal Information', {
