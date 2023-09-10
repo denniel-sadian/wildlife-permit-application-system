@@ -11,7 +11,9 @@ urlpatterns = [
          name='password_change'),
     path('auth/', include('django.contrib.auth.urls')),
     path('registration/', views.ClientRegistrationView.as_view(),
-         name='registration')
+         name='registration'),
+    path('profile/', views.ProfileView.as_view(),
+         name='profile')
 ]
 
 if settings.DEBUG:
