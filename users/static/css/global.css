@@ -230,6 +230,40 @@ table * {
     white-space: nowrap;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Roboto Slab", serif !important;
+    text-transform: capitalize;
+}
+
+.messages {
+    padding: 20px;
+    width: 100%;
+    max-width: 500px;
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+}
+
+.messages > div {
+    box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+    color: #fff;
+}
+
+.messages .info {
+    background: #009688;
+}
+.messages .success {
+    background: #4CAF50;
+}
+
+.messages .warning {
+    background: #ff9800;
+}
+
+.messages .error {
+    background: #e91e63;
+}
+
 /*  MOBILE */
 
 @media only screen and (max-width: 1000px) {

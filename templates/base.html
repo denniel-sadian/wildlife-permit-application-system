@@ -8,7 +8,7 @@
             content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"
             name="viewport"
         />
-        <link rel="stylesheet" href="{% static 'css/global.css' %}?v=35" />
+        <link rel="stylesheet" href="{% static 'css/global.css' %}?v=37" />
         <link rel="stylesheet" href="{% static 'css/w3.css' %}?v=34" />
         <link rel="stylesheet" href="{% static 'js/global.js' %}?v=34" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,7 +35,7 @@
         <nav class="w3-blue">
             <div class="nav-cont">
                 <div class="brand">
-                    <a href="/">
+                    <a href="{% url 'home' %}">
                         <img src="{% static 'img/brand.png' %}" />
                         <span>Butterfly LTP System</span>
                     </a>
@@ -57,21 +57,34 @@
                     {% endif %}
 
                     {% if user.is_authenticated %}
-                    <a href="/profile/details.php" class="name {% if tab == 'profile' %}current-tab{% endif %}">
-                        <b><i class="fa fa-user-circle-o"></i> {{ user.first_name }}</b>
-                    </a>
+                    <a href="{% url 'profile' %}"><b><i class="fa fa-user-circle-o"></i> {{ user.name }}</b></a>
                     {% endif %}
                 </div>
             </div>
         </nav>
         <div class="page">
-            <div class="content">{% block content %}{% endblock %}</div>
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
             <footer class="w3-blue">
                 <div class="cont">
                     <h2>Department of Environment and Natural Resources</h2>
                 </div>
             </footer>
         </div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="w3-panel w3-display-container {{ message.tags }} w3-round-large">
+                <span onclick="this.parentElement.style.display='none'" class="w3-button w3-large w3-display-topright w3-round-large"><i class="fa fa-close"></i></span>
+                <h3>{{ message.tags }}</h3>
+                <p>{{ message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         {% block scripts %}{% endblock %}
 
         <script>
