@@ -6,11 +6,6 @@ from model_utils.managers import InheritanceManager
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-class Role(models.TextChoices):
-    CLIENT = 'CLIENT', 'Client'
-    ADMIN = 'ADMIN', 'Admin'
-
-
 class Gender(models.TextChoices):
     MALE = 'MALE', 'Male'
     FEMALE = 'FEMALE', 'Female'
@@ -23,7 +18,6 @@ class ObjectManager(UserManager, InheritanceManager):
         """Create superuser; called by `createsuperuser` management command."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('role', Role.ADMIN)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
@@ -43,7 +37,6 @@ class User(AbstractUser):
 
     objects = ObjectManager()
 
-    role = models.CharField(choices=Role.choices, max_length=50)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     gender = models.CharField(choices=Gender.choices, max_length=10)
@@ -65,6 +58,11 @@ class User(AbstractUser):
         """Return the type of the user."""
         return self.subclass.__class__.__name__
 
+    @property
+    def name(self):
+        salutation = 'Mr.' if self.gender == Gender.MALE else 'Ms.'
+        return salutation + ' ' + str(self)
+
     def __str__(self):
         return self.first_name + ' ' + self.last_name
 
@@ -79,7 +77,6 @@ class Client(User):
     agreed_to_terms_and_conditions = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        self.role = Role.CLIENT
         super().save(*args, **kwargs)
 
 
@@ -89,7 +86,6 @@ class Admin(User):
         verbose_name = 'Admin'
 
     def save(self, *args, **kwargs):
-        self.role = Role.ADMIN
         self.is_staff = True
         super().save(*args, **kwargs)
 
