@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from model_utils.managers import InheritanceManager
 
@@ -30,7 +31,7 @@ class Permit(models.Model):
     permit_no = models.CharField(max_length=255)
     status = models.CharField(choices=Status.choices, max_length=50)
     client = models.ForeignKey(
-        Client, on_delete=models.CASCADE, related_name='permits')
+        Client, on_delete=models.CASCADE, blank=True, null=True, related_name='permits')
     permittee = models.ForeignKey(
         Permittee, on_delete=models.CASCADE, blank=True, null=True, related_name='temporarily_assigned_permits')
     uploaded_file = models.FileField(
@@ -39,6 +40,14 @@ class Permit(models.Model):
     created_at = models.DateField(auto_now_add=True)
 
     objects = InheritanceManager()
+
+    @property
+    def current_status(self):
+        if self.valid_until:
+            is_still_valid = self.valid_until >= timezone.now().date()
+            if not is_still_valid:
+                return Status.EXPIRED
+        return self.status
 
     def __str__(self):
         return str(self.permit_no)
@@ -60,7 +69,7 @@ class PermittedToCollectAnimal(models.Model):
     sub_species = models.ForeignKey(
         SubSpecies, on_delete=models.CASCADE, related_name='species_permitted')
     wcp = models.ForeignKey(
-        WildlifeCollectorPermit, on_delete=models.CASCADE, related_name='wcp_species')
+        WildlifeCollectorPermit, on_delete=models.CASCADE, related_name='allowed_species')
     quantity = models.IntegerField()
 
     class Meta:
