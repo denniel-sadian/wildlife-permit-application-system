@@ -5,6 +5,8 @@ from django.contrib.auth.models import UserManager
 from model_utils.managers import InheritanceManager
 from phonenumber_field.modelfields import PhoneNumberField
 
+from permits.models import WildlifeCollectorPermit, WildlifeFarmPermit
+
 
 class Gender(models.TextChoices):
     MALE = 'MALE', 'Male'
@@ -76,8 +78,23 @@ class Client(User):
     business_name = models.CharField(max_length=255)
     agreed_to_terms_and_conditions = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    @property
+    def current_wcp(self):
+        try:
+            wfp = WildlifeCollectorPermit.objects \
+                .filter(client=self).latest('created_at')
+        except WildlifeCollectorPermit.DoesNotExist:
+            wfp = None
+        return wfp
+
+    @property
+    def current_wfp(self):
+        try:
+            wfp = WildlifeFarmPermit.objects \
+                .filter(client=self).latest('created_at')
+        except WildlifeFarmPermit.DoesNotExist:
+            wfp = None
+        return wfp
 
 
 class Admin(User):
