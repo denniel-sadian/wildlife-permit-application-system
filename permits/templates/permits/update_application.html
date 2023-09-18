@@ -26,7 +26,7 @@
 <main>
     <div class="cont">
         <form action="" method="POST" enctype="multipart/form-data">
-            <h1>{{ object.no }}</h1>
+            <h1>{{ object.no }} <span class="w3-small w3-tag w3-round-xxlarge {{ object.status }}">{{ object.get_status_display }}</span></h1>
             <p>You are editing your application for {{ object.get_permit_type_display }}.</p>
             {% csrf_token %}
 
@@ -53,8 +53,15 @@
             </div>
             <hr>
             <div class="buttons">
-                <a href="{% url 'list_applications' %}" class="w3-btn w3-round-large w3-text-green w3-border w3-border-green">Go back</a>
+
+                <a href="{% url 'list_applications' %}" class="w3-btn w3-round-large w3-text-gray w3-border w3-border-gray">Go back</a>
+
+                {% if object.status in 'DRAFT RETURNED' %}
+                <a href="{% url 'delete_application' pk=object.id %}" class="w3-btn w3-round-large w3-text-red w3-border w3-border-red">Delete</a>
+
                 <input type="submit" id="add-req-form" class="w3-btn w3-round-large w3-green" value="Save">
+                {% endif %}
+
             </div>
         </form>
         <script>
