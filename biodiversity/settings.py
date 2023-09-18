@@ -194,3 +194,8 @@ EMAIL_USE_TLS = json.loads(os.getenv('EMAIL_USE_TLS', 'false'))
 PHONENUMBER_DB_FORMAT = 'NATIONAL'
 
 PHONENUMBER_DEFAULT_REGION = 'PH'
+
+
+# TIME
+
+TIME_ZONE = 'Asia/Manila'
