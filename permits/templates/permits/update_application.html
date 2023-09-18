@@ -38,17 +38,24 @@
             <div class="extra-form">
                 <h3>Requirements</h3>
                 {% for i in requirements %}
-                <div id="reqs-form">
+                <div id="{{ requirements.prefix }}">
                     <div class="mini-form">
                         {{ i.id }}
                         {{ i.permit_application }}
                         {% include 'ui/inputbox.html' with field=i.requirement_type %}
                         {% include 'ui/fileinput.html' with field=i.uploaded_file %}
+                        {% if i.id.value %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
                     </div>
                 </div>
                 {% endfor %}
                 <div class="buttons">
-                    <button id="add-req-form" type="button" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Add requirement</button>
+                    <button type="button" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue" onclick="addForm('{{ requirements.prefix }}')">Add requirement</button>
+                </div>
+                <div id="{{ requirements.prefix }}-empty" style="display:none">
+                    <div class="mini-form">
+                        {% include 'ui/inputbox.html' with field=requirements.empty_form.requirement_type %}
+                        {% include 'ui/fileinput.html' with field=requirements.empty_form.uploaded_file %}
+                    </div>
                 </div>
             </div>
             <hr>
@@ -65,21 +72,14 @@
             </div>
         </form>
         <script>
-            $(function() {
-                $('#add-req-form').click(function() {
-                    var formset = $('#image-formset');
-                    var total = $('#id_form-TOTAL_FORMS');
-                    var totalForms = parseInt(total.val());
-                    var emptyFormStr = `
-                        <div class="mini-form">
-                            {% include 'ui/inputbox.html' with field=requirements.empty_form.requirement_type %}
-                            {% include 'ui/fileinput.html' with field=requirements.empty_form.uploaded_file %}
-                        </div>`.replaceAll('__prefix__', totalForms);
-                    var newForm = $(emptyFormStr);
-                    $('#reqs-form').append(newForm);
-                    total.val(totalForms+1);
-                });
-            });
+            function addForm(prefix) {
+                var total = $(`#id_${prefix}-TOTAL_FORMS`);
+                var totalForms = parseInt(total.val());
+                var emptyFormStr = $(`#${prefix}-empty`).html().replaceAll('__prefix__', totalForms);
+                var newForm = $(emptyFormStr);
+                $(`#${prefix}`).append(newForm);
+                total.val(totalForms+1);
+            }
         </script>
     </div>
 </main>
