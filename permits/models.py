@@ -88,14 +88,6 @@ class LocalTransportPermit(Permit):
         verbose_name = "Local Transport Permit"
 
 
-class TransportEntry(models.Model):
-    sub_species = models.ForeignKey(
-        SubSpecies, on_delete=models.CASCADE, related_name='transportings')
-    ltp = models.ForeignKey(
-        LocalTransportPermit, on_delete=models.CASCADE, related_name='species_to_transport')
-    quantity = models.IntegerField()
-
-
 class PermitApplication(models.Model):
     no = models.CharField(max_length=255)
     client = models.ForeignKey(
@@ -108,6 +100,18 @@ class PermitApplication(models.Model):
 
     def __str__(self):
         return str(self.no)
+
+
+class TransportEntry(models.Model):
+    sub_species = models.ForeignKey(
+        SubSpecies, on_delete=models.CASCADE, related_name='transportings')
+    application = models.ForeignKey(
+        PermitApplication, on_delete=models.CASCADE, related_name='requested_species_to_transport',
+        blank=True, null=True)
+    ltp = models.ForeignKey(
+        LocalTransportPermit, on_delete=models.CASCADE, related_name='species_to_transport',
+        blank=True, null=True)
+    quantity = models.IntegerField()
 
 
 class Requirement(models.Model):
