@@ -10,8 +10,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib import messages
 
-from permits.models import WildlifeFarmPermit, WildlifeCollectorPermit
-
 from .models import User, Client
 from .forms import ClientRegistrationForm
 from .emails import RegistrationEmailView
@@ -75,21 +73,8 @@ class ProfileView(CustomLoginRequiredMixin, TemplateView):
     template_name = 'users/profile.html'
 
     def get(self, request, *args, **kwargs):
-        client: Client = request.user
+        client: Client = request.user.subclass
         context = self.get_context_data(**kwargs)
-
-        try:
-            wfp = WildlifeFarmPermit.objects \
-                .filter(client=client).latest('created_at')
-        except WildlifeFarmPermit.DoesNotExist:
-            wfp = None
-        context['wfp'] = wfp
-
-        try:
-            wcp = WildlifeCollectorPermit.objects \
-                .filter(client=client).latest('created_at')
-        except WildlifeCollectorPermit.DoesNotExist:
-            wcp = None
-        context['wcp'] = wcp
-
+        context['wfp'] = client.current_wfp
+        context['wcp'] = client.current_wcp
         return self.render_to_response(context)
