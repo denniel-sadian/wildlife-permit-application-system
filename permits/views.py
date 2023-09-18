@@ -7,6 +7,7 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
+from django.views.generic import DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 
@@ -100,3 +101,9 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
             self.request,
             'Permit application has been saved')
         return super().form_valid(form)
+
+
+class PermitApplicationDeleteView(DeleteView):
+    model = PermitApplication
+    template_name = 'permits/confirm_delete_permit_application.html'
+    success_url = reverse_lazy('list_applications')
