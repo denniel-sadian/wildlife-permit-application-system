@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}{{ object.no }}{% endblock %}
+
+{% block styles %}
+<style>
+    main .cont {
+        margin: 100px auto;
+        padding: 0px 20px;
+        width: 100%;
+        max-width: 1100px;
+    }
+
+    .mini-form {
+        border: 2px solid lightgray;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="cont">
+        <form action="" method="POST" enctype="multipart/form-data">
+            <h1>{{ object.no }}</h1>
+            <p>You are editing your application for {{ object.get_permit_type_display }}.</p>
+            {% csrf_token %}
+
+            {% if object.permit_type == 'LTP' %}
+            {% include 'ui/inputbox.html' with field=form.transport_date %}
+            {% endif %}
+
+            {{ requirements.management_form }}
+            <div class="extra-form">
+                <h3>Requirements</h3>
+                {% for i in requirements %}
+                <div id="reqs-form">
+                    <div class="mini-form">
+                        {{ i.id }}
+                        {{ i.permit_application }}
+                        {% include 'ui/inputbox.html' with field=i.requirement_type %}
+                        {% include 'ui/fileinput.html' with field=i.uploaded_file %}
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="buttons">
+                    <button id="add-req-form" type="button" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Add requirement</button>
+                </div>
+            </div>
+            <hr>
+            <div class="buttons">
+                <a href="{% url 'list_applications' %}" class="w3-btn w3-round-large w3-text-green w3-border w3-border-green">Go back</a>
+                <input type="submit" id="add-req-form" class="w3-btn w3-round-large w3-green" value="Save">
+            </div>
+        </form>
+        <script>
+            $(function() {
+                $('#add-req-form').click(function() {
+                    var formset = $('#image-formset');
+                    var total = $('#id_form-TOTAL_FORMS');
+                    var totalForms = parseInt(total.val());
+                    var emptyFormStr = `
+                        <div class="mini-form">
+                            {% include 'ui/inputbox.html' with field=requirements.empty_form.requirement_type %}
+                            {% include 'ui/fileinput.html' with field=requirements.empty_form.uploaded_file %}
+                        </div>`.replaceAll('__prefix__', totalForms);
+                    var newForm = $(emptyFormStr);
+                    $('#reqs-form').append(newForm);
+                    total.val(totalForms+1);
+                });
+            });
+        </script>
+    </div>
+</main>
+{% endblock %}

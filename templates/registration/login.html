@@ -39,14 +39,8 @@
         {% if form.errors %}
         <div class="w3-panel w3-pale-red w3-padding w3-border-left w3-border-pink">Your username and password didn't match. Please try again.</div>
         {% endif %}
-        <div class="text-box">
-            <span>Username:</span>
-            <input type="text" name="username" required>
-        </div>
-        <div class="text-box">
-            <span>Password:</span>
-            <input type="password" name="password" required>
-        </div>
+        {% include 'ui/inputbox.html' with field=form.username %}
+        {% include 'ui/inputbox.html' with field=form.password %}
         <div class="buttons">
             <a href="{% url 'registration' %}" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Register</a>
             <input type="submit" class="w3-btn w3-blue w3-round-large" name="submit" value="Login">

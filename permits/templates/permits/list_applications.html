@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Permit Applications{% endblock %}
+
+{% block styles %}
+<style>
+    main .cont {
+        margin: 100px auto;
+        padding: 0px 20px;
+        width: 100%;
+        max-width: 1100px;
+    }
+
+    main .cont a {
+        color: blue;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="cont">
+        <h1>Permit Applications</h1>
+        <p>Here are your permit applications.</p>
+        <div class="buttons w3-margin-bottom">
+            <a href="{% url 'create_application' %}" class="w3-btn w3-round-large w3-blue">Apply For Permit</a>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="w3-table w3-table-all">
+                <tr>
+                    <th>No.</th>
+                    <th>For Permit</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                </tr>
+                {% for i in applications %}
+                <tr>
+                    <td class="robotic-txt"><a href="{% url 'update_application' pk=i.id %}">{{ i.no }}</a></td>
+                    <td>{{ i.get_permit_type_display }}</td>
+                    <td>{{ i.get_status_display }}</td>
+                    <td>{{ i.created_at }}</td>
+                    <td>{{ i.updated_at }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% include 'ui/paginator.html' %}
+    </div>
+</main>
+{% endblock %}

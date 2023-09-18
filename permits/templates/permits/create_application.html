@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Create Permit Application{% endblock %}
+
+{% block styles %}
+<style>
+    main .cont {
+        margin: 100px auto;
+        padding: 0px 20px;
+        width: 100%;
+        max-width: 1100px;
+    }
+
+    .extra-form {
+    }
+
+    .mini-form {
+        border: 2px solid lightgray;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="cont">
+        <form action="" method="POST" enctype="multipart/form-data">
+            <h1>Creating a permit application</h1>
+            {% csrf_token %}
+            {{ form.client }}
+            {% include 'ui/inputbox.html' with field=form.permit_type %}
+
+            <hr>
+            <div class="buttons">
+                <a href="{% url 'list_applications' %}" class="w3-btn w3-round-large w3-text-green w3-border w3-border-green">Go back</a>
+                <input type="submit" id="add-req-form" class="w3-btn w3-round-large w3-green" value="Create application">
+            </div>
+        </form>
+        <script>
+            $(function() {
+                $('#add-req-form').click(function() {
+                    var formset = $('#image-formset');
+                    var total = $('#id_form-TOTAL_FORMS');
+                    var totalForms = parseInt(total.val());
+                    var emptyFormStr = `
+                        <div class="mini-form">
+                            {% include 'ui/inputbox.html' with field=requirements.empty_form.requirement_type %}
+                            {% include 'ui/fileinput.html' with field=requirements.empty_form.uploaded_file %}
+                        </div>`.replaceAll('__prefix__', totalForms);
+                    var newForm = $(emptyFormStr);
+                    $('#reqs-form').append(newForm);
+                    total.val(totalForms+1);
+                });
+            });
+        </script>
+    </div>
+</main>
+{% endblock %}

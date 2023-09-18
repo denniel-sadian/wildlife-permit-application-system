@@ -8,7 +8,7 @@
             content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"
             name="viewport"
         />
-        <link rel="stylesheet" href="{% static 'css/global.css' %}?v=37" />
+        <link rel="stylesheet" href="{% static 'css/global.css' %}?v=40" />
         <link rel="stylesheet" href="{% static 'css/w3.css' %}?v=34" />
         <link rel="stylesheet" href="{% static 'js/global.js' %}?v=34" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -47,7 +47,7 @@
                 </div>
                 <div class="links" id="nav-links">
                     {% if user.is_authenticated and user.type == 'Client' %}
-                    <a href="/ltpapplications/list.php?page=1">Permit Applications</a>
+                    <a href="{% url 'list_applications' %}">Permit Applications</a>
                     <a href="/ltpapplications/list.php?page=1">My Permits</a>
                     {% endif %}
 
