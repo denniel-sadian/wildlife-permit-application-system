@@ -105,7 +105,7 @@ class PermitApplication(models.Model):
 class TransportEntry(models.Model):
     sub_species = models.ForeignKey(
         SubSpecies, on_delete=models.CASCADE, related_name='transportings')
-    application = models.ForeignKey(
+    permit_application = models.ForeignKey(
         PermitApplication, on_delete=models.CASCADE, related_name='requested_species_to_transport',
         blank=True, null=True)
     ltp = models.ForeignKey(
