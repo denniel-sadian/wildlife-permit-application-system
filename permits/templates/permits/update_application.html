@@ -58,7 +58,36 @@
                     </div>
                 </div>
             </div>
+
+            {% if object.permit_type == 'LTP' %}
+            {{ transport_entries.management_form }}
+            <div class="extra-form">
+                <h3>Transport Entries</h3>
+                {% for i in transport_entries %}
+                <div id="{{ transport_entries.prefix }}">
+                    <div class="mini-form">
+                        {{ i.id }}
+                        {{ i.permit_application }}
+                        {% include 'ui/inputbox.html' with field=i.sub_species %}
+                        {% include 'ui/inputbox.html' with field=i.quantity %}
+                        {% if i.id.value %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="buttons">
+                    <button type="button" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue" onclick="addForm('{{ transport_entries.prefix }}')">Add transport entry</button>
+                </div>
+                <div id="{{ transport_entries.prefix }}-empty" style="display:none">
+                    <div class="mini-form">
+                        {% include 'ui/inputbox.html' with field=transport_entries.empty_form.sub_species %}
+                        {% include 'ui/inputbox.html' with field=transport_entries.empty_form.quantity %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <hr>
+
             <div class="buttons">
 
                 <a href="{% url 'list_applications' %}" class="w3-btn w3-round-large w3-text-gray w3-border w3-border-gray">Go back</a>
