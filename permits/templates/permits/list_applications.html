@@ -40,7 +40,7 @@
                 <tr>
                     <td class="robotic-txt"><a href="{% url 'update_application' pk=i.id %}">{{ i.no }}</a></td>
                     <td>{{ i.get_permit_type_display }}</td>
-                    <td>{{ i.get_status_display }}</td>
+                    <td><span class="w3-tag w3-round-xxlarge {{ i.status }}">{{ i.get_status_display }}</span></td>
                     <td>{{ i.created_at }}</td>
                     <td>{{ i.updated_at }}</td>
                 </tr>
