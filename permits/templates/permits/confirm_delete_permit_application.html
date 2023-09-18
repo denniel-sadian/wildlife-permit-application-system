@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Delete {{ object.no }}{% endblock %}
+
+{% block styles %}
+<style>
+    main .cont {
+        margin: 100px auto;
+        padding: 0px 20px;
+        width: 100%;
+        max-width: 1100px;
+    }
+
+    .extra-form {
+    }
+
+    .mini-form {
+        border: 2px solid lightgray;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="cont">
+        <form action="" method="POST" enctype="multipart/form-data">
+            <h1><i class="fa fa-warning w3-text-red"></i> Warning</h1>
+            <p>You are about to delete your permit application with number <strong>{{ object.no }}</strong>.</p>
+            <p>Doing this is irreversible. Do you still want to continue?</p>
+            {% csrf_token %}
+            <hr>
+            <div class="buttons">
+                <a href="{% url 'update_application' pk=object.id %}" class="w3-btn w3-round-large w3-text-green w3-border w3-border-green">No, take me back</a>
+                <input type="submit" id="add-req-form" class="w3-btn w3-round-large w3-red" value="Yes, delete">
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}
