@@ -12,8 +12,11 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 
 from users.views import CustomLoginRequiredMixin
-from .models import PermitApplication, Requirement, Status
-from .forms import PermitApplicationForm, PermitApplicationUpdateForm, RequirementFormSet
+from .models import PermitApplication, Requirement, TransportEntry, Status
+from .forms import (
+    PermitApplicationForm, PermitApplicationUpdateForm,
+    RequirementFormSet, TransportEntryFormSet
+)
 
 
 class PermitApplicationCreateView(CustomLoginRequiredMixin, CreateView):
@@ -73,28 +76,40 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
 
         requirements = Requirement.objects.filter(
             permit_application=self.object)
+        transport_entries = TransportEntry.objects.filter(
+            permit_application=self.object)
         if self.request.POST:
             context['requirements'] = RequirementFormSet(
-                self.request.POST, self.request.FILES, instance=self.object)
+                self.request.POST, self.request.FILES, instance=self.object, prefix='reqs')
+            context['transport_entries'] = TransportEntryFormSet(
+                self.request.POST, self.request.FILES, instance=self.object, prefix='transports')
         else:
             context['requirements'] = RequirementFormSet(
-                instance=self.object, queryset=requirements)
+                instance=self.object, queryset=requirements, prefix='reqs')
+            context['transport_entries'] = TransportEntryFormSet(
+                instance=self.object, queryset=transport_entries, prefix='transports')
 
         return context
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         context = self.get_context_data()
+
         requirements = context['requirements']
+        transport_entries = context['transport_entries']
+
         with transaction.atomic():
+
             form.instance.client = self.request.user.subclass
             self.object = form.save()
+
             if requirements.is_valid():
                 requirements.save()
             else:
-                messages.info(
-                    self.request,
-                    'Application has been saved. But please make sure that once a requirement '
-                    'is already submitted, you can no longer submit a double copy of it.')
+                return super().form_valid(form)
+
+            if transport_entries.is_valid():
+                transport_entries.save()
+            else:
                 return super().form_valid(form)
 
         messages.success(
