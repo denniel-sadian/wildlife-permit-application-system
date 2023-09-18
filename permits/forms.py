@@ -3,7 +3,12 @@ from datetime import datetime
 from django import forms
 
 from users.models import Client
-from .models import Requirement, PermitApplication, PermitType
+from .models import (
+    Requirement,
+    PermitApplication,
+    PermitType,
+    TransportEntry
+)
 
 
 class RequirementForm(forms.ModelForm):
@@ -20,6 +25,23 @@ class RequirementForm(forms.ModelForm):
         if existing_requirement is not None and (existing_requirement.id != self.instance.id):
             raise forms.ValidationError('This requirement already exists.')
         return requirement_type
+
+
+class TransportEntryForm(forms.ModelForm):
+
+    class Meta:
+        model = TransportEntry
+        fields = ('sub_species', 'quantity')
+
+    def clean_sub_species(self):
+        sub_species = self.cleaned_data.get('sub_species')
+        application: PermitApplication = self.instance.permit_application
+        existing_transport = application.requested_species_to_transport.filter(
+            sub_species=sub_species).first()
+        if existing_transport is not None and (existing_transport.id != self.instance.id):
+            raise forms.ValidationError(
+                'This species has been chosen for transport already.')
+        return sub_species
 
 
 class PermitApplicationForm(forms.ModelForm):
@@ -61,3 +83,6 @@ class PermitApplicationUpdateForm(forms.ModelForm):
 
 RequirementFormSet = forms.inlineformset_factory(
     PermitApplication, Requirement, form=RequirementForm, extra=1)
+
+TransportEntryFormSet = forms.inlineformset_factory(
+    PermitApplication, TransportEntry, form=TransportEntryForm, extra=1)
