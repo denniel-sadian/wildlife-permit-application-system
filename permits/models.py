@@ -4,7 +4,6 @@ from django.utils import timezone
 from model_utils.managers import InheritanceManager
 
 from animals.models import SubSpecies
-from users.models import Client, Permittee
 
 
 class Status(models.TextChoices):
@@ -18,22 +17,23 @@ class Status(models.TextChoices):
 
 class PermitType(models.TextChoices):
     WFP = 'WFP', 'Wildlife Farm Permit'
-    WCP = 'WCP', 'Wildlife Collector Permit'
+    WCP = 'WCP', "Wildlife Collector's Permit"
     LTP = 'LTP', 'Local Transport Permit'
 
 
 class RequirementType(models.TextChoices):
     REQUIREMENT_1 = 'REQUIREMENT_1', ' Requirement 1'
     REQUIREMENT_2 = 'REQUIREMENT_2', ' Requirement 2'
+    REQUIREMENT_3 = 'REQUIREMENT_3', ' Requirement 3'
 
 
 class Permit(models.Model):
     permit_no = models.CharField(max_length=255)
     status = models.CharField(choices=Status.choices, max_length=50)
     client = models.ForeignKey(
-        Client, on_delete=models.CASCADE, blank=True, null=True, related_name='permits')
+        'users.Client', on_delete=models.CASCADE, blank=True, null=True, related_name='permits')
     permittee = models.ForeignKey(
-        Permittee, on_delete=models.CASCADE, blank=True, null=True, related_name='temporarily_assigned_permits')
+        'users.Permittee', on_delete=models.CASCADE, blank=True, null=True, related_name='temporarily_assigned_permits')
     uploaded_file = models.FileField(
         upload_to='uploads/', null=True, blank=True)
     valid_until = models.DateField(null=True, blank=True)
@@ -97,17 +97,26 @@ class TransportEntry(models.Model):
 
 
 class PermitApplication(models.Model):
+    no = models.CharField(max_length=255)
     client = models.ForeignKey(
-        Client, on_delete=models.CASCADE, related_name='permit_applications')
+        'users.Client', on_delete=models.CASCADE, related_name='permit_applications')
     permit_type = models.CharField(max_length=50, choices=PermitType.choices)
+    transport_date = models.DateField(null=True, blank=True)
     status = models.CharField(choices=Status.choices, max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return str(self.no)
+
 
 class Requirement(models.Model):
     permit_application = models.ForeignKey(
-        PermitApplication, on_delete=models.CASCADE)
+        PermitApplication, on_delete=models.CASCADE, related_name='requirements')
     requirement_type = models.CharField(
-        max_length=50, choices=RequirementType.choices)
-    uploaded_file = models.FileField(upload_to='uploads/')
+        max_length=50, choices=RequirementType.choices, null=False, blank=False)
+    uploaded_file = models.FileField(
+        upload_to='uploads/', null=False, blank=False)
+
+    class Meta:
+        unique_together = ('permit_application', 'requirement_type')
