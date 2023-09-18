@@ -272,6 +272,26 @@ h1, h2, h3, h4, h5, h6 {
     padding: 20px;
 }
 
+.DRAFT {
+    background-color: gray !important;
+}
+
+.RETURNED {
+    background-color: #ff9800 !important;
+}
+
+.SUBMITTED {
+    background-color: #2196F3 !important;
+}
+
+.ACCEPTED, .RELEASED {
+    background-color: #4CAF50 !important;
+}
+
+.EXPIRED {
+    background-color: #f44336 !important;
+}
+
 .robotic-txt {
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
