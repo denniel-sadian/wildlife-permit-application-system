@@ -232,7 +232,6 @@ table * {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: "Roboto Slab", serif !important;
-    text-transform: capitalize;
 }
 
 .messages {
@@ -249,6 +248,10 @@ h1, h2, h3, h4, h5, h6 {
     color: #fff;
 }
 
+.messages h3 {
+    text-transform: capitalize;
+}
+
 .messages .info {
     background: #009688;
 }
@@ -262,6 +265,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .messages .error {
     background: #e91e63;
+}
+
+.pagination {
+    text-align: center;
+    padding: 20px;
+}
+
+.robotic-txt {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
 }
 
 /*  MOBILE */
