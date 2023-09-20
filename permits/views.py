@@ -12,6 +12,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 
 from users.views import CustomLoginRequiredMixin
+from users.models import Client
 from .models import PermitApplication, Requirement, TransportEntry, Status
 from .forms import (
     PermitApplicationForm, PermitApplicationUpdateForm,
@@ -88,6 +89,10 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
                 instance=self.object, queryset=requirements, prefix='reqs')
             context['transport_entries'] = TransportEntryFormSet(
                 instance=self.object, queryset=transport_entries, prefix='transports')
+
+        client: Client = self.request.user.subclass
+        if client.current_wcp:
+            context['allowed_species'] = client.current_wcp.allowed_species.all()
 
         return context
 
