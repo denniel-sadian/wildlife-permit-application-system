@@ -67,8 +67,11 @@ class RequirementItem(models.Model):
     requirement_list = models.ForeignKey(
         RequirementList, on_delete=models.CASCADE, related_name='items')
     requirement = models.CharField(
-        max_length=1000, choices=RequirementType.choices, unique=True)
+        max_length=1000, choices=RequirementType.choices)
     optional = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('requirement_list', 'requirement')
 
 
 class Permit(models.Model):
