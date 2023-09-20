@@ -28,7 +28,7 @@ class WildlifeCollectorPermitAdmin(admin.ModelAdmin):
     inlines = (PermittedToCollectAnimalInline,)
 
 
-class RequirementInline(admin.TabularInline):
+class RequirementInline(admin.StackedInline):
     model = Requirement
     extra = 1
 
@@ -36,6 +36,7 @@ class RequirementInline(admin.TabularInline):
 class TransportEntryInline(admin.TabularInline):
     model = TransportEntry
     extra = 1
+    verbose_name_plural = 'Transport Entries'
 
 
 @admin.register(PermitApplication)
@@ -48,6 +49,9 @@ class PermitApplicationAdmin(admin.ModelAdmin):
         ('Local Transport Permit', {
             'fields': ('transport_date',)
         }),
+        ("Wildlife Collector's Permit", {
+            'fields': ('names_and_addresses_of_authorized_collectors_or_trappers',)
+        })
     )
     inlines = (RequirementInline, TransportEntryInline)
 

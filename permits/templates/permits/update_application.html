@@ -34,6 +34,10 @@
             {% include 'ui/inputbox.html' with field=form.transport_date %}
             {% endif %}
 
+            {% if object.permit_type == 'WCP' %}
+            {% include 'ui/inputbox.html' with field=form.names_and_addresses_of_authorized_collectors_or_trappers %}
+            {% endif %}
+
             {{ requirements.management_form }}
             <div class="extra-form">
                 <h3>Requirements</h3>
