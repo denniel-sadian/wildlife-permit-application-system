@@ -63,19 +63,19 @@
             {{ transport_entries.management_form }}
             <div class="extra-form">
                 <h3>Transport Entries</h3>
-                {% for i in transport_entries %}
                 <div id="{{ transport_entries.prefix }}">
-                    <div class="mini-form">
-                        {{ i.id }}
-                        {{ i.permit_application }}
-                        {% include 'ui/inputbox.html' with field=i.sub_species %}
-                        {% include 'ui/inputbox.html' with field=i.quantity %}
-                        {% if i.id.value %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
-                    </div>
+                {% for i in transport_entries %}
+                <div class="mini-form">
+                    {{ i.id }}
+                    {{ i.permit_application }}
+                    {% include 'ui/inputbox.html' with field=i.sub_species %}
+                    {% include 'ui/inputbox.html' with field=i.quantity %}
+                    {% if i.id.value %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
                 </div>
                 {% endfor %}
+                </div>
                 <div class="buttons">
-                    <button type="button" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue" onclick="addForm('{{ transport_entries.prefix }}')">Add transport entry</button>
+                    <button type="button" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue" onclick="addForm('{{ transport_entries.prefix }}'); limitAllowedAnimals();">Add transport entry</button>
                 </div>
                 <div id="{{ transport_entries.prefix }}-empty" style="display:none">
                     <div class="mini-form">
@@ -101,6 +101,15 @@
             </div>
         </form>
         <script>
+            const allowedSpecies = JSON.parse(`[
+                {% for i in allowed_species %}
+                {
+                    "id": {{ i.sub_species.id }},
+                    "name": "{{ i }}",
+                    "quantity": {{ i.quantity }}
+                },{% endfor %}]`
+                .replace(',]', ']'));
+
             function addForm(prefix) {
                 var total = $(`#id_${prefix}-TOTAL_FORMS`);
                 var totalForms = parseInt(total.val());
@@ -109,6 +118,26 @@
                 $(`#${prefix}`).append(newForm);
                 total.val(totalForms+1);
             }
+
+            function limitAllowedAnimals() {
+                let selects = $('#{{ transport_entries.prefix }}').find('select');
+                selects.each(function() {
+                    const val = $(this).val();
+                    let options = '<option value="">---------</option>\n';
+                    allowedSpecies.forEach(function(i) {
+                        let selected = val == i.id ? 'selected=""' : '';
+                        options += `<option value="${i.id}" ${selected}>${i.name}</option>\n`;
+                    });
+                    $(this).html(options);
+                });
+                selects.on('change', function() {
+                    const quantity = allowedSpecies.find(obj => obj.id == $(this).val()).quantity;
+                    const quantityInput = $('#'+$(this).attr('id').replace('sub_species', 'quantity'));
+                    quantityInput.attr('max', quantity);
+                });
+            }
+
+            limitAllowedAnimals();
         </script>
     </div>
 </main>
