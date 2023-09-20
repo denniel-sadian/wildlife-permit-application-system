@@ -75,6 +75,9 @@ class PermittedToCollectAnimal(models.Model):
     class Meta:
         unique_together = ('sub_species', 'wcp')
 
+    def __str__(self):
+        return str(self.sub_species)
+
 
 class LocalTransportPermit(Permit):
     wfp = models.ForeignKey(
@@ -112,6 +115,9 @@ class TransportEntry(models.Model):
         LocalTransportPermit, on_delete=models.CASCADE, related_name='species_to_transport',
         blank=True, null=True)
     quantity = models.IntegerField()
+
+    class Meta:
+        unique_together = ('sub_species', 'permit_application')
 
 
 class Requirement(models.Model):
