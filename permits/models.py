@@ -19,12 +19,56 @@ class PermitType(models.TextChoices):
     WFP = 'WFP', 'Wildlife Farm Permit'
     WCP = 'WCP', "Wildlife Collector's Permit"
     LTP = 'LTP', 'Local Transport Permit'
+    CWR = 'CWR', 'Certificate of Wildlife Registration'
+    GP = 'GP', 'Gratuitous Permit'
 
 
 class RequirementType(models.TextChoices):
-    REQUIREMENT_1 = 'REQUIREMENT_1', ' Requirement 1'
-    REQUIREMENT_2 = 'REQUIREMENT_2', ' Requirement 2'
-    REQUIREMENT_3 = 'REQUIREMENT_3', ' Requirement 3'
+    PRIOR_CLEARANCE_FROM_AFFECTED_COMMUNITIES = (
+        'PRIOR_CLEARANCE_FROM_AFFECTED_COMMUNITIES',
+        'Prior clearance from the affected communities, i.e. concerned LGUs, recognized head people in accordance with R.A. 8371, or PAMB')
+    # WFP
+    CERT_OF_REGISTRATION = (
+        'CERT_OF_REGISTRATION',
+        'Copy of Certificate of Registration from appropriate Government agencies')
+    SCIENTIFIC_EXPERTISE_PROOF = (
+        'SCIENTIFIC_EXPERTISE_PROOF',
+        'Proof of scientific expertise (list of qualifications of manpower)')
+    FINANCIAL_PLAN = (
+        'FINANCIAL_PLAN',
+        'Financial plan showing financial capability to go into breeding')
+    PROPOSED_FACILITY_DESIGN = (
+        'PROPOSED_FACILITY_DESIGN', 'Proposed facility design')
+    LETTER_OF_COMMITMENT = (
+        'LETTER_OF_COMMITMENT',
+        'In case of indigenous threatened species, letter of commitment to simultaneously undertake conservation breeding and propose measures on rehabilitation and/or protection of habitat, where appropriate, as may be determined by the RWMC')
+    # WCP
+    CITIZENSHIP = (
+        'CITIZENSHIP',
+        'Citizenship verification papers, if citizenship is by Naturalization')
+    # LTP
+    DOCUMENTS_SUPPORTING_LEGAL_POSSESSION_OF_WILDLIFE = (
+        'DOCUMENTS_SUPPORTING_LEGAL_POSSESSION_OF_WILDLIFE',
+        'Documents supporting the legal possession/ acquisition of wildlife')
+    PHYTOSANITARY_OR_VETERINARY_CERT = (
+        'PHYTOSANITARY_OR_VETERINARY_CERT',
+        'Phytosanitary Certificate (for plants) or Veterinary Quarantine Certificate (for animals) from the concerned Department of Agriculture (DA) Office.')
+
+
+class RequirementList(models.Model):
+    permit_type = models.CharField(
+        max_length=50, choices=PermitType.choices, unique=True)
+
+    def __str__(self):
+        return 'Requirements for ' + self.get_permit_type_display()
+
+
+class RequirementItem(models.Model):
+    requirement_list = models.ForeignKey(
+        RequirementList, on_delete=models.CASCADE, related_name='items')
+    requirement = models.CharField(
+        max_length=1000, choices=RequirementType.choices, unique=True)
+    optional = models.BooleanField(default=False)
 
 
 class Permit(models.Model):

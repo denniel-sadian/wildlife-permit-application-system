@@ -6,7 +6,9 @@ from .models import (
     PermittedToCollectAnimal,
     PermitApplication,
     Requirement,
-    TransportEntry
+    TransportEntry,
+    RequirementList,
+    RequirementItem
 )
 
 
@@ -48,3 +50,13 @@ class PermitApplicationAdmin(admin.ModelAdmin):
         }),
     )
     inlines = (RequirementInline, TransportEntryInline)
+
+
+class RequirementItemInline(admin.StackedInline):
+    model = RequirementItem
+    extra = 1
+
+
+@admin.register(RequirementList)
+class RequirementListAdmin(admin.ModelAdmin):
+    inlines = (RequirementItemInline,)
