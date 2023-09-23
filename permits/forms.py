@@ -7,7 +7,8 @@ from .models import (
     Requirement,
     PermitApplication,
     PermitType,
-    TransportEntry
+    TransportEntry,
+    CollectionEntry
 )
 
 
@@ -82,8 +83,30 @@ class PermitApplicationUpdateForm(forms.ModelForm):
         return transport_date
 
 
+class CollectionEntryForm(forms.ModelForm):
+
+    class Meta:
+        model = CollectionEntry
+        fields = ('sub_species', 'quantity')
+
+    def clean_sub_species(self):
+        sub_species = self.cleaned_data.get('sub_species')
+        application: PermitApplication = self.instance.permit_application
+        existing_entry = application.requested_species.filter(
+            sub_species=sub_species).first()
+        if existing_entry is not None and (existing_entry.id != self.instance.id):
+            print('Not oklang', existing_entry)
+            raise forms.ValidationError(
+                'This species has been chosen.')
+        print('Oklang')
+        return sub_species
+
+
 RequirementFormSet = forms.inlineformset_factory(
     PermitApplication, Requirement, form=RequirementForm, extra=1)
 
 TransportEntryFormSet = forms.inlineformset_factory(
     PermitApplication, TransportEntry, form=TransportEntryForm, extra=1)
+
+CollectionEntryFormSet = forms.inlineformset_factory(
+    PermitApplication, CollectionEntry, form=CollectionEntryForm, extra=1)
