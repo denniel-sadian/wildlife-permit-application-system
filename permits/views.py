@@ -15,8 +15,6 @@ from users.views import CustomLoginRequiredMixin
 from users.models import Client
 from .models import (
     PermitApplication,
-    RequirementList,
-    Requirement,
     Status
 )
 from .forms import (
