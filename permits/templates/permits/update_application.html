@@ -90,6 +90,33 @@
             </div>
             {% endif %}
 
+            {% if object.permit_type == 'WCP' %}
+            {{ requested_species.management_form }}
+            <div class="extra-form">
+                <h3>Collection Entries</h3>
+                {% for i in requested_species %}
+                <div id="{{ requested_species.prefix }}">
+                    <div class="mini-form">
+                        {{ i.id }}
+                        {{ i.permit_application }}
+                        {% include 'ui/inputbox.html' with field=i.sub_species %}
+                        {% include 'ui/inputbox.html' with field=i.quantity %}
+                        {% if i.id.value %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="buttons">
+                    <button type="button" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue" onclick="addForm('{{ requested_species.prefix }}')">Add species</button>
+                </div>
+                <div id="{{ requested_species.prefix }}-empty" style="display:none">
+                    <div class="mini-form">
+                        {% include 'ui/inputbox.html' with field=requested_species.empty_form.sub_species %}
+                        {% include 'ui/inputbox.html' with field=requested_species.empty_form.quantity %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <hr>
 
             <div class="buttons">
