@@ -173,6 +173,24 @@ class TransportEntry(models.Model):
         unique_together = ('sub_species', 'permit_application')
 
 
+class CollectionEntry(models.Model):
+    sub_species = models.ForeignKey(
+        SubSpecies, on_delete=models.CASCADE, related_name='collections')
+    permit_application = models.ForeignKey(
+        PermitApplication, on_delete=models.CASCADE, related_name='requested_species',
+        blank=True, null=True)
+    wcp = models.ForeignKey(
+        WildlifeCollectorPermit, on_delete=models.CASCADE, related_name='allowed_animals',
+        blank=True, null=True)
+    quantity = models.IntegerField()
+
+    class Meta:
+        unique_together = ('sub_species', 'permit_application')
+
+    def __str__(self):
+        return str(self.sub_species)
+
+
 class Requirement(models.Model):
     permit_application = models.ForeignKey(
         PermitApplication, on_delete=models.CASCADE, related_name='requirements')
