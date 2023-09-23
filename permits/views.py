@@ -13,7 +13,12 @@ from django.contrib import messages
 
 from users.views import CustomLoginRequiredMixin
 from users.models import Client
-from .models import PermitApplication, CollectionEntry, Status
+from .models import (
+    PermitApplication,
+    RequirementList,
+    Requirement,
+    Status
+)
 from .forms import (
     PermitApplicationForm, PermitApplicationUpdateForm,
     RequirementFormSet, TransportEntryFormSet, CollectionEntryFormSet
@@ -99,6 +104,8 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
         client: Client = self.request.user.subclass
         if client.current_wcp:
             context['allowed_species'] = client.current_wcp.allowed_species.all()
+
+        context['needed_requirements'] = self.object.needed_requirements
 
         return context
 
