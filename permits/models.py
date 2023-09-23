@@ -49,7 +49,7 @@ class RequirementType(models.TextChoices):
     # LTP
     DOCUMENTS_SUPPORTING_LEGAL_POSSESSION_OF_WILDLIFE = (
         'DOCUMENTS_SUPPORTING_LEGAL_POSSESSION_OF_WILDLIFE',
-        'Documents supporting the legal possession/ acquisition of wildlife')
+        'Documents supporting the legal possession/acquisition of wildlife')
     PHYTOSANITARY_OR_VETERINARY_CERT = (
         'PHYTOSANITARY_OR_VETERINARY_CERT',
         'Phytosanitary Certificate (for plants) or Veterinary Quarantine Certificate (for animals) from the concerned Department of Agriculture (DA) Office.')
@@ -160,6 +160,26 @@ class PermitApplication(models.Model):
     # WCP
     names_and_addresses_of_authorized_collectors_or_trappers = models.TextField(
         null=True, blank=True)
+
+    @property
+    def needed_requirements(self):
+        needed_requirements = []
+        for needed_requirement in RequirementList.objects.get(permit_type=self.permit_type).items.all():
+            uploaded_requirement = Requirement.objects.filter(requirement_type=needed_requirement.requirement,
+                                                              permit_application=self).first()
+            needed_requirements.append({
+                'requirement': needed_requirement,
+                'submitted': uploaded_requirement is not None,
+                'optional': needed_requirement.optional,
+            })
+        return needed_requirements
+
+    @property
+    def needed_requirements_are_submitted(self):
+        for requirement in self.needed_requirements:
+            if not requirement['optional'] and not requirement['submitted']:
+                return False
+        return True
 
     def __str__(self):
         return str(self.no)
