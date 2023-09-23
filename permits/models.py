@@ -54,6 +54,13 @@ class RequirementType(models.TextChoices):
         'PHYTOSANITARY_OR_VETERINARY_CERT',
         'Phytosanitary Certificate (for plants) or Veterinary Quarantine Certificate (for animals) from the concerned Department of Agriculture (DA) Office.')
 
+    # CWP
+    ACQUISITION_PROOF_OR_DEEDS_OF_DONATION = 'ACQUISITION_PROOF_OR_DEEDS_OF_DONATION', 'Proof of Acquisition/Deeds of Donation'
+
+    # GW
+    ENDORSEMENT_LETTER = 'ENDORSEMENT_LETTER', 'Endorsement letter from dead/recognized expert/conservation organization'
+    COPY_OF_RESEARCH_THESIS_DISSERTATION = 'COPY_OF_RESEARCH_THESIS_DISSERTATION', 'Copy of the research/thesis/dissertation proposals, or copy of the affidavit of undertaking/approved memorandum of agreement (MOA)'
+
 
 class RequirementList(models.Model):
     permit_type = models.CharField(
