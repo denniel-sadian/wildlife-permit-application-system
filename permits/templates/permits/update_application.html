@@ -98,7 +98,17 @@
 
             {{ requirements.management_form }}
             <div class="extra-form">
-                <h3>Requirements</h3>
+                {% if needed_requirements %}
+                <div>
+                    <h3>Needed Requirements:</h3>
+                    <ul>
+                        {% for i in needed_requirements %}
+                        <li><i class="fa {% if i.submitted %}fa-check w3-text-green{% else %}fa-times w3-text-red{% endif %}"></i> {% if i.optional %}(Optional) {% endif %}{{ i.requirement.get_requirement_display }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                <h4>Uploaded Requirements:</h4>
                 {% for i in requirements %}
                 <div id="{{ requirements.prefix }}">
                     <div class="mini-form">
