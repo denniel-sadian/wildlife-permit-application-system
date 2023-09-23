@@ -13,10 +13,10 @@ from django.contrib import messages
 
 from users.views import CustomLoginRequiredMixin
 from users.models import Client
-from .models import PermitApplication, Requirement, TransportEntry, Status
+from .models import PermitApplication, CollectionEntry, Status
 from .forms import (
     PermitApplicationForm, PermitApplicationUpdateForm,
-    RequirementFormSet, TransportEntryFormSet
+    RequirementFormSet, TransportEntryFormSet, CollectionEntryFormSet
 )
 
 
@@ -75,20 +75,26 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
-        requirements = Requirement.objects.filter(
-            permit_application=self.object)
-        transport_entries = TransportEntry.objects.filter(
-            permit_application=self.object)
+        requirements = self.object.requirements.all()
+        transport_entries = self.object.requested_species_to_transport.all().order_by(
+            'sub_species__main_species')
+        requested_species = self.object.requested_species.all().order_by(
+            'sub_species__main_species', 'sub_species__common_name')
+
         if self.request.POST:
             context['requirements'] = RequirementFormSet(
                 self.request.POST, self.request.FILES, instance=self.object, prefix='reqs')
             context['transport_entries'] = TransportEntryFormSet(
                 self.request.POST, self.request.FILES, instance=self.object, prefix='transports')
+            context['requested_species'] = CollectionEntryFormSet(
+                self.request.POST, self.request.FILES, instance=self.object, prefix='collection_entries')
         else:
             context['requirements'] = RequirementFormSet(
                 instance=self.object, queryset=requirements, prefix='reqs')
             context['transport_entries'] = TransportEntryFormSet(
                 instance=self.object, queryset=transport_entries, prefix='transports')
+            context['requested_species'] = CollectionEntryFormSet(
+                instance=self.object, queryset=requested_species, prefix='collection_entries')
 
         client: Client = self.request.user.subclass
         if client.current_wcp:
@@ -101,6 +107,7 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
 
         requirements = context['requirements']
         transport_entries = context['transport_entries']
+        requested_species = context['requested_species']
 
         with transaction.atomic():
 
@@ -109,13 +116,12 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
 
             if requirements.is_valid():
                 requirements.save()
-            else:
-                return super().form_valid(form)
 
             if transport_entries.is_valid():
                 transport_entries.save()
-            else:
-                return super().form_valid(form)
+
+            if requested_species.is_valid():
+                requested_species.save()
 
         messages.success(
             self.request,
