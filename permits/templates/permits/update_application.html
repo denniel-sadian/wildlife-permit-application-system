@@ -38,31 +38,6 @@
             {% include 'ui/inputbox.html' with field=form.names_and_addresses_of_authorized_collectors_or_trappers %}
             {% endif %}
 
-            {{ requirements.management_form }}
-            <div class="extra-form">
-                <h3>Requirements</h3>
-                {% for i in requirements %}
-                <div id="{{ requirements.prefix }}">
-                    <div class="mini-form">
-                        {{ i.id }}
-                        {{ i.permit_application }}
-                        {% include 'ui/inputbox.html' with field=i.requirement_type %}
-                        {% include 'ui/fileinput.html' with field=i.uploaded_file %}
-                        {% if i.id.value %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-                <div class="buttons">
-                    <button type="button" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue" onclick="addForm('{{ requirements.prefix }}')">Add requirement</button>
-                </div>
-                <div id="{{ requirements.prefix }}-empty" style="display:none">
-                    <div class="mini-form">
-                        {% include 'ui/inputbox.html' with field=requirements.empty_form.requirement_type %}
-                        {% include 'ui/fileinput.html' with field=requirements.empty_form.uploaded_file %}
-                    </div>
-                </div>
-            </div>
-
             {% if object.permit_type == 'LTP' %}
             {{ transport_entries.management_form }}
             <div class="extra-form">
@@ -116,6 +91,31 @@
                 </div>
             </div>
             {% endif %}
+
+            {{ requirements.management_form }}
+            <div class="extra-form">
+                <h3>Requirements</h3>
+                {% for i in requirements %}
+                <div id="{{ requirements.prefix }}">
+                    <div class="mini-form">
+                        {{ i.id }}
+                        {{ i.permit_application }}
+                        {% include 'ui/inputbox.html' with field=i.requirement_type %}
+                        {% include 'ui/fileinput.html' with field=i.uploaded_file %}
+                        {% if i.id.value %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="buttons">
+                    <button type="button" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue" onclick="addForm('{{ requirements.prefix }}')">Add requirement</button>
+                </div>
+                <div id="{{ requirements.prefix }}-empty" style="display:none">
+                    <div class="mini-form">
+                        {% include 'ui/inputbox.html' with field=requirements.empty_form.requirement_type %}
+                        {% include 'ui/fileinput.html' with field=requirements.empty_form.uploaded_file %}
+                    </div>
+                </div>
+            </div>
 
             <hr>
 
