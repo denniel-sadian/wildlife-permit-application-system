@@ -99,6 +99,16 @@ class PermitApplicationAdmin(admin.ModelAdmin):
 
         return inlines
 
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for obj in formset.deleted_objects:
+            obj.delete()
+        for instance in instances:
+            if (isinstance(instance, Remarks)):
+                instance.user = request.user
+                instance.save()
+        formset.save_m2m()
+
 
 class RequirementItemInline(admin.StackedInline):
     model = RequirementItem
