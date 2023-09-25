@@ -250,6 +250,6 @@ class Requirement(models.Model):
 
 class Remarks(models.Model):
     permit_application = models.ForeignKey(
-        PermitApplication, on_delete=models.CASCADE)
+        PermitApplication, on_delete=models.CASCADE, related_name="remarks")
     content = models.TextField()
     created_at = models.DateTimeField(auto_now=True, auto_now_add=False)
