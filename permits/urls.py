@@ -11,6 +11,8 @@ urlpatterns = [
          name='update_application'),
     path('applications/<int:pk>/delete/', views.PermitApplicationDeleteView.as_view(),
          name='delete_application'),
+    path('applications/<int:pk>/submit/', views.SubmitRedirectView.as_view(),
+         name='submit_application'),
     path('applications/create/', views.PermitApplicationCreateView.as_view(),
          name='create_application')
 ]
