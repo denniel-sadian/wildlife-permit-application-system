@@ -7,7 +7,8 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
-from django.views.generic import DeleteView
+from django.views.generic import DeleteView, RedirectView
+from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 
@@ -15,6 +16,7 @@ from users.views import CustomLoginRequiredMixin
 from users.models import Client
 from .models import (
     PermitApplication,
+    PermitType,
     Status
 )
 from .forms import (
@@ -138,3 +140,41 @@ class PermitApplicationDeleteView(DeleteView):
     model = PermitApplication
     template_name = 'permits/confirm_delete_permit_application.html'
     success_url = reverse_lazy('list_applications')
+
+
+class SubmitRedirectView(SingleObjectMixin, RedirectView):
+    model = PermitApplication
+
+    def get_redirect_url(self, *args: Any, **kwargs: Any):
+        permit_application: PermitApplication = self.get_object()
+        same_url = reverse_lazy('update_application', kwargs={
+                                'pk': permit_application.id})
+
+        if not permit_application.needed_requirements_are_submitted:
+            messages.warning(
+                self.request,
+                'You have not yet completed the requirements for this permit application.')
+            return same_url
+
+        if permit_application.permit_type == PermitType.LTP:
+            if permit_application.requested_species_to_transport.count() == 0:
+                messages.warning(
+                    self.request,
+                    'You cannot submit an LTP application without any transport entries.')
+                return same_url
+
+        if permit_application.permit_type == PermitType.WCP:
+            if permit_application.requested_species.count() == 0:
+                messages.warning(
+                    self.request,
+                    'You cannot submit a WCP application without any collection entries.')
+                return same_url
+
+        permit_application.status = Status.SUBMITTED
+        permit_application.save()
+        messages.success(
+            self.request,
+            f'Your permit application {permit_application.no} has been submitted. '
+            'We have notified the admins already.')
+
+        return reverse_lazy('list_applications')
