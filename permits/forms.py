@@ -6,6 +6,7 @@ from users.models import Client
 from .models import (
     Requirement,
     PermitApplication,
+    Status,
     PermitType,
     TransportEntry,
     CollectionEntry
@@ -56,12 +57,20 @@ class PermitApplicationForm(forms.ModelForm):
 
     def clean_permit_type(self):
         permit_type = self.cleaned_data.get('permit_type')
+        client: Client = self.initial.get('client')
+
         if permit_type == PermitType.LTP:
-            client: Client = self.initial.get('client')
             has_needed_permits = client.current_wcp and client.current_wfp
             if not has_needed_permits:
                 return forms.ValidationError(
                     "You currently don't have the needed permits WFP or WCP.")
+
+        in_progress_application = PermitApplication.objects.filter(
+            client=client, permit_type=permit_type).exclude(status=Status.RELEASED).first()
+        if in_progress_application:
+            return forms.ValidationError(
+                "You currently have an in progress application for this permit type.")
+
         return permit_type
 
 
