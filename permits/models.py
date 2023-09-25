@@ -246,3 +246,10 @@ class Requirement(models.Model):
 
     class Meta:
         unique_together = ('permit_application', 'requirement_type')
+
+
+class Remarks(models.Model):
+    permit_application = models.ForeignKey(
+        PermitApplication, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now=True, auto_now_add=False)
