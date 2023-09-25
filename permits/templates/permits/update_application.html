@@ -131,6 +131,21 @@
                 </div>
             </div>
 
+            {% if object.remarks.count != 0 %}
+            <div>
+                <h4>Admin Remarks:</h4>
+                {% for i in object.remarks.all %}
+                <div class="w3-panel w3-pale-blue w3-round-large w3-border w3-border-blue">
+                    <p>
+                        <strong class="w3-small w3-text-gray">{{ i.created_at }}</strong>
+                        <br>
+                        <span class="w3-large"><span class="w3-text-gray">{{ i.user }}:</span> {{ i.content }}</span>
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             <hr>
 
             <div class="buttons">
