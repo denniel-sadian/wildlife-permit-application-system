@@ -12,7 +12,8 @@ from .models import (
     TransportEntry,
     RequirementList,
     RequirementItem,
-    CollectionEntry
+    CollectionEntry,
+    Remarks
 )
 
 
@@ -52,6 +53,13 @@ class CollectionEntryInline(admin.TabularInline):
     verbose_name_plural = 'Collection Entries'
 
 
+class RemarksInline(admin.TabularInline):
+    fields = ('content',)
+    model = Remarks
+    extra = 0
+    verbose_name_plural = 'Remarks'
+
+
 @admin.register(PermitApplication)
 class PermitApplicationAdmin(admin.ModelAdmin):
     list_display = ('no', 'permit_type', 'client', 'status', 'created_at')
@@ -76,7 +84,10 @@ class PermitApplicationAdmin(admin.ModelAdmin):
         return fieldsets
 
     def get_inline_instances(self, request: HttpRequest, obj: Any | None = ...):
-        inlines = [RequirementInline(self.model, self.admin_site)]
+        inlines = [
+            RequirementInline(self.model, self.admin_site),
+            RemarksInline(self.model, self.admin_site)
+        ]
 
         if obj and obj.permit_type == PermitType.LTP:
             inlines.insert(0, TransportEntryInline(
