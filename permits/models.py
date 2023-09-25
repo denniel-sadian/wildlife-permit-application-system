@@ -251,5 +251,10 @@ class Requirement(models.Model):
 class Remarks(models.Model):
     permit_application = models.ForeignKey(
         PermitApplication, on_delete=models.CASCADE, related_name="remarks")
+    user = models.ForeignKey(
+        'users.User', on_delete=models.CASCADE, blank=True, null=True)
     content = models.TextField()
-    created_at = models.DateTimeField(auto_now=True, auto_now_add=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
