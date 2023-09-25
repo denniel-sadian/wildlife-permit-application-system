@@ -177,4 +177,19 @@ class SubmitRedirectView(SingleObjectMixin, RedirectView):
             f'Your permit application {permit_application.no} has been submitted. '
             'We have notified the admins already.')
 
-        return reverse_lazy('list_applications')
+        return same_url
+
+
+class UnsubmitRedirectView(SingleObjectMixin, RedirectView):
+    model = PermitApplication
+
+    def get_redirect_url(self, *args: Any, **kwargs: Any):
+        permit_application: PermitApplication = self.get_object()
+        same_url = reverse_lazy('update_application', kwargs={
+                                'pk': permit_application.id})
+
+        if permit_application.status == Status.SUBMITTED:
+            permit_application.status = Status.DRAFT
+            permit_application.save()
+
+        return same_url
