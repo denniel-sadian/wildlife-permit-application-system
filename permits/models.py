@@ -181,6 +181,24 @@ class PermitApplication(models.Model):
                 return False
         return True
 
+    @property
+    def can_be_submitted(self):
+        # Make sure the requirements are submitted
+        if not self.needed_requirements_are_submitted:
+            return False
+
+        # If LTP, make sure the transport entries are set
+        if self.permit_type == PermitType.LTP:
+            if self.requested_species_to_transport.count() == 0:
+                return False
+
+        # If WCP, make sure the collection entries are set
+        if self.permit_type == PermitType.WCP:
+            if self.requested_species.count() == 0:
+                return False
+
+        return True
+
     def __str__(self):
         return str(self.no)
 
