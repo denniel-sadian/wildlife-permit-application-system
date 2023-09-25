@@ -140,7 +140,9 @@
                 {% if object.status in 'DRAFT RETURNED' %}
                 <a href="{% url 'delete_application' pk=object.id %}" class="w3-btn w3-round-large w3-text-red w3-border w3-border-red">Delete</a>
 
-                <input type="submit" id="add-req-form" class="w3-btn w3-round-large w3-green" value="Save">
+                <input type="submit" id="add-req-form" class="w3-btn w3-round-large w3-blue" value="Save">
+
+                {% if object.needed_requirements_are_submitted %}<a href="{% url 'submit_application' pk=object.id %}" class="w3-btn w3-round-large w3-green">Submit</a>{% endif %}
                 {% endif %}
 
             </div>
