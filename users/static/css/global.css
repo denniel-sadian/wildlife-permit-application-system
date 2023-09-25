@@ -148,6 +148,10 @@ footer .cont h2 {
     padding: 0px 8px;
 }
 
+textarea {
+    height: 150px !important;
+}
+
 .errorlist {
     margin: 4px 0px 0px 0px;
     color: #f44336;
