@@ -50,10 +50,13 @@ INSTALLED_APPS = [
     'guardian',
     'phonenumber_field',
     'django_yubin',
+    'dal',
+    'dal_select2',
 
     'users',
     'animals',
-    'permits'
+    'permits',
+    'payments'
 ]
 
 MIDDLEWARE = [
