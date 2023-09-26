@@ -28,6 +28,18 @@
             <a href="{% url 'create_application' %}" class="w3-btn w3-round-large w3-blue">Apply For Permit</a>
         </div>
         <div style="overflow-x:auto;">
+            <div class="filter-chips">
+                <a href="?status=ALL" class="w3-btn w3-small {% if 'ALL' == status %}w3-blue{% else %}w3-gray{% endif %} w3-text-white">All</a>
+                {% for i in statuses %}
+                <a href="?status={{ i.0 }}" class="w3-btn w3-small {% if i.0 == status %}w3-blue{% else %}w3-gray{% endif %} w3-text-white">{{ i.1 }}</a>
+                {% endfor %}
+            </div>
+            <div class="filter-chips">
+                <a href="?permit_type=ALL" class="w3-btn w3-small {% if 'ALL' == permit_type %}w3-blue{% else %}w3-gray{% endif %} w3-text-white">All</a>
+                {% for i in permit_types %}
+                <a href="?permit_type={{ i.0 }}" class="w3-btn w3-small {% if i.0 == permit_type %}w3-blue{% else %}w3-gray{% endif %} w3-text-white">{{ i.1 }}</a>
+                {% endfor %}
+            </div>
             <table class="w3-table w3-table-all">
                 <tr>
                     <th>No.</th>
