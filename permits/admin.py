@@ -43,6 +43,7 @@ class TransportEntryInline(admin.TabularInline):
     fields = ('sub_species', 'quantity')
     model = TransportEntry
     extra = 1
+    autocomplete_fields = ('sub_species',)
     verbose_name_plural = 'Transport Entries'
 
 
@@ -50,6 +51,7 @@ class CollectionEntryInline(admin.TabularInline):
     fields = ('sub_species', 'quantity')
     model = CollectionEntry
     extra = 1
+    autocomplete_fields = ('sub_species',)
     verbose_name_plural = 'Collection Entries'
 
 
@@ -66,6 +68,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
     list_filter = ('permit_type', 'status',)
     search_fields = ('no', 'permit_type', 'client__first_name',
                      'client__last_name', 'status')
+    autocomplete_fields = ('client',)
 
     def get_fieldsets(self, request: HttpRequest, obj: Any | None = ...):
         fields = ['no', 'permit_type', 'status', 'client']

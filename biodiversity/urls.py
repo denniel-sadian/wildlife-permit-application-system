@@ -25,6 +25,7 @@ admin.site.index_title = TITLE
 
 urlpatterns = [
     path('', include('users.urls')),
+    path('species/', include('animals.urls')),
     path('permits/', include('permits.urls')),
     path('admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) if settings.DEBUG else []
