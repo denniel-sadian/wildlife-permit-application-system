@@ -16,5 +16,9 @@ urlpatterns = [
     path('applications/<int:pk>/unsubmit/', views.UnsubmitRedirectView.as_view(),
          name='unsubmit_application'),
     path('applications/create/', views.PermitApplicationCreateView.as_view(),
-         name='create_application')
+         name='create_application'),
+
+    # Autocomplete
+    path('applications-autocomplete/', views.PermitApplicationAutocompleteView.as_view(),
+         name='applications-autocomplete'),
 ]

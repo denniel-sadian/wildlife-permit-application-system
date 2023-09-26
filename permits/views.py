@@ -1,6 +1,8 @@
 from typing import Any
 from datetime import datetime
 
+from dal import autocomplete
+
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.db import transaction
@@ -204,3 +206,18 @@ class UnsubmitRedirectView(SingleObjectMixin, RedirectView):
             permit_application.save()
 
         return same_url
+
+
+class PermitApplicationAutocompleteView(autocomplete.Select2QuerySetView):
+
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated:
+            return PermitApplication.objects.none()
+
+        qs = PermitApplication.objects.all()
+
+        if self.q:
+            qs = qs.filter(no__istartswith=self.q)
+
+        return qs
