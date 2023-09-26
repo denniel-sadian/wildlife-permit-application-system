@@ -301,6 +301,16 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
 }
 
+.filter-chips {
+    border-top: 1px solid rgb(207, 207, 207);
+    padding-top: 4px;
+}
+
+.filter-chips > a {
+    border-radius: 32px;
+    margin-bottom: 4px;
+}
+
 /*  MOBILE */
 
 @media only screen and (max-width: 1000px) {
