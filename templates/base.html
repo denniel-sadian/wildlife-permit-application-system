@@ -8,7 +8,7 @@
             content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"
             name="viewport"
         />
-        <link rel="stylesheet" href="{% static 'css/global.css' %}?v=44" />
+        <link rel="stylesheet" href="{% static 'css/global.css' %}?v=45" />
         <link rel="stylesheet" href="{% static 'css/w3.css' %}?v=34" />
         <link rel="stylesheet" href="{% static 'js/global.js' %}?v=34" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -92,7 +92,21 @@
                 $("#nav-btn").click(function () {
                     $("#nav-links").toggle();
                 });
+
+                [...document.querySelectorAll("a")].forEach((e) => {
+                    const url = new URL(e.href);
+                    for (let [k, v] of new URLSearchParams(
+                        window.location.search
+                    ).entries()) {
+                        if (url.searchParams.get(k) == null) {
+                            url.searchParams.set(k, v);
+                        }
+                    }
+                    e.href = url.toString();
+                });
             });
+
+
         </script>
     </body>
 </html>
