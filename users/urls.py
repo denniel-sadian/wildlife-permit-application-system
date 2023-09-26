@@ -13,7 +13,11 @@ urlpatterns = [
     path('registration/', views.ClientRegistrationView.as_view(),
          name='registration'),
     path('profile/', views.ProfileView.as_view(),
-         name='profile')
+         name='profile'),
+
+    # Autocomplete
+    path('clients-autocomplete/', views.ClientAutocompleteView.as_view(),
+         name='clients-autocomplete'),
 ]
 
 if settings.DEBUG:
