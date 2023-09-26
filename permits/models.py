@@ -10,7 +10,7 @@ class Status(models.TextChoices):
     DRAFT = 'DRAFT', 'On Draft'
     SUBMITTED = 'SUBMITTED', 'Submitted'
     RETURNED = 'RETURNED', 'Returned'
-    ACCEPTED = 'Accepted', 'Accepted'
+    ACCEPTED = 'ACCEPTED', 'Accepted'
     RELEASED = 'RELEASED', 'Released'
     EXPIRED = 'EXPIRED', 'Expired'
 
