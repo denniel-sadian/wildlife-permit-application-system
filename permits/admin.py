@@ -109,7 +109,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
         for instance in instances:
             if (isinstance(instance, Remarks)):
                 instance.user = request.user
-                instance.save()
+            instance.save()
         formset.save_m2m()
 
 
