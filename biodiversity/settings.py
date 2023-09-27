@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django_yubin',
     'dal',
     'dal_select2',
+    'ajax_select',
 
     'users',
     'animals',
