@@ -131,7 +131,7 @@ footer .cont h2 {
     margin-bottom: 16px;
 }
 
-.text-box span,
+.text-box span, .select-box span,
 .file-input span {
     font-family: "Nunito", sans-serif;
     font-size: 12px;
@@ -141,16 +141,23 @@ footer .cont h2 {
     color: gray;
 }
 
-.text-box > *:nth-child(2) {
+.text-box > *:nth-child(2), .select-box input {
     border: 1px solid gray;
     border-radius: 6px;
     height: 40px;
     padding: 0px 8px;
+    width: 100%;
 }
 
 textarea {
     height: 150px !important;
 }
+
+.select-box input {
+    margin-bottom: 8px;
+    background-color: white !important;
+}
+
 
 .errorlist {
     margin: 4px 0px 0px 0px;
