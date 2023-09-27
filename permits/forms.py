@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from ajax_select.fields import AutoCompleteSelectField
+
 from django import forms
 
 from users.models import Client
@@ -30,6 +32,8 @@ class RequirementForm(forms.ModelForm):
 
 
 class TransportEntryForm(forms.ModelForm):
+    sub_species = AutoCompleteSelectField(
+        'permitted-subspecies', required=True, help_text=None)
 
     class Meta:
         model = TransportEntry
@@ -93,6 +97,8 @@ class PermitApplicationUpdateForm(forms.ModelForm):
 
 
 class CollectionEntryForm(forms.ModelForm):
+    sub_species = AutoCompleteSelectField(
+        'subspecies', required=True, help_text=None)
 
     class Meta:
         model = CollectionEntry
@@ -104,10 +110,8 @@ class CollectionEntryForm(forms.ModelForm):
         existing_entry = application.requested_species.filter(
             sub_species=sub_species).first()
         if existing_entry is not None and (existing_entry.id != self.instance.id):
-            print('Not oklang', existing_entry)
             raise forms.ValidationError(
                 'This species has been chosen.')
-        print('Oklang')
         return sub_species
 
 
