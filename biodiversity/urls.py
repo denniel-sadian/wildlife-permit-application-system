@@ -18,14 +18,19 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+from ajax_select import urls as ajax_select_urls
+
 TITLE = 'Biodiversity Administration'
 admin.site.site_header = TITLE
 admin.site.site_title = TITLE
 admin.site.index_title = TITLE
+
+admin.autodiscover()
 
 urlpatterns = [
     path('', include('users.urls')),
     path('species/', include('animals.urls')),
     path('permits/', include('permits.urls')),
     path('admin/', admin.site.urls),
+    path('ajax_select/', include(ajax_select_urls))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) if settings.DEBUG else []
