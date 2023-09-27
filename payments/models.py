@@ -11,13 +11,13 @@ class OrderOfPayment(models.Model):
     nature_of_doc_being_secured = models.CharField(
         'Nature of Application/Permit/Documents being secured', max_length=255)
     client = models.ForeignKey(
-        'users.Client', on_delete=models.CASCADE, related_name='ors')
+        'users.Client', on_delete=models.CASCADE)
     permit_application = models.OneToOneField(
-        PermitApplication, on_delete=models.CASCADE, related_name="ors_1")
+        PermitApplication, on_delete=models.CASCADE)
     prepared_by = models.ForeignKey(
-        'users.Admin', on_delete=models.CASCADE, related_name='ors_2')
+        'users.Admin', on_delete=models.CASCADE, related_name='prepared_order_of_payments')
     approved_by = models.ForeignKey(
-        'users.Admin', on_delete=models.CASCADE, null=True, blank=True, related_name='ors_3')
+        'users.Admin', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self) -> str:
         return str(self.no)
