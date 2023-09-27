@@ -16,7 +16,7 @@ class SubSpeciesAutocompleteView(autocomplete.Select2QuerySetView):
 
         if self.q:
             qs = qs.filter(common_name__istartswith=self.q,
-                           scientific__istartswith=self.q,
+                           scientific_name__istartswith=self.q,
                            main_species__name__istartswith=self.q)
 
         return qs
