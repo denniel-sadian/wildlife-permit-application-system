@@ -44,6 +44,7 @@
 
             {% if object.permit_type == 'LTP' %}
             {{ transport_entries.management_form }}
+            {{ transport_entries.media }}
             <div class="extra-form">
                 <h3>Transport Entries</h3>
                 <div id="{{ transport_entries.prefix }}">
@@ -51,7 +52,7 @@
                 <div class="mini-form">
                     {{ i.id }}
                     {{ i.permit_application }}
-                    {% include 'ui/inputbox.html' with field=i.sub_species %}
+                    {% include 'ui/select.html' with field=i.sub_species %}
                     {% include 'ui/inputbox.html' with field=i.quantity %}
                     {% if i.id.value %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
                 </div>
@@ -71,6 +72,7 @@
 
             {% if object.permit_type == 'WCP' %}
             {{ requested_species.management_form }}
+            {{ requested_species.media }}
             <div class="extra-form">
                 <h3>Collection Entries</h3>
                 {% for i in requested_species %}
@@ -78,7 +80,7 @@
                     <div class="mini-form">
                         {{ i.id }}
                         {{ i.permit_application }}
-                        {% include 'ui/inputbox.html' with field=i.sub_species %}
+                        {% include 'ui/select.html' with field=i.sub_species %}
                         {% include 'ui/inputbox.html' with field=i.quantity %}
                         {% if i.id.value %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
                     </div>
