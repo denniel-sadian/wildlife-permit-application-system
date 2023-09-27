@@ -1,9 +1,17 @@
 from typing import Any
-from django.contrib import admin
-from django.http.request import HttpRequest
+from datetime import datetime
 
+from django.urls import reverse_lazy
+from django.contrib import admin
+from django.contrib import messages
+from django.http.request import HttpRequest
+from django.http import HttpResponseRedirect
 from django.db.models import Q
 from django import forms
+
+from payments.models import (
+    OrderOfPayment
+)
 
 from animals.models import (
     SubSpecies
@@ -103,6 +111,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
     search_fields = ('no', 'permit_type', 'client__first_name',
                      'client__last_name', 'status')
     autocomplete_fields = ('client',)
+    change_form_template = 'permits/admin/application_changeform.html'
 
     def get_readonly_fields(self, request, obj=None):
         # If obj is None, it means we are adding a new record
@@ -152,6 +161,33 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                 instance.user = request.user
             instance.save()
         formset.save_m2m()
+
+    def response_change(self, request, obj: PermitApplication):
+        if 'generate_op' in request.POST:
+            if obj.can_be_submitted:
+                payment_order = OrderOfPayment(
+                    nature_of_doc_being_secured='Wildlife',
+                    client=obj.client,
+                    permit_application=obj,
+                    prepared_by=request.user.subclass
+                )
+                payment_order.save()
+                current_date = datetime.now()
+                formatted_date = current_date.strftime("%Y-%m")
+                day_part = current_date.day
+                no = f'PO-{formatted_date}-{day_part}-{payment_order.id}'
+                payment_order.no = no
+                payment_order.save()
+                self.message_user(request, 'Ok', level=messages.SUCCESS)
+                path = f'admin:{payment_order._meta.app_label}_{payment_order._meta.model_name}_change'
+                return HttpResponseRedirect(reverse_lazy(path, args=[payment_order.id]))
+            else:
+                return HttpResponseRedirect('.')
+        elif 'view_op' in request.POST:
+            payment_order = obj.orderofpayment
+            path = f'admin:{payment_order._meta.app_label}_{payment_order._meta.model_name}_change'
+            return HttpResponseRedirect(reverse_lazy(path, args=[payment_order.id]))
+        return super().response_change(request, obj)
 
 
 class RequirementItemInline(admin.StackedInline):
