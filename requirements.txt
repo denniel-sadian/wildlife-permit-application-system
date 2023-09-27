@@ -8,3 +8,4 @@ django-guardian==2.4.0
 django-yubin==2.0.1
 Pillow==10.0.0
 django-autocomplete-light==3.9.7
+django-ajax-selects==2.2.0
