@@ -2,6 +2,13 @@ from typing import Any
 from django.contrib import admin
 from django.http.request import HttpRequest
 
+from django.db.models import Q
+from django import forms
+
+from animals.models import (
+    SubSpecies
+)
+
 from .models import (
     WildlifeFarmPermit,
     WildlifeCollectorPermit,
@@ -39,9 +46,36 @@ class RequirementInline(admin.StackedInline):
     verbose_name_plural = 'Submitted Requirements'
 
 
+class TransportEntryForm(forms.ModelForm):
+
+    class Meta:
+        model = TransportEntry
+        fields = ('sub_species', 'quantity')
+
+    def clean_sub_species(self):
+        # Make sure double transport for the same species is forbidden
+        sub_species = self.cleaned_data.get('sub_species')
+        application: PermitApplication = self.instance.permit_application
+        existing_transport = application.requested_species_to_transport.filter(
+            sub_species=sub_species).first()
+        if existing_transport is not None and (existing_transport.id != self.instance.id):
+            raise forms.ValidationError(
+                'This species has been chosen for transport already.')
+
+        # Make sure only collected species are chosen for transport
+        allowed = SubSpecies.objects.filter(Q(species_permitted__wcp__client=application.client) &
+                                            Q(common_name__exact=sub_species.common_name)).first()
+        if not allowed:
+            raise forms.ValidationError(
+                'The client is not allowed to transport this species.')
+
+        return sub_species
+
+
 class TransportEntryInline(admin.TabularInline):
     fields = ('sub_species', 'quantity')
     model = TransportEntry
+    form = TransportEntryForm
     extra = 1
     autocomplete_fields = ('sub_species',)
     verbose_name_plural = 'Transport Entries'
@@ -69,6 +103,13 @@ class PermitApplicationAdmin(admin.ModelAdmin):
     search_fields = ('no', 'permit_type', 'client__first_name',
                      'client__last_name', 'status')
     autocomplete_fields = ('client',)
+
+    def get_readonly_fields(self, request, obj=None):
+        # If obj is None, it means we are adding a new record
+        if obj is None:
+            return ()
+        # Otherwise, when updating an existing record
+        return ('client', 'permit_type')
 
     def get_fieldsets(self, request: HttpRequest, obj: Any | None = ...):
         fields = ['no', 'permit_type', 'status', 'client']
