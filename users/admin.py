@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Client, Admin, Permittee
+from .models import (
+    Client,
+    Admin,
+    Cashier,
+    Permittee
+)
 
 
 class BaseUserAdmin(UserAdmin):
@@ -24,6 +29,8 @@ class BaseUserAdmin(UserAdmin):
             {
                 "fields": (
                     "is_active",
+                    'groups',
+                    'user_permissions'
                 ),
             },
         ),
@@ -32,6 +39,11 @@ class BaseUserAdmin(UserAdmin):
 
 @admin.register(Admin)
 class AdminAdmin(BaseUserAdmin):
+    pass
+
+
+@admin.register(Cashier)
+class CashierAdmin(BaseUserAdmin):
     pass
 
 

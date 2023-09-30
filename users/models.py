@@ -107,6 +107,16 @@ class Admin(User):
         super().save(*args, **kwargs)
 
 
+class Cashier(User):
+
+    class Meta:
+        verbose_name = 'Cashier'
+
+    def save(self, *args, **kwargs):
+        self.is_staff = True
+        super().save(*args, **kwargs)
+
+
 class Permittee(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
