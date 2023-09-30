@@ -6,7 +6,7 @@
         {% if original.can_be_submitted and not original.orderofpayment %}
         <input type="submit" value="Generate Order of Payment" name="generate_op">
         {% elif original.orderofpayment %}
-        <input type="submit" value="View Order of Payment" name="view_op">
+        <a href="{% url 'admin:payments_orderofpayment_change' original.orderofpayment.id %}">View Order of Payment</a>
         {% endif %}
     </div>
 {% endblock %}
