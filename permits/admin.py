@@ -183,10 +183,6 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                 return HttpResponseRedirect(reverse_lazy(path, args=[payment_order.id]))
             else:
                 return HttpResponseRedirect('.')
-        elif 'view_op' in request.POST:
-            payment_order = obj.orderofpayment
-            path = f'admin:{payment_order._meta.app_label}_{payment_order._meta.model_name}_change'
-            return HttpResponseRedirect(reverse_lazy(path, args=[payment_order.id]))
         return super().response_change(request, obj)
 
 

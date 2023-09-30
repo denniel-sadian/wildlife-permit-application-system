@@ -34,9 +34,6 @@ class OrderOfPaymentAdmin(admin.ModelAdmin):
         return ('client', 'client', 'permit_application')
 
     def response_change(self, request, obj: OrderOfPayment):
-        if 'view_application' in request.POST:
-            path = f'admin:{obj.permit_application._meta.app_label}_{obj.permit_application._meta.model_name}_change'
-            return HttpResponseRedirect(reverse_lazy(path, args=[obj.permit_application.id]))
         return super().response_change(request, obj)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
