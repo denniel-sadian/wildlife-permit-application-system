@@ -1,11 +1,14 @@
 from typing import Any
 from django.contrib import admin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.http.request import HttpRequest
+from django.utils.html import format_html
 from django.urls import reverse_lazy
 
 from .models import (
     OrderOfPayment,
-    ORItem
+    ORItem,
+    Payment
 )
 
 
@@ -36,9 +39,22 @@ class OrderOfPaymentAdmin(admin.ModelAdmin):
             return HttpResponseRedirect(reverse_lazy(path, args=[obj.permit_application.id]))
         return super().response_change(request, obj)
 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        obj = self.get_object(request, object_id)
+        related_object_url = ''
+        link_html = f'<a href="{related_object_url}">View Related Object</a>'
+        extra_context = {'related_object_link': format_html(link_html)}
+
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
+
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         if not change:
             obj.prepared_by = request.user.subclass
 
         obj.save()
         return super().save_model(request, obj, form, change)
+
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    exclude = ('json_response',)

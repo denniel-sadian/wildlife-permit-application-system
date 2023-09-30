@@ -32,3 +32,19 @@ class ORItem(models.Model):
 
     class Meta:
         verbose_name = "Order of Payment Item"
+
+
+class PaymentType(models.TextChoices):
+    OTC = 'OTC', 'On the counter'
+    ONLINE = 'ONLINE', 'Online'
+
+
+class Payment(models.Model):
+    receipt_no = models.CharField(max_length=255)
+    payment_order = models.OneToOneField(
+        OrderOfPayment, on_delete=models.CASCADE)
+    uploaded_receipt = models.FileField(
+        upload_to='receipts/', null=True, blank=True)
+    json_response = models.JSONField(null=True, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_type = models.CharField(max_length=50, choices=PaymentType.choices)
