@@ -259,13 +259,13 @@ class CollectionEntry(models.Model):
 class UploadedRequirement(models.Model):
     permit_application = models.ForeignKey(
         PermitApplication, on_delete=models.CASCADE, related_name='requirements')
-    requirement_type = models.CharField(
-        max_length=50, choices=RequirementType.choices, null=False, blank=False)
+    requirement = models.ForeignKey(
+        Requirement, on_delete=models.CASCADE)
     uploaded_file = models.FileField(
         upload_to='requirements/', null=False, blank=False)
 
     class Meta:
-        unique_together = ('permit_application', 'requirement_type')
+        unique_together = ('permit_application', 'requirement')
 
 
 class Remarks(models.Model):
