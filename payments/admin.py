@@ -23,7 +23,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
     list_display = ('no', 'permit_application', 'prepared_by', 'created_at')
     fields = ('no', 'nature_of_doc_being_secured',
               'client', 'permit_application', 'approved_by', 'prepared_by')
-    autocomplete_fields = ('permit_application', 'client')
+    autocomplete_fields = ('permit_application', 'client', 'approved_by')
     inlines = (OItemInline,)
     change_form_template = 'payments/admin/op_changeform.html'
 
