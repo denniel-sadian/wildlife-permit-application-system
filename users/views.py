@@ -10,6 +10,7 @@ from django.views.generic import FormView
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.views import LoginView
 from django.contrib import messages
 
 from .models import User, Client
@@ -25,6 +26,14 @@ class CustomLoginRequiredMixin(LoginRequiredMixin):
         if not request.user.is_initial_password_changed:
             return redirect('password_change')
         return super().dispatch(request, *args, **kwargs)
+
+
+class CustomLoginView(LoginView):
+
+    def get_redirect_url(self) -> str:
+        if self.request.user.is_staff:
+            return reverse_lazy('admin:index')
+        return reverse_lazy('home')
 
 
 class ClientRegistrationView(FormView):
