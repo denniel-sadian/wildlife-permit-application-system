@@ -63,7 +63,7 @@
                 </div>
                 <div id="{{ transport_entries.prefix }}-empty" style="display:none">
                     <div class="mini-form">
-                        {% include 'ui/inputbox.html' with field=transport_entries.empty_form.sub_species %}
+                        {% include 'ui/select.html' with field=transport_entries.empty_form.sub_species %}
                         {% include 'ui/inputbox.html' with field=transport_entries.empty_form.quantity %}
                     </div>
                 </div>
@@ -91,7 +91,7 @@
                 </div>
                 <div id="{{ requested_species.prefix }}-empty" style="display:none">
                     <div class="mini-form">
-                        {% include 'ui/inputbox.html' with field=requested_species.empty_form.sub_species %}
+                        {% include 'ui/select.html' with field=requested_species.empty_form.sub_species %}
                         {% include 'ui/inputbox.html' with field=requested_species.empty_form.quantity %}
                     </div>
                 </div>
@@ -184,27 +184,33 @@
                 var newForm = $(emptyFormStr);
                 $(`#${prefix}`).append(newForm);
                 total.val(totalForms+1);
+
+                $(window).trigger('init-autocomplete');
+            }
+
+            function limitQuantity(animalInput) {
+                if (animalInput.val()) {
+                    const quantity = allowedSpecies.find(obj => obj.id == animalInput.val()).quantity;
+                    const quantityInput = $('#'+animalInput.attr('id').replace('sub_species', 'quantity'));
+                    quantityInput.attr('max', quantity);
+                }
             }
 
             function limitAllowedAnimals() {
-                let selects = $('#{{ transport_entries.prefix }}').find('select');
-                selects.each(function() {
-                    const val = $(this).val();
-                    let options = '<option value="">---------</option>\n';
-                    allowedSpecies.forEach(function(i) {
-                        let selected = val == i.id ? 'selected=""' : '';
-                        options += `<option value="${i.id}" ${selected}>${i.name}</option>\n`;
-                    });
-                    $(this).html(options);
-                });
-                selects.on('change', function() {
-                    const quantity = allowedSpecies.find(obj => obj.id == $(this).val()).quantity;
-                    const quantityInput = $('#'+$(this).attr('id').replace('sub_species', 'quantity'));
-                    quantityInput.attr('max', quantity);
-                });
+                let inputs = $('#{{ transport_entries.prefix }}').find('input:hidden');
+                inputs.each(function () {
+                    if ($(this).attr('id').includes('sub_species')) {
+                        limitQuantity($(this));
+                        $(this).on('change', function () {
+                            limitQuantity($(this));
+                        });
+                    }
+                })
             }
 
-            limitAllowedAnimals();
+            $(function () {
+                limitAllowedAnimals();
+            });
         </script>
     </div>
 </main>
