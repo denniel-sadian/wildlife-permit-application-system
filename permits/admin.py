@@ -48,10 +48,9 @@ class WildlifeCollectorPermitAdmin(admin.ModelAdmin):
     inlines = (PermittedToCollectAnimalInline,)
 
 
-class RequirementInline(admin.StackedInline):
+class UploadedRequirementInline(admin.StackedInline):
     model = UploadedRequirement
     extra = 1
-    verbose_name_plural = 'Submitted Requirements'
 
 
 class TransportEntryForm(TransportEntryBaseForm):
@@ -122,7 +121,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
 
     def get_inline_instances(self, request: HttpRequest, obj: Any | None = ...):
         inlines = [
-            RequirementInline(self.model, self.admin_site),
+            UploadedRequirementInline(self.model, self.admin_site),
             RemarksInline(self.model, self.admin_site)
         ]
 
