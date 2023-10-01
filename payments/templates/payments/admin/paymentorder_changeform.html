@@ -13,14 +13,14 @@
     <div class="submit-row custom-row">
         {% if request.user.type == 'Admin' %}
         <input type="submit" value="Notify Client" name="notify_client">
-        <a href="{% url 'admin:permits_permitapplication_change' original.permit_application.id %}">View Permit Application</a>
+        {% if original.permit_application %}<a href="{% url 'admin:permits_permitapplication_change' original.permit_application.id %}">View Permit Application</a>{% endif %}
         {% endif %}
 
         {% if request.user.type in 'Cashier Admin' %}
             {% if not original.payment%}
             <input type="submit" value="Create Payment" name="create_payment">
             {%  else %}
-            <a href="{% url 'admin:payments_payment_change' original.payment.id %}">View Payment</a>
+            {% if original.payment %}<a href="{% url 'admin:payments_payment_change' original.payment.id %}">View Payment</a>{% endif %}
             {% endif %}
         {% endif %}
     </div>
