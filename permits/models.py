@@ -86,8 +86,7 @@ class RequirementList(models.Model):
 class RequirementItem(models.Model):
     requirement_list = models.ForeignKey(
         RequirementList, on_delete=models.CASCADE, related_name='items')
-    requirement = models.CharField(
-        max_length=1000, choices=RequirementType.choices)
+    requirement = models.ForeignKey(Requirement, on_delete=models.CASCADE)
     optional = models.BooleanField(default=False)
 
     class Meta:
