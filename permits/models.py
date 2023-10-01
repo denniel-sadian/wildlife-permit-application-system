@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from django.db import models
 from django.utils import timezone
 
@@ -68,6 +69,10 @@ class Requirement(models.Model):
 
     def __str__(self):
         return str(self.code)
+
+    def save(self, *args, **kwargs):
+        self.code = self.code.upper().replace(' ', '')
+        super().save(*args, **kwargs)
 
 
 class RequirementList(models.Model):
