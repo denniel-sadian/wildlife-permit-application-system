@@ -56,8 +56,12 @@
                     <a href="{% url 'registration' %}">Register</a>
                     {% endif %}
 
-                    {% if user.is_authenticated %}
+                    {% if user.is_authenticated and user.type == 'Client' %}
                     <a href="{% url 'profile' %}"><b><i class="fa fa-user-circle-o"></i> {{ user.name }}</b></a>
+                    {% endif %}
+
+                    {% if user.is_authenticated and user.is_staff %}
+                    <a href="{% url 'admin:index' %}"><b><i class="fa fa-cogs"></i> Management</b></a>
                     {% endif %}
                 </div>
             </div>
