@@ -37,7 +37,7 @@ class PaymentOrder(models.Model):
         return str(self.no)
 
 
-class ORItem(models.Model):
+class PaymentOrderItem(models.Model):
     payment_order = models.ForeignKey(
         PaymentOrder, on_delete=models.CASCADE, related_name='items')
     legal_basis = models.CharField(max_length=50)

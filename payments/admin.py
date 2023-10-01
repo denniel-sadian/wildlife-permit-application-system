@@ -1,20 +1,19 @@
 from typing import Any
 from django.contrib import admin
-from django.http import HttpResponse, HttpResponseRedirect
-from django.http.request import HttpRequest
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.urls import reverse_lazy
 
 from .models import (
     PaymentOrder,
-    ORItem,
+    PaymentOrderItem,
     Payment,
     PaymentType
 )
 
 
-class OItemInline(admin.StackedInline):
-    model = ORItem
+class PaymentOrderItemInline(admin.TabularInline):
+    model = PaymentOrderItem
     extra = 1
 
 
@@ -22,9 +21,10 @@ class OItemInline(admin.StackedInline):
 class PaymentOrderAdmin(admin.ModelAdmin):
     list_display = ('no', 'permit_application', 'prepared_by', 'created_at')
     fields = ('no', 'nature_of_doc_being_secured',
-              'client', 'permit_application', 'approved_by', 'prepared_by')
-    autocomplete_fields = ('permit_application', 'client', 'approved_by')
-    inlines = (OItemInline,)
+              'client', 'permit_application', 'prepared_by', 'approved_by')
+    autocomplete_fields = ('permit_application', 'client',
+                           'approved_by', 'prepared_by')
+    inlines = (PaymentOrderItemInline,)
     change_form_template = 'payments/admin/paymentorder_changeform.html'
 
     def get_readonly_fields(self, request, obj=None):
@@ -36,7 +36,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj: PaymentOrder):
         if 'create_payment' in request.POST:
-            if obj.payment_order is None:
+            if hasattr(obj, 'payment'):
                 payment = Payment(receipt_no=obj.no,
                                   payment_order=obj,
                                   amount=obj.total,
