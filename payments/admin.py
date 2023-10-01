@@ -24,6 +24,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
               'client', 'permit_application', 'prepared_by', 'approved_by')
     autocomplete_fields = ('permit_application', 'client',
                            'approved_by', 'prepared_by')
+    search_fields = ('no', 'permit_application__no')
     inlines = (PaymentOrderItemInline,)
     change_form_template = 'payments/admin/paymentorder_changeform.html'
 
@@ -60,4 +61,5 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
     exclude = ('json_response',)
+    autocomplete_fields = ('payment_order',)
     change_form_template = 'payments/admin/payment_changeform.html'

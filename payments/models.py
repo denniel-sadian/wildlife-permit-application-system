@@ -62,3 +62,6 @@ class Payment(models.Model):
     json_response = models.JSONField(null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=50, choices=PaymentType.choices)
+
+    def __str__(self):
+        return str(self.receipt_no)
