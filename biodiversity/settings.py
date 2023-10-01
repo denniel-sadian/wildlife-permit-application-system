@@ -114,8 +114,6 @@ AUTHENTICATION_BACKENDS = (
 
 ANONYMOUS_USER_NAME = None
 
-LOGIN_REDIRECT_URL = 'home'
-
 LOGOUT_REDIRECT_URL = 'login'
 
 # Default primary key field type
