@@ -1,10 +1,7 @@
 from typing import Any
 import uuid
 
-from dal import autocomplete
-
 from django.http import HttpResponse
-from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.views.generic import FormView
@@ -91,19 +88,3 @@ class ProfileView(CustomLoginRequiredMixin, TemplateView):
         context['wfp'] = client.current_wfp
         context['wcp'] = client.current_wcp
         return self.render_to_response(context)
-
-
-class ClientAutocompleteView(autocomplete.Select2QuerySetView):
-
-    def get_queryset(self):
-        # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated:
-            return Client.objects.none()
-
-        qs = Client.objects.all()
-
-        if self.q:
-            qs = qs.filter(first_name__istartswith=self.q,
-                           last_name__istartswith=self.q)
-
-        return qs
