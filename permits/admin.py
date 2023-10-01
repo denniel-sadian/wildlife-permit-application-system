@@ -148,7 +148,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj: PermitApplication):
         if 'generate_payment_order' in request.POST:
-            if obj.paymentorder:
+            if hasattr(obj, 'paymentorder'):
                 self.message_user(
                     request, 'Order of Payment has been created already.', level=messages.WARNING)
                 path = f'admin:{obj.paymentorder._meta.app_label}_{obj.paymentorder._meta.model_name}_change'
@@ -164,7 +164,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                 current_date = datetime.now()
                 formatted_date = current_date.strftime("%Y-%m")
                 day_part = current_date.day
-                no = f'PO-{formatted_date}-{day_part}-{payment_order.id}'
+                no = f'payment-order-{formatted_date}-{day_part}-{payment_order.id}'
                 payment_order.no = no
                 payment_order.save()
                 self.message_user(
