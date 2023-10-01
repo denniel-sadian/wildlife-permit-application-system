@@ -178,7 +178,8 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                 no = f'PO-{formatted_date}-{day_part}-{payment_order.id}'
                 payment_order.no = no
                 payment_order.save()
-                self.message_user(request, 'Ok', level=messages.SUCCESS)
+                self.message_user(
+                    request, 'Order of Payment has been created', level=messages.SUCCESS)
                 path = f'admin:{payment_order._meta.app_label}_{payment_order._meta.model_name}_change'
                 return HttpResponseRedirect(reverse_lazy(path, args=[payment_order.id]))
             else:
