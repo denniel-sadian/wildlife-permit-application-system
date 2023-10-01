@@ -1,9 +1,28 @@
 {% extends 'admin/change_form.html' %}
 
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=35" />
+{% endblock %}
+
 {% block submit_buttons_bottom %}
     {{ block.super }}
-    <div class="submit-row">
-        <a href="{% url 'admin:permits_permitapplication_change' original.permit_application.id %}">View Permit Application</a>
+
+    <div class="submit-row custom-row">
+        {% if request.user.type == 'Admin' %}
         <input type="submit" value="Notify Client" name="notify_client">
+        <a href="{% url 'admin:permits_permitapplication_change' original.permit_application.id %}">View Permit Application</a>
+        {% endif %}
+
+        {% if request.user.type in 'Cashier Admin' %}
+            {% if not original.payment%}
+            <input type="submit" value="Create Payment" name="create_payment">
+            {%  else %}
+            <a href="{% url 'admin:payments_payment_change' original.payment.id %}">View Payment</a>
+            {% endif %}
+        {% endif %}
     </div>
+
 {% endblock %}
