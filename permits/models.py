@@ -68,7 +68,7 @@ class Requirement(models.Model):
     label = models.CharField(max_length=255)
 
     def __str__(self):
-        return str(self.code)
+        return str(self.label)
 
     def save(self, *args, **kwargs):
         self.code = self.code.upper().replace(' ', '')
