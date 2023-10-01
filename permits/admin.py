@@ -6,15 +6,13 @@ from django.contrib import admin
 from django.contrib import messages
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
-from django.db.models import Q
-from django import forms
 
 from payments.models import (
     OrderOfPayment
 )
 
-from animals.models import (
-    SubSpecies
+from .forms import (
+    TransportEntryBaseForm
 )
 
 from .models import (
@@ -54,30 +52,8 @@ class RequirementInline(admin.StackedInline):
     verbose_name_plural = 'Submitted Requirements'
 
 
-class TransportEntryForm(forms.ModelForm):
-
-    class Meta:
-        model = TransportEntry
-        fields = ('sub_species', 'quantity')
-
-    def clean_sub_species(self):
-        # Make sure double transport for the same species is forbidden
-        sub_species = self.cleaned_data.get('sub_species')
-        application: PermitApplication = self.instance.permit_application
-        existing_transport = application.requested_species_to_transport.filter(
-            sub_species=sub_species).first()
-        if existing_transport is not None and (existing_transport.id != self.instance.id):
-            raise forms.ValidationError(
-                'This species has been chosen for transport already.')
-
-        # Make sure only collected species are chosen for transport
-        allowed = SubSpecies.objects.filter(Q(species_permitted__wcp__client=application.client) &
-                                            Q(common_name__exact=sub_species.common_name)).first()
-        if not allowed:
-            raise forms.ValidationError(
-                'The client is not allowed to transport this species.')
-
-        return sub_species
+class TransportEntryForm(TransportEntryBaseForm):
+    pass
 
 
 class TransportEntryInline(admin.TabularInline):
