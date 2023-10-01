@@ -177,7 +177,7 @@ class PermitApplication(models.Model):
     def needed_requirements(self):
         needed_requirements = []
         for needed_requirement in RequirementList.objects.get(permit_type=self.permit_type).items.all():
-            uploaded_requirement = UploadedRequirement.objects.filter(requirement_type=needed_requirement.requirement,
+            uploaded_requirement = UploadedRequirement.objects.filter(requirement=needed_requirement.requirement,
                                                                       permit_application=self).first()
             needed_requirements.append({
                 'requirement': needed_requirement,
