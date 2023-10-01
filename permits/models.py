@@ -182,6 +182,10 @@ class PermitApplication(models.Model):
         return True
 
     @property
+    def editable(self):
+        return self.status in (Status.DRAFT, Status.RETURNED)
+
+    @property
     def submittable(self):
         # Make sure the requirements are submitted
         if not self.needed_requirements_are_submitted:
