@@ -62,6 +62,11 @@ class RequirementType(models.TextChoices):
     COPY_OF_RESEARCH_THESIS_DISSERTATION = 'COPY_OF_RESEARCH_THESIS_DISSERTATION', 'Copy of the research/thesis/dissertation proposals, or copy of the affidavit of undertaking/approved memorandum of agreement (MOA)'
 
 
+class Requirement(models.Model):
+    code = models.CharField(max_length=100, unique=True)
+    label = models.CharField(max_length=255)
+
+
 class RequirementList(models.Model):
     permit_type = models.CharField(
         max_length=50, choices=PermitType.choices, unique=True)
