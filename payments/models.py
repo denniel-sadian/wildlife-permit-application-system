@@ -1,4 +1,8 @@
+from decimal import Decimal
+
 from django.db import models
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 
 from permits.models import (
     PermitApplication
@@ -18,6 +22,16 @@ class OrderOfPayment(models.Model):
         'users.Admin', on_delete=models.CASCADE, related_name='prepared_order_of_payments')
     approved_by = models.ForeignKey(
         'users.Admin', on_delete=models.CASCADE, null=True, blank=True)
+
+    @property
+    def total(self):
+        total = self.items.aggregate(
+            total=Coalesce(
+                Sum('amount', output_field=models.DecimalField()),
+                Decimal('0.0')
+            )
+        )['total']
+        return total
 
     def __str__(self) -> str:
         return str(self.no)
