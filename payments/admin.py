@@ -37,7 +37,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj: PaymentOrder):
         if 'create_payment' in request.POST:
-            if hasattr(obj, 'payment'):
+            if not hasattr(obj, 'payment'):
                 payment = Payment(receipt_no=obj.no,
                                   payment_order=obj,
                                   amount=obj.total,
