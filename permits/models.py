@@ -262,7 +262,7 @@ class UploadedRequirement(models.Model):
     requirement_type = models.CharField(
         max_length=50, choices=RequirementType.choices, null=False, blank=False)
     uploaded_file = models.FileField(
-        upload_to='uploads/', null=False, blank=False)
+        upload_to='requirements/', null=False, blank=False)
 
     class Meta:
         unique_together = ('permit_application', 'requirement_type')
