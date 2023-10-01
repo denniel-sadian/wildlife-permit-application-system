@@ -277,3 +277,16 @@ class Remarks(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class Inspection(models.Model):
+    permit_application = models.OneToOneField(
+        PermitApplication, on_delete=models.CASCADE)
+    scheduled_date = models.DateField(blank=True, null=True)
+    inspecting_officer = models.ForeignKey(
+        'users.Admin', on_delete=models.CASCADE, blank=True, null=True)
+    report_file = models.FileField(
+        upload_to='inspection_reports/', blank=True, null=True)
+
+    def __str__(self):
+        return f'Inspection on {self.scheduled_date} for application {self.permit_application}'
