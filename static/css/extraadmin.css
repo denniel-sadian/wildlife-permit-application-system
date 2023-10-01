@@ -1,0 +1,16 @@
+.custom-row {
+    display: flex;
+    grid-gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 12px;
+}
+
+.custom-row a {
+    order: 1;
+}
+
+.custom-row input {
+    order: 2;
+    margin: 0px;
+}
