@@ -16,6 +16,12 @@
         {% elif original.paymentorder %}
         <a href="{% url 'admin:payments_paymentorder_change' original.paymentorder.id %}">View Payment Order</a>
         {% endif %}
+
+        {% if not original.inspection %}
+        <input type="submit" value="Start Inspection" name="create_inspection">
+        {% else %}
+        <a href="{% url 'admin:permits_inspection_change' original.inspection.id %}">View Inspection</a>
+        {% endif %}
     </div>
 
 {% endblock %}
