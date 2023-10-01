@@ -155,13 +155,3 @@ class CollectionEntryForm(forms.ModelForm):
             raise forms.ValidationError(
                 'This species has been chosen.')
         return sub_species
-
-
-RequirementFormSet = forms.inlineformset_factory(
-    PermitApplication, Requirement, form=RequirementForm, extra=1)
-
-TransportEntryFormSet = forms.inlineformset_factory(
-    PermitApplication, TransportEntry, form=TransportEntryForm, extra=1)
-
-CollectionEntryFormSet = forms.inlineformset_factory(
-    PermitApplication, CollectionEntry, form=CollectionEntryForm, extra=1)
