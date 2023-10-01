@@ -1,9 +1,10 @@
 from typing import Any
 import uuid
-from django.http import HttpResponse
 
 from dal import autocomplete
 
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.views.generic import FormView
@@ -30,7 +31,8 @@ class CustomLoginRequiredMixin(LoginRequiredMixin):
 
 class CustomLoginView(LoginView):
 
-    def get_redirect_url(self) -> str:
+    def get_default_redirect_url(self):
+        super().get_default_redirect_url()
         if self.request.user.is_staff:
             return reverse_lazy('admin:index')
         return reverse_lazy('home')
