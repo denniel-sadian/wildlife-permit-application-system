@@ -2,13 +2,14 @@ from typing import Any
 from django.contrib import admin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http.request import HttpRequest
-from django.utils.html import format_html
+from django.contrib import messages
 from django.urls import reverse_lazy
 
 from .models import (
     OrderOfPayment,
     ORItem,
-    Payment
+    Payment,
+    PaymentType
 )
 
 
@@ -21,7 +22,7 @@ class OItemInline(admin.StackedInline):
 class OrderOfPaymentAdmin(admin.ModelAdmin):
     list_display = ('no', 'permit_application', 'prepared_by', 'created_at')
     fields = ('no', 'nature_of_doc_being_secured',
-              'client', 'permit_application', 'approved_by')
+              'client', 'permit_application', 'approved_by', 'prepared_by')
     autocomplete_fields = ('permit_application', 'client')
     inlines = (OItemInline,)
     change_form_template = 'payments/admin/op_changeform.html'
@@ -31,18 +32,22 @@ class OrderOfPaymentAdmin(admin.ModelAdmin):
         if obj is None:
             return ()
         # Otherwise, when updating an existing record
-        return ('client', 'client', 'permit_application')
+        return ('client', 'client', 'permit_application', 'prepared_by')
 
     def response_change(self, request, obj: OrderOfPayment):
+        if 'create_payment' in request.POST:
+            if obj.payment_order is None:
+                payment = Payment(receipt_no=obj.no,
+                                  payment_order=obj,
+                                  amount=obj.total,
+                                  payment_type=PaymentType.OTC)
+                payment.save()
+                self.message_user(
+                    request, 'Payment record has been made.', level=messages.SUCCESS)
+                path = f'admin:{payment._meta.app_label}_{payment._meta.model_name}_change'
+                return HttpResponseRedirect(reverse_lazy(path, args=[payment.id]))
+
         return super().response_change(request, obj)
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        obj = self.get_object(request, object_id)
-        related_object_url = ''
-        link_html = f'<a href="{related_object_url}">View Related Object</a>'
-        extra_context = {'related_object_link': format_html(link_html)}
-
-        return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         if not change:
@@ -55,3 +60,4 @@ class OrderOfPaymentAdmin(admin.ModelAdmin):
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
     exclude = ('json_response',)
+    change_form_template = 'payments/admin/payment_changeform.html'
