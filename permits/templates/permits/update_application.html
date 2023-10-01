@@ -109,7 +109,7 @@
                     <h3>Needed Requirements:</h3>
                     <ul>
                         {% for i in needed_requirements %}
-                        <li><i class="fa {% if i.submitted %}fa-check w3-text-green{% else %}fa-times w3-text-red{% endif %}"></i> {% if i.optional %}(Optional) {% endif %}{{ i.requirement.get_requirement_display }}</li>
+                        <li><i class="fa {% if i.submitted %}fa-check w3-text-green{% else %}fa-times w3-text-red{% endif %}"></i> {% if i.optional %}(Optional) {% endif %}{{ i.requirement.requirement.label }}</li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -120,7 +120,7 @@
                     <div class="mini-form">
                         {{ i.id }}
                         {{ i.permit_application }}
-                        {% include 'ui/inputbox.html' with field=i.requirement_type %}
+                        {% include 'ui/select.html' with field=i.requirement %}
                         {% include 'ui/fileinput.html' with field=i.uploaded_file %}
                         {% if i.id.value and object.editable %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
                     </div>
@@ -133,7 +133,7 @@
                 {% endif %}
                 <div id="{{ requirements.prefix }}-empty" style="display:none">
                     <div class="mini-form">
-                        {% include 'ui/inputbox.html' with field=requirements.empty_form.requirement_type %}
+                        {% include 'ui/inputbox.html' with field=requirements.empty_form.requirement %}
                         {% include 'ui/fileinput.html' with field=requirements.empty_form.uploaded_file %}
                     </div>
                 </div>
