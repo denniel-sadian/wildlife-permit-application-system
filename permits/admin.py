@@ -23,6 +23,7 @@ from .models import (
     PermitType,
     UploadedRequirement,
     TransportEntry,
+    Requirement,
     RequirementList,
     RequirementItem,
     CollectionEntry,
@@ -188,3 +189,8 @@ class RequirementItemInline(admin.StackedInline):
 @admin.register(RequirementList)
 class RequirementListAdmin(admin.ModelAdmin):
     inlines = (RequirementItemInline,)
+
+
+@admin.register(Requirement)
+class RequirementAdmin(admin.ModelAdmin):
+    list_display = ('code',)
