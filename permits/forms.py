@@ -17,29 +17,13 @@ from .models import (
     Status,
     PermitType,
     TransportEntry,
-    CollectionEntry
+    CollectionEntry,
+    WildlifeCollectorPermit,
+    PermittedToCollectAnimal
 )
 
 
-class RequirementForm(forms.ModelForm):
-
-    class Meta:
-        model = Requirement
-        fields = ('requirement_type', 'uploaded_file')
-
-    def clean_requirement_type(self):
-        requirement_type = self.cleaned_data.get('requirement_type')
-        application: PermitApplication = self.instance.permit_application
-        existing_requirement = application.requirements.filter(
-            requirement_type=requirement_type).first()
-        if existing_requirement is not None and (existing_requirement.id != self.instance.id):
-            raise forms.ValidationError('This requirement already exists.')
-        return requirement_type
-
-
-class TransportEntryForm(forms.ModelForm):
-    sub_species = AutoCompleteSelectField(
-        'permitted-subspecies', required=True, help_text=None)
+class TransportEntryBaseForm(forms.ModelForm):
 
     class Meta:
         model = TransportEntry
@@ -63,6 +47,49 @@ class TransportEntryForm(forms.ModelForm):
                 'The client is not allowed to transport this species.')
 
         return sub_species
+
+    def clean_quantity(self):
+        sub_species = self.cleaned_data.get('sub_species')
+        quantity = self.cleaned_data.get('quantity')
+
+        wcp: WildlifeCollectorPermit = self.instance.permit_application.client.current_wcp
+        if wcp:
+            permitted_species: PermittedToCollectAnimal = wcp.allowed_species.filter(
+                sub_species=sub_species).first()
+            if permitted_species:
+                if quantity > permitted_species.quantity:
+                    raise forms.ValidationError(
+                        f'The client is only allowed to transport a quanity of {permitted_species.quantity} '
+                        f'for the species {sub_species}.')
+            else:
+                raise forms.ValidationError(
+                    'The client is not allowed to transport this species.')
+        else:
+            raise forms.ValidationError(
+                'The client does not have a WCP yet.')
+
+        return quantity
+
+
+class RequirementForm(forms.ModelForm):
+
+    class Meta:
+        model = Requirement
+        fields = ('requirement_type', 'uploaded_file')
+
+    def clean_requirement_type(self):
+        requirement_type = self.cleaned_data.get('requirement_type')
+        application: PermitApplication = self.instance.permit_application
+        existing_requirement = application.requirements.filter(
+            requirement_type=requirement_type).first()
+        if existing_requirement is not None and (existing_requirement.id != self.instance.id):
+            raise forms.ValidationError('This requirement already exists.')
+        return requirement_type
+
+
+class TransportEntryForm(TransportEntryBaseForm):
+    sub_species = AutoCompleteSelectField(
+        'permitted-subspecies', required=True, help_text=None)
 
 
 class PermitApplicationForm(forms.ModelForm):
