@@ -25,7 +25,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
               'client', 'permit_application', 'approved_by', 'prepared_by')
     autocomplete_fields = ('permit_application', 'client', 'approved_by')
     inlines = (OItemInline,)
-    change_form_template = 'payments/admin/op_changeform.html'
+    change_form_template = 'payments/admin/paymentorder_changeform.html'
 
     def get_readonly_fields(self, request, obj=None):
         # If obj is None, it means we are adding a new record
