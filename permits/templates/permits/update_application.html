@@ -139,6 +139,30 @@
                 </div>
             </div>
 
+            {% if object.paymentorder %}
+            <div class="w3-margin-bottom">
+                <h4>Payment Order:</h4>
+                <table class="w3-table w3-table-all">
+                    <tr>
+                        <th>Legal Basis</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                    {% for i in object.paymentorder.items.all %}
+                    <tr>
+                        <td>{{ i.legal_basis }}</td>
+                        <td>{{ i.description }}</td>
+                        <td>{{ i.amount }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <th colspan="2">Total</th>
+                        <th>{{ object.paymentorder.total }}</th>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+
             {% if object.remarks.count != 0 %}
             <div>
                 <h4>Admin Remarks:</h4>
