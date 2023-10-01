@@ -187,14 +187,18 @@ class PermitApplication(models.Model):
         if not self.needed_requirements_are_submitted:
             return False
 
-        # If LTP, make sure the transport entries are set
+        # For LTP
         if self.permit_type == PermitType.LTP:
             if self.requested_species_to_transport.count() == 0:
                 return False
+            if self.transport_date is None:
+                return False
 
-        # If WCP, make sure the collection entries are set
+        # For WCP
         if self.permit_type == PermitType.WCP:
             if self.requested_species.count() == 0:
+                return False
+            if self.names_and_addresses_of_authorized_collectors_or_trappers is None:
                 return False
 
         return True
