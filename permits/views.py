@@ -13,17 +13,24 @@ from django.views.generic import DeleteView, RedirectView
 from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django import forms
 
 from users.views import CustomLoginRequiredMixin
 from users.models import Client
 from .models import (
     PermitApplication,
     PermitType,
-    Status
+    Status,
+    Requirement,
+    TransportEntry,
+    CollectionEntry
 )
 from .forms import (
-    PermitApplicationForm, PermitApplicationUpdateForm,
-    RequirementFormSet, TransportEntryFormSet, CollectionEntryFormSet
+    PermitApplicationForm,
+    PermitApplicationUpdateForm,
+    RequirementForm,
+    TransportEntryForm,
+    CollectionEntryForm
 )
 
 
@@ -112,19 +119,36 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
             'sub_species__main_species')
         requested_species = self.object.requested_species.all().order_by(
             'sub_species__main_species', 'sub_species__common_name')
+        extra = 1 if self.object.editable else 0
 
         if self.request.POST:
+            RequirementFormSet = forms.inlineformset_factory(
+                PermitApplication, Requirement, form=RequirementForm, extra=extra)
             context['requirements'] = RequirementFormSet(
                 self.request.POST, self.request.FILES, instance=self.object, prefix='reqs')
+
+            TransportEntryFormSet = forms.inlineformset_factory(
+                PermitApplication, TransportEntry, form=TransportEntryForm, extra=extra)
             context['transport_entries'] = TransportEntryFormSet(
                 self.request.POST, self.request.FILES, instance=self.object, prefix='transports')
+
+            CollectionEntryFormSet = forms.inlineformset_factory(
+                PermitApplication, CollectionEntry, form=CollectionEntryForm, extra=extra)
             context['requested_species'] = CollectionEntryFormSet(
                 self.request.POST, self.request.FILES, instance=self.object, prefix='collection_entries')
         else:
+            RequirementFormSet = forms.inlineformset_factory(
+                PermitApplication, Requirement, form=RequirementForm, extra=extra)
             context['requirements'] = RequirementFormSet(
                 instance=self.object, queryset=requirements, prefix='reqs')
+
+            TransportEntryFormSet = forms.inlineformset_factory(
+                PermitApplication, TransportEntry, form=TransportEntryForm, extra=extra)
             context['transport_entries'] = TransportEntryFormSet(
                 instance=self.object, queryset=transport_entries, prefix='transports')
+
+            CollectionEntryFormSet = forms.inlineformset_factory(
+                PermitApplication, CollectionEntry, form=CollectionEntryForm, extra=extra)
             context['requested_species'] = CollectionEntryFormSet(
                 instance=self.object, queryset=requested_species, prefix='collection_entries')
 
