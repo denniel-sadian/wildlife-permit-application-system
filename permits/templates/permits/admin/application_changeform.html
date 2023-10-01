@@ -11,10 +11,10 @@
     {{ block.super }}
 
     <div class="submit-row custom-row">
-        {% if original.can_be_submitted and not original.orderofpayment %}
-        <input type="submit" value="Generate Order of Payment" name="generate_payment_order">
-        {% elif original.orderofpayment %}
-        <a href="{% url 'admin:payments_orderofpayment_change' original.orderofpayment.id %}">View Order of Payment</a>
+        {% if original.submittable and not original.paymentorder %}
+        <input type="submit" value="Generate Payment Order" name="generate_payment_order">
+        {% elif original.paymentorder %}
+        <a href="{% url 'admin:payments_paymentorder_change' original.paymentorder.id %}">View Payment Order</a>
         {% endif %}
     </div>
 

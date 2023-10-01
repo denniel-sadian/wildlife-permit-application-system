@@ -26,7 +26,8 @@ from .models import (
     RequirementList,
     RequirementItem,
     CollectionEntry,
-    Remarks
+    Remarks,
+    Status
 )
 
 
@@ -82,12 +83,18 @@ class RemarksInline(admin.TabularInline):
 
 @admin.register(PermitApplication)
 class PermitApplicationAdmin(admin.ModelAdmin):
-    list_display = ('no', 'permit_type', 'client', 'status', 'created_at')
+    list_display = ('no', 'permit_type', 'client', 'status',
+                    'submittable', 'created_at')
     list_filter = ('permit_type', 'status',)
     search_fields = ('no', 'permit_type', 'client__first_name',
                      'client__last_name', 'status')
     autocomplete_fields = ('client',)
     change_form_template = 'permits/admin/application_changeform.html'
+
+    def submittable(self, obj):
+        return obj.submittable
+
+    submittable.boolean = True
 
     def get_readonly_fields(self, request, obj=None):
         # If obj is None, it means we are adding a new record
@@ -140,7 +147,12 @@ class PermitApplicationAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj: PermitApplication):
         if 'generate_payment_order' in request.POST:
-            if obj.can_be_submitted:
+            if obj.paymentorder:
+                self.message_user(
+                    request, 'Order of Payment has been created already.', level=messages.WARNING)
+                path = f'admin:{obj.paymentorder._meta.app_label}_{obj.paymentorder._meta.model_name}_change'
+                return HttpResponseRedirect(reverse_lazy(path, args=[obj.paymentorder.id]))
+            if obj.submittable and obj.status != Status.DRAFT:
                 payment_order = PaymentOrder(
                     nature_of_doc_being_secured='Wildlife',
                     client=obj.client,
@@ -155,10 +167,15 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                 payment_order.no = no
                 payment_order.save()
                 self.message_user(
-                    request, 'Order of Payment has been created', level=messages.SUCCESS)
+                    request, 'Order of Payment has been created.', level=messages.SUCCESS)
                 path = f'admin:{payment_order._meta.app_label}_{payment_order._meta.model_name}_change'
                 return HttpResponseRedirect(reverse_lazy(path, args=[payment_order.id]))
             else:
+                self.message_user(request,
+                                  f'Please make sure the permit application is submittable '
+                                  f'and no longer on status {Status.DRAFT} (i.e. should be ACCEPTED) '
+                                  'before generating the payment order.',
+                                  level=messages.ERROR)
                 return HttpResponseRedirect('.')
         return super().response_change(request, obj)
 

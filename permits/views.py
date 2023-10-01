@@ -177,7 +177,7 @@ class SubmitRedirectView(SingleObjectMixin, RedirectView):
         same_url = reverse_lazy('update_application', kwargs={
                                 'pk': permit_application.id})
 
-        if not permit_application.can_be_submitted:
+        if not permit_application.submittable:
             messages.warning(
                 self.request,
                 'Your permit application is incomplete.')

@@ -182,7 +182,7 @@ class PermitApplication(models.Model):
         return True
 
     @property
-    def can_be_submitted(self):
+    def submittable(self):
         # Make sure the requirements are submitted
         if not self.needed_requirements_are_submitted:
             return False

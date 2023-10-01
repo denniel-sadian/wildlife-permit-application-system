@@ -45,7 +45,7 @@ class ORItem(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
-        verbose_name = "Order of Payment Item"
+        verbose_name = "Payment Order Item"
 
 
 class PaymentType(models.TextChoices):
