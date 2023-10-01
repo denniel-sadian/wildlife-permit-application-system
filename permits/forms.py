@@ -71,20 +71,13 @@ class TransportEntryBaseForm(forms.ModelForm):
         return quantity
 
 
-class RequirementForm(forms.ModelForm):
+class UploadedRequirementForm(forms.ModelForm):
+    requirement = AutoCompleteSelectField(
+        'needed-requirements', required=True, help_text=None)
 
     class Meta:
         model = UploadedRequirement
-        fields = ('requirement_type', 'uploaded_file')
-
-    def clean_requirement_type(self):
-        requirement_type = self.cleaned_data.get('requirement_type')
-        application: PermitApplication = self.instance.permit_application
-        existing_requirement = application.requirements.filter(
-            requirement_type=requirement_type).first()
-        if existing_requirement is not None and (existing_requirement.id != self.instance.id):
-            raise forms.ValidationError('This requirement already exists.')
-        return requirement_type
+        fields = ('requirement', 'uploaded_file')
 
 
 class TransportEntryForm(TransportEntryBaseForm):
