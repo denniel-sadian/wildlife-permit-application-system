@@ -51,6 +51,7 @@ class WildlifeCollectorPermitAdmin(admin.ModelAdmin):
 class UploadedRequirementInline(admin.StackedInline):
     model = UploadedRequirement
     extra = 1
+    autocomplete_fields = ('requirement',)
 
 
 class TransportEntryForm(TransportEntryBaseForm):
