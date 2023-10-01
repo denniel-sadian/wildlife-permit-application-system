@@ -4,8 +4,10 @@ from datetime import datetime
 from django.urls import reverse_lazy
 from django.contrib import admin
 from django.contrib import messages
+from django.contrib.admin.widgets import AdminDateWidget
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
+from django import forms
 
 from payments.models import (
     PaymentOrder
@@ -28,7 +30,8 @@ from .models import (
     RequirementItem,
     CollectionEntry,
     Remarks,
-    Status
+    Status,
+    Inspection
 )
 
 
@@ -178,6 +181,28 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                                   'before generating the payment order.',
                                   level=messages.ERROR)
                 return HttpResponseRedirect('.')
+
+        if 'create_inspection' in request.POST:
+            if hasattr(obj, 'inspection'):
+                self.message_user(
+                    request, 'Inspection has started already.', level=messages.WARNING)
+                path = f'admin:{obj.inspection._meta.app_label}_{obj.inspection._meta.model_name}_change'
+                return HttpResponseRedirect(reverse_lazy(path, args=[obj.inspection.id]))
+            if obj.submittable and obj.status != Status.DRAFT:
+                inspection = Inspection(permit_application=obj)
+                inspection.save()
+                self.message_user(
+                    request, 'Please continue editing the inspection record.', level=messages.SUCCESS)
+                path = f'admin:{inspection._meta.app_label}_{inspection._meta.model_name}_change'
+                return HttpResponseRedirect(reverse_lazy(path, args=[inspection.id]))
+            else:
+                self.message_user(request,
+                                  f'Please make sure the permit application is submittable '
+                                  f'and no longer on status {Status.DRAFT} (i.e. should be ACCEPTED) '
+                                  'before starting the inspection.',
+                                  level=messages.ERROR)
+                return HttpResponseRedirect('.')
+
         return super().response_change(request, obj)
 
 
@@ -196,3 +221,26 @@ class RequirementListAdmin(admin.ModelAdmin):
 class RequirementAdmin(admin.ModelAdmin):
     list_display = ('code',)
     search_fields = ('code', 'label')
+
+
+class InspectionForm(forms.ModelForm):
+    scheduled_date = forms.DateField(required=True, widget=AdminDateWidget())
+
+    class Meta:
+        model = Inspection
+        fields = ('permit_application', 'scheduled_date',
+                  'inspecting_officer', 'report_file')
+
+    def clean_scheduled_date(self):
+        scheduled_date = self.cleaned_data.get('scheduled_date')
+        if scheduled_date is not None and (scheduled_date < datetime.now().date()):
+            raise forms.ValidationError('The date is from the past.')
+        return scheduled_date
+
+
+@admin.register(Inspection)
+class InspectionAdmin(admin.ModelAdmin):
+    list_display = ('permit_application', 'scheduled_date')
+    autocomplete_fields = ('permit_application', 'inspecting_officer')
+    form = InspectionForm
+    change_form_template = 'permits/admin/inspection_changeform.html'
