@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 
 from .models import (
-    OrderOfPayment,
+    PaymentOrder,
     ORItem,
     Payment,
     PaymentType
@@ -18,8 +18,8 @@ class OItemInline(admin.StackedInline):
     extra = 1
 
 
-@admin.register(OrderOfPayment)
-class OrderOfPaymentAdmin(admin.ModelAdmin):
+@admin.register(PaymentOrder)
+class PaymentOrderAdmin(admin.ModelAdmin):
     list_display = ('no', 'permit_application', 'prepared_by', 'created_at')
     fields = ('no', 'nature_of_doc_being_secured',
               'client', 'permit_application', 'approved_by', 'prepared_by')
@@ -34,7 +34,7 @@ class OrderOfPaymentAdmin(admin.ModelAdmin):
         # Otherwise, when updating an existing record
         return ('client', 'client', 'permit_application', 'prepared_by')
 
-    def response_change(self, request, obj: OrderOfPayment):
+    def response_change(self, request, obj: PaymentOrder):
         if 'create_payment' in request.POST:
             if obj.payment_order is None:
                 payment = Payment(receipt_no=obj.no,

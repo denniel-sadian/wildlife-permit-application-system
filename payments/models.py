@@ -9,7 +9,7 @@ from permits.models import (
 )
 
 
-class OrderOfPayment(models.Model):
+class PaymentOrder(models.Model):
     no = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     nature_of_doc_being_secured = models.CharField(
@@ -39,7 +39,7 @@ class OrderOfPayment(models.Model):
 
 class ORItem(models.Model):
     order_of_payment = models.ForeignKey(
-        OrderOfPayment, on_delete=models.CASCADE, related_name='items')
+        PaymentOrder, on_delete=models.CASCADE, related_name='items')
     legal_basis = models.CharField(max_length=50)
     description = models.CharField(max_length=50)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -56,7 +56,7 @@ class PaymentType(models.TextChoices):
 class Payment(models.Model):
     receipt_no = models.CharField(max_length=255)
     payment_order = models.OneToOneField(
-        OrderOfPayment, on_delete=models.CASCADE)
+        PaymentOrder, on_delete=models.CASCADE)
     uploaded_receipt = models.FileField(
         upload_to='receipts/', null=True, blank=True)
     json_response = models.JSONField(null=True, blank=True)

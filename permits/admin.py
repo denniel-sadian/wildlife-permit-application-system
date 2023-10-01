@@ -8,7 +8,7 @@ from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
 
 from payments.models import (
-    OrderOfPayment
+    PaymentOrder
 )
 
 from .forms import (
@@ -141,7 +141,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
     def response_change(self, request, obj: PermitApplication):
         if 'generate_op' in request.POST:
             if obj.can_be_submitted:
-                payment_order = OrderOfPayment(
+                payment_order = PaymentOrder(
                     nature_of_doc_being_secured='Wildlife',
                     client=obj.client,
                     permit_application=obj,
