@@ -12,7 +12,7 @@ from animals.models import (
 from users.models import Client
 
 from .models import (
-    Requirement,
+    UploadedRequirement,
     PermitApplication,
     Status,
     PermitType,
@@ -74,7 +74,7 @@ class TransportEntryBaseForm(forms.ModelForm):
 class RequirementForm(forms.ModelForm):
 
     class Meta:
-        model = Requirement
+        model = UploadedRequirement
         fields = ('requirement_type', 'uploaded_file')
 
     def clean_requirement_type(self):

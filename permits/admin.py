@@ -21,7 +21,7 @@ from .models import (
     PermittedToCollectAnimal,
     PermitApplication,
     PermitType,
-    Requirement,
+    UploadedRequirement,
     TransportEntry,
     RequirementList,
     RequirementItem,
@@ -48,7 +48,7 @@ class WildlifeCollectorPermitAdmin(admin.ModelAdmin):
 
 
 class RequirementInline(admin.StackedInline):
-    model = Requirement
+    model = UploadedRequirement
     extra = 1
     verbose_name_plural = 'Submitted Requirements'
 

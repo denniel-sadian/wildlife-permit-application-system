@@ -21,7 +21,7 @@ from .models import (
     PermitApplication,
     PermitType,
     Status,
-    Requirement,
+    UploadedRequirement,
     TransportEntry,
     CollectionEntry
 )
@@ -123,7 +123,7 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
 
         if self.request.POST:
             RequirementFormSet = forms.inlineformset_factory(
-                PermitApplication, Requirement, form=RequirementForm, extra=extra)
+                PermitApplication, UploadedRequirement, form=RequirementForm, extra=extra)
             context['requirements'] = RequirementFormSet(
                 self.request.POST, self.request.FILES, instance=self.object, prefix='reqs')
 
@@ -138,7 +138,7 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
                 self.request.POST, self.request.FILES, instance=self.object, prefix='collection_entries')
         else:
             RequirementFormSet = forms.inlineformset_factory(
-                PermitApplication, Requirement, form=RequirementForm, extra=extra)
+                PermitApplication, UploadedRequirement, form=RequirementForm, extra=extra)
             context['requirements'] = RequirementFormSet(
                 instance=self.object, queryset=requirements, prefix='reqs')
 
