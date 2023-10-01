@@ -181,9 +181,10 @@ class PermitApplicationAdmin(admin.ModelAdmin):
         return super().response_change(request, obj)
 
 
-class RequirementItemInline(admin.StackedInline):
+class RequirementItemInline(admin.TabularInline):
     model = RequirementItem
     extra = 1
+    autocomplete_fields = ('requirement',)
 
 
 @admin.register(RequirementList)
@@ -194,3 +195,4 @@ class RequirementListAdmin(admin.ModelAdmin):
 @admin.register(Requirement)
 class RequirementAdmin(admin.ModelAdmin):
     list_display = ('code',)
+    search_fields = ('code', 'label')
