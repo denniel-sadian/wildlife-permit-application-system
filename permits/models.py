@@ -66,6 +66,9 @@ class Requirement(models.Model):
     code = models.CharField(max_length=100, unique=True)
     label = models.CharField(max_length=255)
 
+    def __str__(self):
+        return str(self.code)
+
 
 class RequirementList(models.Model):
     permit_type = models.CharField(
