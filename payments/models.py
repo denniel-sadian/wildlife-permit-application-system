@@ -19,7 +19,7 @@ class PaymentOrder(models.Model):
     permit_application = models.OneToOneField(
         PermitApplication, on_delete=models.CASCADE)
     prepared_by = models.ForeignKey(
-        'users.Admin', on_delete=models.CASCADE, related_name='prepared_order_of_payments')
+        'users.Admin', on_delete=models.CASCADE, related_name='prepared_payment_orders')
     approved_by = models.ForeignKey(
         'users.Admin', on_delete=models.CASCADE, null=True, blank=True)
 
@@ -38,7 +38,7 @@ class PaymentOrder(models.Model):
 
 
 class ORItem(models.Model):
-    order_of_payment = models.ForeignKey(
+    payment_order = models.ForeignKey(
         PaymentOrder, on_delete=models.CASCADE, related_name='items')
     legal_basis = models.CharField(max_length=50)
     description = models.CharField(max_length=50)
