@@ -12,7 +12,7 @@
 
     <div class="submit-row custom-row">
         {% if original.can_be_submitted and not original.orderofpayment %}
-        <input type="submit" value="Generate Order of Payment" name="generate_op">
+        <input type="submit" value="Generate Order of Payment" name="generate_payment_order">
         {% elif original.orderofpayment %}
         <a href="{% url 'admin:payments_orderofpayment_change' original.orderofpayment.id %}">View Order of Payment</a>
         {% endif %}

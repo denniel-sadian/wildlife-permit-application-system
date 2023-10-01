@@ -139,7 +139,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
         formset.save_m2m()
 
     def response_change(self, request, obj: PermitApplication):
-        if 'generate_op' in request.POST:
+        if 'generate_payment_order' in request.POST:
             if obj.can_be_submitted:
                 payment_order = PaymentOrder(
                     nature_of_doc_being_secured='Wildlife',
