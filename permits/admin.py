@@ -70,6 +70,13 @@ class TransportEntryInline(admin.TabularInline):
     verbose_name_plural = 'Transport Entries'
 
 
+@admin.register(LocalTransportPermit)
+class LocalTransportPermitAdmin(admin.ModelAdmin):
+    list_display = ('permit_no', 'status', 'client')
+    inlines = (TransportEntryInline,)
+    change_form_template = 'permits/admin/permit_changeform.html'
+
+
 class CollectionEntryInline(admin.TabularInline):
     fields = ('sub_species', 'quantity')
     model = CollectionEntry
