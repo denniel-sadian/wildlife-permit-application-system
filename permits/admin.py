@@ -1,5 +1,6 @@
 from typing import Any
 from datetime import datetime
+from datetime import timedelta
 
 from django.urls import reverse_lazy
 from django.contrib import admin
@@ -7,6 +8,9 @@ from django.contrib import messages
 from django.contrib.admin.widgets import AdminDateWidget
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
+from django.utils import timezone
+from django.conf import settings
+
 from django import forms
 
 from payments.models import (
@@ -18,8 +22,10 @@ from .forms import (
 )
 
 from .models import (
+    Permit,
     WildlifeFarmPermit,
     WildlifeCollectorPermit,
+    LocalTransportPermit,
     PermittedToCollectAnimal,
     PermitApplication,
     PermitType,
@@ -119,6 +125,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
 
         if obj and obj.permit_type == PermitType.LTP:
             fields.append('transport_date')
+            fields.append('transport_location')
         if obj and obj.permit_type == PermitType.WCP:
             fields.append(
                 'names_and_addresses_of_authorized_collectors_or_trappers')
@@ -209,6 +216,29 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                                   'before starting the inspection.',
                                   level=messages.ERROR)
                 return HttpResponseRedirect('.')
+
+        if 'generate_permit' in request.POST:
+            if obj.permit is None:
+                if obj.permit_type == PermitType.LTP:
+                    ltp = LocalTransportPermit(
+                        status=Status.DRAFT,
+                        client=obj.client,
+                        valid_until=timezone.now()+timedelta(days=settings.DAYS_VALID),
+                        wfp=obj.client.current_wfp,
+                        wcp=obj.client.current_wcp,
+                        transport_location=obj.transport_location,
+                        transport_date=obj.transport_date
+                    )
+                    ltp.save()
+                    formatted_date = datetime.now().strftime("%Y-%m")
+                    day_part = datetime.now().day
+                    ltp.permit_no = f'PMDQ-{obj.permit_type}-{formatted_date}-{day_part}-{ltp.id}'
+                    ltp.save()
+                    for i in obj.requested_species_to_transport.all():
+                        i.ltp = ltp
+                        i.save()
+                    obj.permit = Permit.objects.select_subclasses().get(id=ltp.id)
+                    obj.save()
 
         return super().response_change(request, obj)
 
