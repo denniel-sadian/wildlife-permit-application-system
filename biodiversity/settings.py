@@ -205,3 +205,8 @@ PHONENUMBER_DEFAULT_REGION = 'PH'
 # TIME
 
 TIME_ZONE = 'Asia/Manila'
+
+
+# Permits
+
+DAYS_VALID = 30
