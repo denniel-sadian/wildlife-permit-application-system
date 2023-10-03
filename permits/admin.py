@@ -168,8 +168,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
             if hasattr(obj, 'paymentorder'):
                 self.message_user(
                     request, 'Order of Payment has been created already.', level=messages.WARNING)
-                path = f'admin:{obj.paymentorder._meta.app_label}_{obj.paymentorder._meta.model_name}_change'
-                return HttpResponseRedirect(reverse_lazy(path, args=[obj.paymentorder.id]))
+                return HttpResponseRedirect(obj.admin_url)
             if obj.submittable and obj.status != Status.DRAFT:
                 payment_order = PaymentOrder(
                     nature_of_doc_being_secured='Wildlife',
@@ -186,8 +185,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                 payment_order.save()
                 self.message_user(
                     request, 'Order of Payment has been created.', level=messages.SUCCESS)
-                path = f'admin:{payment_order._meta.app_label}_{payment_order._meta.model_name}_change'
-                return HttpResponseRedirect(reverse_lazy(path, args=[payment_order.id]))
+                return HttpResponseRedirect(payment_order.admin_url)
             else:
                 self.message_user(request,
                                   f'Please make sure the permit application is submittable '
@@ -200,15 +198,13 @@ class PermitApplicationAdmin(admin.ModelAdmin):
             if hasattr(obj, 'inspection'):
                 self.message_user(
                     request, 'Inspection has started already.', level=messages.WARNING)
-                path = f'admin:{obj.inspection._meta.app_label}_{obj.inspection._meta.model_name}_change'
-                return HttpResponseRedirect(reverse_lazy(path, args=[obj.inspection.id]))
+                return HttpResponseRedirect(obj.inspection.admin_url)
             if obj.submittable and obj.status != Status.DRAFT:
                 inspection = Inspection(permit_application=obj)
                 inspection.save()
                 self.message_user(
                     request, 'Please continue editing the inspection record.', level=messages.SUCCESS)
-                path = f'admin:{inspection._meta.app_label}_{inspection._meta.model_name}_change'
-                return HttpResponseRedirect(reverse_lazy(path, args=[inspection.id]))
+                return HttpResponseRedirect(inspection.admin_url)
             else:
                 self.message_user(request,
                                   f'Please make sure the permit application is submittable '

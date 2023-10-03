@@ -45,8 +45,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
                 payment.save()
                 self.message_user(
                     request, 'Payment record has been made.', level=messages.SUCCESS)
-                path = f'admin:{payment._meta.app_label}_{payment._meta.model_name}_change'
-                return HttpResponseRedirect(reverse_lazy(path, args=[payment.id]))
+                return HttpResponseRedirect(payment.admin_url)
 
         return super().response_change(request, obj)
 
