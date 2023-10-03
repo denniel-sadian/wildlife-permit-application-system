@@ -11,7 +11,7 @@
     {{ block.super }}
 
     <div class="submit-row custom-row">
-        {% if original.permit_application %}<a href="{% url 'admin:permits_permitapplication_change' original.permit_application.id %}">View Permit Application</a>{% endif %}
+        {% if original.permit_application %}<a href="{{ original.permit_application.admin_url }}">View Permit Application</a>{% endif %}
     </div>
 
 {% endblock %}

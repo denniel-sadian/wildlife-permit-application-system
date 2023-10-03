@@ -14,13 +14,13 @@
         {% if original.submittable and not original.paymentorder %}
         <input type="submit" value="Generate Payment Order" name="generate_payment_order">
         {% elif original.paymentorder %}
-        <a href="{% url 'admin:payments_paymentorder_change' original.paymentorder.id %}">View Payment Order</a>
+        <a href="{{ original.paymentorder.admin_url }}">View Payment Order</a>
         {% endif %}
 
         {% if not original.inspection %}
         <input type="submit" value="Start Inspection" name="create_inspection">
         {% else %}
-        <a href="{% url 'admin:permits_inspection_change' original.inspection.id %}">View Inspection</a>
+        <a href="{{ original.inspection.admin_url }}">View Inspection</a>
         {% endif %}
 
         {% if request.user.type == 'Admin' %}

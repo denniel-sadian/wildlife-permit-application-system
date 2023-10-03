@@ -11,7 +11,7 @@
     {{ block.super }}
 
     <div class="submit-row custom-row">
-        {% if original.payment_order %}<a href="{% url 'admin:payments_paymentorder_change' original.payment_order.id %}">View Payment Order</a>{% endif %}
+        {% if original.payment_order %}<a href="{{ original.payment_order.admin_url }}">View Payment Order</a>{% endif %}
     </div>
 
 {% endblock %}
