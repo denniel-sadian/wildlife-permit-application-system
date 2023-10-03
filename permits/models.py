@@ -107,12 +107,37 @@ class Permit(models.Model):
     objects = InheritanceManager()
 
     @property
+    def subclass(self):
+        """Return the subclass instance."""
+        try:
+            return self._subclass
+        except AttributeError:
+            self._subclass = self.__class__.objects.get_subclass(id=self.id)
+        return self._subclass
+
+    @property
+    def type(self):
+        """Return the type of the permit."""
+        return self.subclass.__class__.__name__
+
+    @property
     def current_status(self):
         if self.valid_until:
             is_still_valid = self.valid_until >= timezone.now().date()
             if not is_still_valid:
                 return Status.EXPIRED
         return self.status
+
+    @property
+    def admin_url(self):
+        permit = self.subclass
+        path = f'admin:{permit._meta.app_label}_{permit._meta.model_name}_change'
+        return reverse_lazy(path, args=[permit.id])
+
+    @property
+    def application(self):
+        application = PermitApplication.objects.filter(permit=self).first()
+        return application
 
     def __str__(self):
         return str(self.permit_no)
