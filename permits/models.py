@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 
 from model_utils.managers import InheritanceManager
 
+from users.mixins import ModelMixin
 from animals.models import SubSpecies
 
 
@@ -182,7 +183,7 @@ class LocalTransportPermit(Permit):
         verbose_name = "Local Transport Permit"
 
 
-class PermitApplication(models.Model):
+class PermitApplication(ModelMixin, models.Model):
     no = models.CharField(max_length=255)
     client = models.ForeignKey(
         'users.Client', on_delete=models.CASCADE, related_name='permit_applications')
@@ -250,11 +251,6 @@ class PermitApplication(models.Model):
 
         return True
 
-    @property
-    def admin_url(self):
-        path = f'admin:{self._meta.app_label}_{self._meta.model_name}_change'
-        return reverse_lazy(path, args=[self.id])
-
     def __str__(self):
         return str(self.no)
 
@@ -316,7 +312,7 @@ class Remarks(models.Model):
         ordering = ['-created_at']
 
 
-class Inspection(models.Model):
+class Inspection(ModelMixin, models.Model):
     permit_application = models.OneToOneField(
         PermitApplication, on_delete=models.CASCADE)
     scheduled_date = models.DateField(blank=True, null=True)
