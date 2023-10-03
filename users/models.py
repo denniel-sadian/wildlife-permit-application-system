@@ -81,11 +81,11 @@ class Client(User):
     @property
     def current_wcp(self):
         try:
-            wfp = WildlifeCollectorPermit.objects \
+            wcp = WildlifeCollectorPermit.objects \
                 .filter(client=self).latest('created_at')
         except WildlifeCollectorPermit.DoesNotExist:
-            wfp = None
-        return wfp
+            wcp = None
+        return wcp
 
     @property
     def current_wfp(self):
