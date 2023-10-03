@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse_lazy
 
 from model_utils.managers import InheritanceManager
 
@@ -173,7 +174,7 @@ class LocalTransportPermit(Permit):
     wfp = models.ForeignKey(
         WildlifeFarmPermit, on_delete=models.CASCADE, related_name='wfp_ltps')
     wcp = models.ForeignKey(
-        WildlifeFarmPermit, on_delete=models.CASCADE, related_name='wcp_ltps')
+        WildlifeCollectorPermit, on_delete=models.CASCADE, related_name='wcp_ltps')
     transport_location = models.CharField(max_length=255)
     transport_date = models.DateField()
 
@@ -192,10 +193,16 @@ class PermitApplication(models.Model):
 
     # LTP
     transport_date = models.DateField(null=True, blank=True)
+    transport_location = models.CharField(
+        max_length=255, null=True, blank=True)
 
     # WCP
     names_and_addresses_of_authorized_collectors_or_trappers = models.TextField(
         null=True, blank=True)
+
+    # The permit created
+    permit = models.ForeignKey(
+        Permit, on_delete=models.CASCADE, null=True, blank=True)
 
     @property
     def needed_requirements(self):
@@ -242,6 +249,11 @@ class PermitApplication(models.Model):
                 return False
 
         return True
+
+    @property
+    def admin_url(self):
+        path = f'admin:{self._meta.app_label}_{self._meta.model_name}_change'
+        return reverse_lazy(path, args=[self.id])
 
     def __str__(self):
         return str(self.no)
