@@ -4,12 +4,13 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
+from users.mixins import ModelMixin
 from permits.models import (
     PermitApplication
 )
 
 
-class PaymentOrder(models.Model):
+class PaymentOrder(ModelMixin, models.Model):
     no = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     nature_of_doc_being_secured = models.CharField(
@@ -53,7 +54,7 @@ class PaymentType(models.TextChoices):
     ONLINE = 'ONLINE', 'Online'
 
 
-class Payment(models.Model):
+class Payment(ModelMixin, models.Model):
     receipt_no = models.CharField(max_length=255)
     payment_order = models.OneToOneField(
         PaymentOrder, on_delete=models.CASCADE)
