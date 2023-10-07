@@ -2,10 +2,10 @@ from typing import Any
 from datetime import datetime
 from datetime import timedelta
 
-from django.urls import reverse_lazy
 from django.contrib import admin
 from django.contrib import messages
 from django.contrib.admin.widgets import AdminDateWidget
+from django.contrib.contenttypes.admin import GenericStackedInline
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
 from django.utils import timezone
@@ -37,24 +37,9 @@ from .models import (
     CollectionEntry,
     Remarks,
     Status,
-    Inspection
+    Inspection,
+    Signature
 )
-
-
-@admin.register(WildlifeFarmPermit)
-class WildlifeFarmPermitAdmin(admin.ModelAdmin):
-    list_display = ('permit_no', 'status', 'client')
-
-
-class PermittedToCollectAnimalInline(admin.TabularInline):
-    model = PermittedToCollectAnimal
-    extra = 1
-
-
-@admin.register(WildlifeCollectorPermit)
-class WildlifeCollectorPermitAdmin(admin.ModelAdmin):
-    list_display = ('permit_no', 'status', 'client')
-    inlines = (PermittedToCollectAnimalInline,)
 
 
 class UploadedRequirementInline(admin.StackedInline):
@@ -76,11 +61,75 @@ class TransportEntryInline(admin.TabularInline):
     verbose_name_plural = 'Transport Entries'
 
 
-@admin.register(LocalTransportPermit)
-class LocalTransportPermitAdmin(admin.ModelAdmin):
+class SignatureInline(GenericStackedInline):
+    model = Signature
+    fields = ('title', 'image')
+    readonly_fields = ('person',)
+    extra = 1
+
+
+class PermitBaseAdmin(admin.ModelAdmin):
     list_display = ('permit_no', 'status', 'client')
-    inlines = (TransportEntryInline,)
+    search_fields = ('permit_no',)
     change_form_template = 'permits/admin/permit_changeform.html'
+
+    def get_fields(self, request, obj):
+        fields = ['permit_no', 'status', 'created_at',
+                  'valid_until', 'uploaded_file', 'inspection']
+        if obj.client:
+            fields.append('client')
+        elif obj.permittee:
+            fields.append('permittee')
+        return fields
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj is None:
+            return ()
+
+        read_only_fields = ['created_at', 'wfp', 'wcp', 'inspection']
+        if obj.client:
+            read_only_fields.append('client')
+        elif obj.permittee:
+            read_only_fields.append('permittee')
+
+        return read_only_fields
+
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for obj in formset.deleted_objects:
+            obj.delete()
+        for instance in instances:
+            if (isinstance(instance, Signature)):
+                instance.person = request.user
+                instance.title = instance.person.title
+            instance.save()
+        formset.save_m2m()
+
+
+@admin.register(LocalTransportPermit)
+class LocalTransportPermitAdmin(PermitBaseAdmin):
+    inlines = (TransportEntryInline, SignatureInline)
+    autocomplete_fields = ('wfp', 'wcp')
+
+    def get_fields(self, request, obj):
+        fields = super().get_fields(request, obj)
+        fields += ['wfp', 'wcp', 'transport_location', 'transport_date']
+        return fields
+
+
+@admin.register(WildlifeFarmPermit)
+class WildlifeFarmPermitAdmin(PermitBaseAdmin):
+    pass
+
+
+class PermittedToCollectAnimalInline(admin.TabularInline):
+    model = PermittedToCollectAnimal
+    extra = 1
+
+
+@admin.register(WildlifeCollectorPermit)
+class WildlifeCollectorPermitAdmin(PermitBaseAdmin):
+    inlines = (PermittedToCollectAnimalInline,)
 
 
 class CollectionEntryInline(admin.TabularInline):
@@ -215,6 +264,19 @@ class PermitApplicationAdmin(admin.ModelAdmin):
 
         if 'generate_permit' in request.POST:
             if obj.permit is None:
+                if not hasattr(obj, 'paymentorder') or (hasattr(obj, 'paymentorder') and not obj.paymentorder.paid):
+                    self.message_user(
+                        request,
+                        'Please make sure first that there is a payment order and that it has been '
+                        'paid already before generating the very permit record.', level=messages.ERROR)
+                    return HttpResponseRedirect('.')
+
+                if not hasattr(obj, 'inspection'):
+                    self.message_user(
+                        request,
+                        'Cannot generate the permit because there is no inspection report.', level=messages.ERROR)
+                    return HttpResponseRedirect('.')
+
                 if obj.permit_type == PermitType.LTP:
                     ltp = LocalTransportPermit(
                         status=Status.DRAFT,
@@ -223,7 +285,9 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                         wfp=obj.client.current_wfp,
                         wcp=obj.client.current_wcp,
                         transport_location=obj.transport_location,
-                        transport_date=obj.transport_date
+                        transport_date=obj.transport_date,
+                        payment_order=obj.paymentorder,
+                        inspection=obj.inspection
                     )
                     ltp.save()
                     formatted_date = datetime.now().strftime("%Y-%m")
@@ -235,6 +299,8 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                         i.save()
                     obj.permit = Permit.objects.select_subclasses().get(id=ltp.id)
                     obj.save()
+
+                    return HttpResponseRedirect(ltp.admin_url)
 
         return super().response_change(request, obj)
 
@@ -263,12 +329,6 @@ class InspectionForm(forms.ModelForm):
         model = Inspection
         fields = ('permit_application', 'scheduled_date',
                   'inspecting_officer', 'report_file')
-
-    def clean_scheduled_date(self):
-        scheduled_date = self.cleaned_data.get('scheduled_date')
-        if scheduled_date is not None and (scheduled_date < datetime.now().date()):
-            raise forms.ValidationError('The date is from the past.')
-        return scheduled_date
 
 
 @admin.register(Inspection)
