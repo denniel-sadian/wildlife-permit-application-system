@@ -1,23 +1,29 @@
+import uuid
+
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.dispatch import Signal
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.auth.models import Group
 
-from .models import User, Admin, Client, Permittee
+from .models import User, Client, Permittee
+from .emails import RegistrationEmailView
 
 
-def add_to_correct_group_if_not_yet_added(user: User):
-    '''Add the user to thier correct group.'''
-    group = Group.objects.get(name=user.role.label)
-    if (group not in user.groups.all()):
+user_created = Signal()
+
+
+@receiver(user_created)
+def handle_user_created(sender, user: User, **kwargs):
+    # Set temporary password, and then send the registration email too
+    temporary_password = str(uuid.uuid4())
+    user.set_password(temporary_password)
+    user.save()
+    RegistrationEmailView(user, temporary_password).send()
+
+    # Assign the user to the right group
+    group = Group.objects.get(name=user.type)
+    if group not in user.groups.all():
         user.groups.add(group)
-
-
-@receiver(post_save, sender=Admin)
-def post_save_admin(sender, instance: Admin, created, **kwargs):
-    """Admins' post-save signal."""
-    if created:
-        add_to_correct_group_if_not_yet_added(instance)
 
 
 @receiver(user_logged_in)
