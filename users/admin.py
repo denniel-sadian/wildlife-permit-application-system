@@ -21,8 +21,8 @@ class BaseUserAdmin(UserAdmin):
                     'date_joined', 'last_login')
     fieldsets = (
         ('Authentication', {'fields': ('username', 'password')}),
-        ('Personal Information', {
-         'fields': ('first_name', 'last_name', 'gender', 'email', 'phone_number')}),
+        ('User Information', {
+         'fields': ('first_name', 'last_name', 'gender', 'email', 'phone_number', 'title')}),
         ('Important dates', {'fields': ('date_joined',)}),
         (
             'Permissions',
