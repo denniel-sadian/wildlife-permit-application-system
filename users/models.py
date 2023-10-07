@@ -96,6 +96,17 @@ class Admin(User):
         super().save(*args, **kwargs)
 
 
+class Signatory(User):
+
+    class Meta:
+        verbose_name = 'Signatory'
+        verbose_name_plural = 'Signatories'
+
+    def save(self, *args, **kwargs):
+        self.is_staff = True
+        super().save(*args, **kwargs)
+
+
 class Cashier(User):
 
     class Meta:

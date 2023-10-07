@@ -5,7 +5,8 @@ from .models import (
     Client,
     Admin,
     Cashier,
-    Permittee
+    Permittee,
+    Signatory
 )
 
 
@@ -44,6 +45,11 @@ class AdminAdmin(BaseUserAdmin):
 
 @admin.register(Cashier)
 class CashierAdmin(BaseUserAdmin):
+    pass
+
+
+@admin.register(Signatory)
+class SignatoryAdmin(BaseUserAdmin):
     pass
 
 
