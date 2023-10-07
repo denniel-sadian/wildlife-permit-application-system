@@ -69,7 +69,7 @@ class SignatureInline(GenericStackedInline):
 
 
 class PermitBaseAdmin(admin.ModelAdmin):
-    list_display = ('permit_no', 'status', 'client')
+    list_display = ('permit_no', 'status', 'client', 'permittee')
     search_fields = ('permit_no',)
     autocomplete_fields = ('inspection', 'client', 'permittee')
     change_form_template = 'permits/admin/permit_changeform.html'
@@ -83,9 +83,9 @@ class PermitBaseAdmin(admin.ModelAdmin):
         else:
             fields += ['client', 'permittee']
 
-        if hasattr(obj, 'client'):
+        if obj.client:
             fields.append('client')
-        elif hasattr(obj, 'permittee'):
+        elif obj.permittee:
             fields.append('permittee')
 
         return fields
@@ -95,9 +95,9 @@ class PermitBaseAdmin(admin.ModelAdmin):
             return ()
 
         read_only_fields = ['created_at', 'wfp', 'wcp', 'inspection']
-        if hasattr(obj, 'client'):
+        if obj.client:
             read_only_fields.append('client')
-        elif hasattr(obj, 'permittee'):
+        elif obj.permittee:
             read_only_fields.append('permittee')
 
         return read_only_fields
