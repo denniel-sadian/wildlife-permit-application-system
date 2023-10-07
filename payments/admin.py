@@ -19,14 +19,20 @@ class PaymentOrderItemInline(admin.TabularInline):
 
 @admin.register(PaymentOrder)
 class PaymentOrderAdmin(admin.ModelAdmin):
-    list_display = ('no', 'permit_application', 'prepared_by', 'created_at')
+    list_display = ('no', 'permit_application',
+                    'paid', 'prepared_by', 'created_at')
     fields = ('no', 'nature_of_doc_being_secured',
-              'client', 'permit_application', 'prepared_by', 'approved_by')
+              'client', 'permit_application', 'prepared_by', 'approved_by', 'paid')
     autocomplete_fields = ('permit_application', 'client',
                            'approved_by', 'prepared_by')
     search_fields = ('no', 'permit_application__no')
     inlines = (PaymentOrderItemInline,)
     change_form_template = 'payments/admin/paymentorder_changeform.html'
+
+    def paid(self):
+        return self.paid
+
+    paid.boolean = True
 
     def get_readonly_fields(self, request, obj=None):
         # If obj is None, it means we are adding a new record

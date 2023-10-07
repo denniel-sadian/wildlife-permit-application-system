@@ -23,6 +23,7 @@ class PaymentOrder(ModelMixin, models.Model):
         'users.Admin', on_delete=models.CASCADE, related_name='prepared_payment_orders')
     approved_by = models.ForeignKey(
         'users.Admin', on_delete=models.CASCADE, null=True, blank=True)
+    paid = models.BooleanField(default=False)
 
     @property
     def total(self):
