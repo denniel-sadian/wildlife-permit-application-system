@@ -1,12 +1,11 @@
 from typing import Any
 from datetime import datetime
 
-from dal import autocomplete
-
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.db import transaction
 from django.http import HttpResponse
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.views.generic import DeleteView, RedirectView
@@ -23,7 +22,8 @@ from .models import (
     Status,
     UploadedRequirement,
     TransportEntry,
-    CollectionEntry
+    CollectionEntry,
+    Permit
 )
 from .forms import (
     PermitApplicationForm,
@@ -232,16 +232,16 @@ class UnsubmitRedirectView(SingleObjectMixin, RedirectView):
         return same_url
 
 
-class PermitApplicationAutocompleteView(autocomplete.Select2QuerySetView):
+class PermitDetailView(DetailView):
+    model = Permit
 
-    def get_queryset(self):
-        # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated:
-            return PermitApplication.objects.none()
+    def get_template_names(self) -> list[str]:
+        templates = {
+            'LocalTransportPermit': 'permits/ltp.html'
+        }
+        return [templates[self.object.type]]
 
-        qs = PermitApplication.objects.all()
-
-        if self.q:
-            qs = qs.filter(no__istartswith=self.q)
-
-        return qs
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['permit'] = self.get_object().subclass
+        return context
