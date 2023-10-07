@@ -1,10 +1,17 @@
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse_lazy
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Sum, F, Value
+from django.db.models.functions import Coalesce
+
+from django_resized import ResizedImageField
 
 from model_utils.managers import InheritanceManager
 
 from users.mixins import ModelMixin
+from users.mixins import validate_file_extension
 from animals.models import SubSpecies
 
 
@@ -23,45 +30,6 @@ class PermitType(models.TextChoices):
     LTP = 'LTP', 'Local Transport Permit'
     CWR = 'CWR', 'Certificate of Wildlife Registration'
     GP = 'GP', 'Gratuitous Permit'
-
-
-class RequirementType(models.TextChoices):
-    PRIOR_CLEARANCE_FROM_AFFECTED_COMMUNITIES = (
-        'PRIOR_CLEARANCE_FROM_AFFECTED_COMMUNITIES',
-        'Prior clearance from the affected communities, i.e. concerned LGUs, recognized head people in accordance with R.A. 8371, or PAMB')
-    # WFP
-    CERT_OF_REGISTRATION = (
-        'CERT_OF_REGISTRATION',
-        'Copy of Certificate of Registration from appropriate Government agencies')
-    SCIENTIFIC_EXPERTISE_PROOF = (
-        'SCIENTIFIC_EXPERTISE_PROOF',
-        'Proof of scientific expertise (list of qualifications of manpower)')
-    FINANCIAL_PLAN = (
-        'FINANCIAL_PLAN',
-        'Financial plan showing financial capability to go into breeding')
-    PROPOSED_FACILITY_DESIGN = (
-        'PROPOSED_FACILITY_DESIGN', 'Proposed facility design')
-    LETTER_OF_COMMITMENT = (
-        'LETTER_OF_COMMITMENT',
-        'In case of indigenous threatened species, letter of commitment to simultaneously undertake conservation breeding and propose measures on rehabilitation and/or protection of habitat, where appropriate, as may be determined by the RWMC')
-    # WCP
-    CITIZENSHIP = (
-        'CITIZENSHIP',
-        'Citizenship verification papers, if citizenship is by Naturalization')
-    # LTP
-    DOCUMENTS_SUPPORTING_LEGAL_POSSESSION_OF_WILDLIFE = (
-        'DOCUMENTS_SUPPORTING_LEGAL_POSSESSION_OF_WILDLIFE',
-        'Documents supporting the legal possession/acquisition of wildlife')
-    PHYTOSANITARY_OR_VETERINARY_CERT = (
-        'PHYTOSANITARY_OR_VETERINARY_CERT',
-        'Phytosanitary Certificate (for plants) or Veterinary Quarantine Certificate (for animals) from the concerned Department of Agriculture (DA) Office.')
-
-    # CWP
-    ACQUISITION_PROOF_OR_DEEDS_OF_DONATION = 'ACQUISITION_PROOF_OR_DEEDS_OF_DONATION', 'Proof of Acquisition/Deeds of Donation'
-
-    # GW
-    ENDORSEMENT_LETTER = 'ENDORSEMENT_LETTER', 'Endorsement letter from dead/recognized expert/conservation organization'
-    COPY_OF_RESEARCH_THESIS_DISSERTATION = 'COPY_OF_RESEARCH_THESIS_DISSERTATION', 'Copy of the research/thesis/dissertation proposals, or copy of the affidavit of undertaking/approved memorandum of agreement (MOA)'
 
 
 class Requirement(models.Model):
@@ -100,11 +68,16 @@ class Permit(ModelMixin, models.Model):
     client = models.ForeignKey(
         'users.Client', on_delete=models.CASCADE, blank=True, null=True, related_name='permits')
     permittee = models.ForeignKey(
-        'users.Permittee', on_delete=models.CASCADE, blank=True, null=True, related_name='temporarily_assigned_permits')
+        'users.Permittee', on_delete=models.CASCADE, blank=True, null=True,
+        related_name='temporarily_assigned_permits')
     uploaded_file = models.FileField(
-        upload_to='uploads/', null=True, blank=True)
+        upload_to='uploads/', null=True, blank=True, validators=[validate_file_extension])
     valid_until = models.DateField(null=True, blank=True)
     created_at = models.DateField(auto_now_add=True)
+    payment_order = models.ForeignKey(
+        'payments.PaymentOrder', on_delete=models.SET_NULL, blank=True, null=True)
+    inspection = models.ForeignKey(
+        'Inspection', on_delete=models.SET_NULL, blank=True, null=True)
 
     objects = InheritanceManager()
 
@@ -130,6 +103,14 @@ class Permit(ModelMixin, models.Model):
     def application(self):
         application = PermitApplication.objects.filter(permit=self).first()
         return application
+
+    @property
+    def signature(self):
+        try:
+            model_type = ContentType.objects.get_for_model(self.__class__)
+            return Signature.objects.get(content_type__id=model_type.id, object_id=self.subclass.id)
+        except Signature.DoesNotExist:
+            return None
 
     def __str__(self):
         return str(self.permit_no)
@@ -163,14 +144,21 @@ class PermittedToCollectAnimal(models.Model):
 
 class LocalTransportPermit(Permit):
     wfp = models.ForeignKey(
-        WildlifeFarmPermit, on_delete=models.CASCADE, related_name='wfp_ltps')
+        WildlifeFarmPermit, verbose_name='Wildlife Farm Permit',
+        on_delete=models.CASCADE, related_name='wfp_ltps')
     wcp = models.ForeignKey(
-        WildlifeCollectorPermit, on_delete=models.CASCADE, related_name='wcp_ltps')
+        WildlifeCollectorPermit, verbose_name="Wildlife Collector's Permit",
+        on_delete=models.CASCADE, related_name='wcp_ltps')
     transport_location = models.CharField(max_length=255)
     transport_date = models.DateField()
 
     class Meta:
-        verbose_name = "Local Transport Permit"
+        verbose_name = 'Local Transport Permit'
+
+    @property
+    def total_transport_quantity(self):
+        return self.species_to_transport.aggregate(
+            total=Coalesce(Sum(F('quantity')), Value(0, models.IntegerField())))['total']
 
 
 class PermitApplication(ModelMixin, models.Model):
@@ -193,7 +181,7 @@ class PermitApplication(ModelMixin, models.Model):
 
     # The permit created
     permit = models.ForeignKey(
-        Permit, on_delete=models.CASCADE, null=True, blank=True)
+        Permit, on_delete=models.SET_NULL, null=True, blank=True)
 
     @property
     def needed_requirements(self):
@@ -252,9 +240,10 @@ class TransportEntry(models.Model):
         PermitApplication, on_delete=models.CASCADE, related_name='requested_species_to_transport',
         blank=True, null=True)
     ltp = models.ForeignKey(
-        LocalTransportPermit, on_delete=models.CASCADE, related_name='species_to_transport',
+        LocalTransportPermit, on_delete=models.SET_NULL, related_name='species_to_transport',
         blank=True, null=True)
     quantity = models.IntegerField()
+    description = models.CharField(max_length=100)
 
     class Meta:
         unique_together = ('sub_species', 'permit_application')
@@ -309,7 +298,30 @@ class Inspection(ModelMixin, models.Model):
     inspecting_officer = models.ForeignKey(
         'users.Admin', on_delete=models.CASCADE, blank=True, null=True)
     report_file = models.FileField(
-        upload_to='inspection_reports/', blank=True, null=True)
+        upload_to='inspection_reports/', blank=True, null=True,
+        validators=[validate_file_extension])
+
+    @property
+    def is_pdf(self):
+        if self.report_file:
+            return self.report_file.name.lower().endswith('.pdf')
 
     def __str__(self):
-        return f'Inspection on {self.scheduled_date} for application {self.permit_application}'
+        if self.permit_application:
+            return f'Inspection on {self.scheduled_date} for application {self.permit_application}'
+        return f'Inspection on {self.scheduled_date}.'
+
+
+class Signature(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+    person = models.ForeignKey(
+        'users.User', on_delete=models.CASCADE, blank=True, null=True)
+    title = models.CharField(max_length=100, null=True, blank=True)
+    image = ResizedImageField(upload_to='signs/')
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
