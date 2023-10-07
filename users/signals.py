@@ -21,9 +21,12 @@ def handle_user_created(sender, user: User, **kwargs):
     RegistrationEmailView(user, temporary_password).send()
 
     # Assign the user to the right group
-    group = Group.objects.get(name=user.type)
-    if group not in user.groups.all():
-        user.groups.add(group)
+    try:
+        group = Group.objects.get(name=user.type)
+        if group not in user.groups.all():
+            user.groups.add(group)
+    except Group.DoesNotExist:
+        pass
 
 
 @receiver(user_logged_in)
