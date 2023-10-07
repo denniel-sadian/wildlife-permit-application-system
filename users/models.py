@@ -7,6 +7,8 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from permits.models import WildlifeCollectorPermit, WildlifeFarmPermit
 
+from .mixins import ModelMixin
+
 
 class Gender(models.TextChoices):
     MALE = 'MALE', 'Male'
@@ -35,7 +37,7 @@ class ObjectManager(UserManager, InheritanceManager):
             **{'{}__iexact'.format(self.model.USERNAME_FIELD): username})
 
 
-class User(AbstractUser):
+class User(ModelMixin, AbstractUser):
 
     objects = ObjectManager()
 
@@ -45,20 +47,6 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     phone_number = PhoneNumberField(max_length=14)
     is_initial_password_changed = models.BooleanField(default=False)
-
-    @property
-    def subclass(self):
-        """Return the User subclass instance."""
-        try:
-            return self._subclass
-        except AttributeError:
-            self._subclass = self.__class__.objects.get_subclass(id=self.id)
-        return self._subclass
-
-    @property
-    def type(self):
-        """Return the type of the user."""
-        return self.subclass.__class__.__name__
 
     @property
     def name(self):
