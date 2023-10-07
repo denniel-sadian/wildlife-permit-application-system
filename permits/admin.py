@@ -24,6 +24,8 @@ from .models import (
     WildlifeFarmPermit,
     WildlifeCollectorPermit,
     LocalTransportPermit,
+    GratuitousPermit,
+    CertificateOfWildlifeRegistration,
     PermittedToCollectAnimal,
     PermitApplication,
     PermitType,
@@ -69,6 +71,7 @@ class SignatureInline(GenericStackedInline):
 class PermitBaseAdmin(admin.ModelAdmin):
     list_display = ('permit_no', 'status', 'client')
     search_fields = ('permit_no',)
+    autocomplete_fields = ('inspection', 'client', 'permittee')
     change_form_template = 'permits/admin/permit_changeform.html'
 
     def get_fields(self, request, obj=None):
@@ -114,7 +117,6 @@ class PermitBaseAdmin(admin.ModelAdmin):
 @admin.register(LocalTransportPermit)
 class LocalTransportPermitAdmin(PermitBaseAdmin):
     inlines = (TransportEntryInline, SignatureInline)
-    autocomplete_fields = ('wfp', 'wcp', 'inspection', 'client', 'permittee')
 
     def get_fields(self, request, obj):
         fields = super().get_fields(request, obj)
@@ -135,6 +137,16 @@ class PermittedToCollectAnimalInline(admin.TabularInline):
 @admin.register(WildlifeCollectorPermit)
 class WildlifeCollectorPermitAdmin(PermitBaseAdmin):
     inlines = (PermittedToCollectAnimalInline,)
+
+
+@admin.register(GratuitousPermit)
+class GratuitousPermitAdmin(PermitBaseAdmin):
+    pass
+
+
+@admin.register(CertificateOfWildlifeRegistration)
+class CertificateOfWildlifeRegistrationAdmin(PermitBaseAdmin):
+    pass
 
 
 class CollectionEntryInline(admin.TabularInline):
