@@ -27,7 +27,7 @@ class TransportEntryBaseForm(forms.ModelForm):
 
     class Meta:
         model = TransportEntry
-        fields = ('sub_species', 'quantity')
+        fields = ('sub_species', 'quantity', 'description')
 
     def clean_sub_species(self):
         # Make sure double transport for the same species is forbidden
