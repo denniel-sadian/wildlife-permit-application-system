@@ -8,6 +8,7 @@
 
 .custom-row a {
     order: 1;
+    text-decoration: underline;
 }
 
 .custom-row input {
