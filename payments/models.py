@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
-from users.mixins import ModelMixin, validate_file_extension
+from users.mixins import ModelMixin, validate_file_extension, validate_amount
 from permits.models import (
     PermitApplication
 )
@@ -44,7 +44,8 @@ class PaymentOrderItem(models.Model):
         PaymentOrder, on_delete=models.CASCADE, related_name='items')
     legal_basis = models.CharField(max_length=50)
     description = models.CharField(max_length=50)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(
+        max_digits=10, decimal_places=2, validators=[validate_amount])
 
     class Meta:
         verbose_name = "Payment Order Item"
@@ -63,7 +64,8 @@ class Payment(ModelMixin, models.Model):
         upload_to='receipts/', null=True, blank=True,
         validators=[validate_file_extension])
     json_response = models.JSONField(null=True, blank=True)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(
+        max_digits=10, decimal_places=2, validators=[validate_amount])
     payment_type = models.CharField(max_length=50, choices=PaymentType.choices)
 
     def __str__(self):

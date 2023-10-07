@@ -31,3 +31,8 @@ def validate_file_extension(value):
             return
     raise ValidationError(
         'File types that are only allowed: ' + (', ').join(accepted_types))
+
+
+def validate_amount(value):
+    if value < 0:
+        raise ValidationError(f'Really, {str(value)}?')
