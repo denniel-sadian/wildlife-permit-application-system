@@ -94,7 +94,7 @@ class RequirementItem(models.Model):
         unique_together = ('requirement_list', 'requirement')
 
 
-class Permit(models.Model):
+class Permit(ModelMixin, models.Model):
     permit_no = models.CharField(max_length=255)
     status = models.CharField(choices=Status.choices, max_length=50)
     client = models.ForeignKey(
@@ -109,20 +109,6 @@ class Permit(models.Model):
     objects = InheritanceManager()
 
     @property
-    def subclass(self):
-        """Return the subclass instance."""
-        try:
-            return self._subclass
-        except AttributeError:
-            self._subclass = self.__class__.objects.get_subclass(id=self.id)
-        return self._subclass
-
-    @property
-    def type(self):
-        """Return the type of the permit."""
-        return self.subclass.__class__.__name__
-
-    @property
     def current_status(self):
         if self.valid_until:
             is_still_valid = self.valid_until >= timezone.now().date()
@@ -135,6 +121,10 @@ class Permit(models.Model):
         permit = self.subclass
         path = f'admin:{permit._meta.app_label}_{permit._meta.model_name}_change'
         return reverse_lazy(path, args=[permit.id])
+
+    @property
+    def preview_url(self):
+        return reverse_lazy('permit_detail', args=[self.id])
 
     @property
     def application(self):
