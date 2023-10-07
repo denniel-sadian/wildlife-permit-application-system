@@ -14,11 +14,11 @@ class BaseUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'first_name', 'last_name', 'password1', 'password2'),
+            'fields': ('username', 'email', 'first_name', 'last_name', 'title', 'password1', 'password2'),
         }),
     )
-    list_display = ('username', 'email', 'first_name',
-                    'last_name', 'is_active', 'is_initial_password_changed',
+    list_display = ('username', 'email', 'first_name', 'title',
+                    'last_name', 'is_active',
                     'date_joined', 'last_login')
     fieldsets = (
         ('Authentication', {'fields': ('username', 'password')}),
