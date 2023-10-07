@@ -30,6 +30,8 @@ class CustomLoginView(LoginView):
 
     def get_default_redirect_url(self):
         super().get_default_redirect_url()
+        if not self.request.user.is_initial_password_changed:
+            return reverse_lazy('password_change')
         if self.request.user.is_staff:
             return reverse_lazy('admin:index')
         return reverse_lazy('home')
