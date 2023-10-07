@@ -68,7 +68,8 @@ class Permit(ModelMixin, models.Model):
     client = models.ForeignKey(
         'users.Client', on_delete=models.CASCADE, blank=True, null=True, related_name='permits')
     permittee = models.ForeignKey(
-        'users.Permittee', on_delete=models.CASCADE, blank=True, null=True,
+        'users.Permittee', verbose_name='Permittee (unregistered client)',
+        on_delete=models.CASCADE, blank=True, null=True,
         related_name='temporarily_assigned_permits')
     uploaded_file = models.FileField(
         upload_to='uploads/', null=True, blank=True, validators=[validate_file_extension])
@@ -292,8 +293,9 @@ class Remarks(models.Model):
 
 
 class Inspection(ModelMixin, models.Model):
+    no = models.CharField(max_length=255, null=False, blank=True, unique=True)
     permit_application = models.OneToOneField(
-        PermitApplication, on_delete=models.CASCADE)
+        PermitApplication, on_delete=models.CASCADE, null=True, blank=True)
     scheduled_date = models.DateField(blank=True, null=True)
     inspecting_officer = models.ForeignKey(
         'users.Admin', on_delete=models.CASCADE, blank=True, null=True)
@@ -307,9 +309,7 @@ class Inspection(ModelMixin, models.Model):
             return self.report_file.name.lower().endswith('.pdf')
 
     def __str__(self):
-        if self.permit_application:
-            return f'Inspection on {self.scheduled_date} for application {self.permit_application}'
-        return f'Inspection on {self.scheduled_date}.'
+        return str(self.no)
 
 
 class Signature(models.Model):
