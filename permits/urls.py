@@ -18,7 +18,7 @@ urlpatterns = [
     path('applications/create/', views.PermitApplicationCreateView.as_view(),
          name='create_application'),
 
-    # Autocomplete
-    path('applications-autocomplete/', views.PermitApplicationAutocompleteView.as_view(),
-         name='applications-autocomplete'),
+    # Permits
+    path('permits/<int:pk>/', views.PermitDetailView.as_view(),
+         name='permit_detail')
 ]
