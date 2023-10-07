@@ -1,5 +1,4 @@
 from typing import Any
-import uuid
 
 from django.http import HttpResponse
 from django.urls import reverse_lazy
@@ -13,7 +12,8 @@ from django.contrib import messages
 
 from .models import User, Client
 from .forms import ClientRegistrationForm
-from .emails import RegistrationEmailView
+
+from .signals import user_created
 
 
 class CustomLoginRequiredMixin(LoginRequiredMixin):
@@ -44,12 +44,10 @@ class ClientRegistrationView(FormView):
 
     def form_valid(self, form):
         '''If the form is valid, redirect to the supplied URL.'''
-        client: Client = form.instance
-        temporary_password = str(uuid.uuid4())
-        client.set_password(temporary_password)
-        client.save()
-
-        RegistrationEmailView(client, temporary_password).send()
+        user = form.instance
+        user.save()
+        user = User.objects.get(id=user.id)
+        user_created.send(sender=self.__class__, user=user)
 
         messages.info(
             self.request,
