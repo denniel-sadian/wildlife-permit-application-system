@@ -129,6 +129,14 @@ class WildlifeCollectorPermit(Permit):
         verbose_name = "Wildlife Collector's Permit"
 
 
+class GratuitousPermit(Permit):
+    pass
+
+
+class CertificateOfWildlifeRegistration(Permit):
+    pass
+
+
 class PermittedToCollectAnimal(models.Model):
     sub_species = models.ForeignKey(
         SubSpecies, on_delete=models.CASCADE, related_name='species_permitted')
