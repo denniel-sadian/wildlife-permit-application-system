@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserCreationForm
 
 from .models import (
+    User,
     Client,
     Admin,
     Cashier,
@@ -9,19 +11,31 @@ from .models import (
     Signatory
 )
 
+from .signals import user_created
+
+
+class CustomUserCreationForm(UserCreationForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].required = False
+        self.fields['password2'].required = False
+
 
 class BaseUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'first_name', 'last_name', 'title', 'password1', 'password2'),
+            'fields': ('username', 'email', 'first_name', 'last_name', 'title'),
         }),
     )
+    add_form = CustomUserCreationForm
+
     list_display = ('username', 'email', 'first_name', 'title',
                     'last_name', 'is_active',
                     'date_joined', 'last_login')
     fieldsets = (
-        ('Authentication', {'fields': ('username', 'password')}),
+        ('Authentication', {'fields': ('username',)}),
         ('User Information', {
          'fields': ('first_name', 'last_name', 'gender', 'email', 'phone_number', 'title')}),
         ('Important dates', {'fields': ('date_joined',)}),
@@ -36,6 +50,12 @@ class BaseUserAdmin(UserAdmin):
             },
         ),
     )
+
+    def save_model(self, request, obj, form, change) -> None:
+        super().save_model(request, obj, form, change)
+        if not change:
+            user = User.objects.get(id=obj.id)
+            user_created.send(sender=self.__class__, user=user)
 
 
 @admin.register(Admin)
