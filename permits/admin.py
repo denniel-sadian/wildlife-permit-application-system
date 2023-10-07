@@ -4,14 +4,12 @@ from datetime import timedelta
 
 from django.contrib import admin
 from django.contrib import messages
-from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.conf import settings
 
-from django import forms
 
 from payments.models import (
     PaymentOrder
@@ -73,13 +71,20 @@ class PermitBaseAdmin(admin.ModelAdmin):
     search_fields = ('permit_no',)
     change_form_template = 'permits/admin/permit_changeform.html'
 
-    def get_fields(self, request, obj):
-        fields = ['permit_no', 'status', 'created_at',
+    def get_fields(self, request, obj=None):
+        fields = ['permit_no', 'status',
                   'valid_until', 'uploaded_file', 'inspection']
-        if obj.client:
+
+        if obj:
+            fields.append('created_at')
+        else:
+            fields += ['client', 'permittee']
+
+        if hasattr(obj, 'client'):
             fields.append('client')
-        elif obj.permittee:
+        elif hasattr(obj, 'permittee'):
             fields.append('permittee')
+
         return fields
 
     def get_readonly_fields(self, request, obj=None):
@@ -87,9 +92,9 @@ class PermitBaseAdmin(admin.ModelAdmin):
             return ()
 
         read_only_fields = ['created_at', 'wfp', 'wcp', 'inspection']
-        if obj.client:
+        if hasattr(obj, 'client'):
             read_only_fields.append('client')
-        elif obj.permittee:
+        elif hasattr(obj, 'permittee'):
             read_only_fields.append('permittee')
 
         return read_only_fields
@@ -109,7 +114,7 @@ class PermitBaseAdmin(admin.ModelAdmin):
 @admin.register(LocalTransportPermit)
 class LocalTransportPermitAdmin(PermitBaseAdmin):
     inlines = (TransportEntryInline, SignatureInline)
-    autocomplete_fields = ('wfp', 'wcp')
+    autocomplete_fields = ('wfp', 'wcp', 'inspection', 'client', 'permittee')
 
     def get_fields(self, request, obj):
         fields = super().get_fields(request, obj)
@@ -249,7 +254,9 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                     request, 'Inspection has started already.', level=messages.WARNING)
                 return HttpResponseRedirect(obj.inspection.admin_url)
             if obj.submittable and obj.status != Status.DRAFT:
-                inspection = Inspection(permit_application=obj)
+                inspection = Inspection(
+                    permit_application=obj,
+                    no=obj.no+'-inspection')
                 inspection.save()
                 self.message_user(
                     request, 'Please continue editing the inspection record.', level=messages.SUCCESS)
@@ -322,18 +329,9 @@ class RequirementAdmin(admin.ModelAdmin):
     search_fields = ('code', 'label')
 
 
-class InspectionForm(forms.ModelForm):
-    scheduled_date = forms.DateField(required=True, widget=AdminDateWidget())
-
-    class Meta:
-        model = Inspection
-        fields = ('permit_application', 'scheduled_date',
-                  'inspecting_officer', 'report_file')
-
-
 @admin.register(Inspection)
 class InspectionAdmin(admin.ModelAdmin):
-    list_display = ('permit_application', 'scheduled_date')
+    list_display = ('no', 'scheduled_date')
+    search_fields = ('no',)
     autocomplete_fields = ('permit_application', 'inspecting_officer')
-    form = InspectionForm
     change_form_template = 'permits/admin/inspection_changeform.html'
