@@ -4,7 +4,7 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=35" />
+    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=36" />
 {% endblock %}
 
 {% block submit_buttons_bottom %}
@@ -12,7 +12,7 @@
 
     <div class="submit-row custom-row">
         {% if original.application %}<a href="{{ original.application.admin_url }}">View Permit Application</a>{% endif %}
-        {% if original.type == 'LocalTransportPermit' %}<a href="{{ original.preview_url }}">View Preview</a>{% endif %}
+        {% if original.type == 'LocalTransportPermit' %}<a href="{{ original.preview_url }}" target="_blank">View Preview</a>{% endif %}
     </div>
 
 {% endblock %}

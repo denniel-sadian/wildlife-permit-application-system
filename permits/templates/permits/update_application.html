@@ -55,6 +55,7 @@
                     {{ i.permit_application }}
                     {% include 'ui/select.html' with field=i.sub_species %}
                     {% include 'ui/inputbox.html' with field=i.quantity %}
+                    {% include 'ui/inputbox.html' with field=i.description %}
                     {% if i.id.value and object.editable %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
                 </div>
                 {% endfor %}
@@ -68,6 +69,7 @@
                     <div class="mini-form">
                         {% include 'ui/select.html' with field=transport_entries.empty_form.sub_species %}
                         {% include 'ui/inputbox.html' with field=transport_entries.empty_form.quantity %}
+                        {% include 'ui/inputbox.html' with field=transport_entries.empty_form.description %}
                     </div>
                 </div>
             </div>
