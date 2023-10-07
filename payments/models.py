@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
-from users.mixins import ModelMixin
+from users.mixins import ModelMixin, validate_file_extension
 from permits.models import (
     PermitApplication
 )
@@ -18,7 +18,7 @@ class PaymentOrder(ModelMixin, models.Model):
     client = models.ForeignKey(
         'users.Client', on_delete=models.CASCADE)
     permit_application = models.OneToOneField(
-        PermitApplication, on_delete=models.CASCADE)
+        PermitApplication, on_delete=models.CASCADE, null=True, blank=True)
     prepared_by = models.ForeignKey(
         'users.Admin', on_delete=models.CASCADE, related_name='prepared_payment_orders')
     approved_by = models.ForeignKey(
@@ -60,7 +60,8 @@ class Payment(ModelMixin, models.Model):
     payment_order = models.OneToOneField(
         PaymentOrder, on_delete=models.CASCADE)
     uploaded_receipt = models.FileField(
-        upload_to='receipts/', null=True, blank=True)
+        upload_to='receipts/', null=True, blank=True,
+        validators=[validate_file_extension])
     json_response = models.JSONField(null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=50, choices=PaymentType.choices)
