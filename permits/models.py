@@ -122,19 +122,35 @@ class WildlifeFarmPermit(Permit):
     class Meta:
         verbose_name = "Wildlife Farm Permit"
 
+    @property
+    def permit_type(self):
+        return PermitType.WFP.label
+
 
 class WildlifeCollectorPermit(Permit):
 
     class Meta:
         verbose_name = "Wildlife Collector's Permit"
 
+    @property
+    def permit_type(self):
+        return PermitType.WCP.label
+
 
 class GratuitousPermit(Permit):
     pass
 
+    @property
+    def permit_type(self):
+        return PermitType.GP.label
+
 
 class CertificateOfWildlifeRegistration(Permit):
     pass
+
+    @property
+    def permit_type(self):
+        return PermitType.CWR.label
 
 
 class PermittedToCollectAnimal(models.Model):
@@ -163,6 +179,10 @@ class LocalTransportPermit(Permit):
 
     class Meta:
         verbose_name = 'Local Transport Permit'
+
+    @property
+    def permit_type(self):
+        return PermitType.LTP.label
 
     @property
     def total_transport_quantity(self):
