@@ -49,6 +49,13 @@ class QueryParamFilterMixin:
 
         return original_filters, modified_filters
 
+    def get_queryset(self) -> QuerySet[Any]:
+        filters = self.get_query_filters()[1]
+
+        applications = self.model.objects.filter(
+            client=self.request.user, **filters).order_by('-created_at')
+        return applications
+
 
 class PermitApplicationCreateView(CustomLoginRequiredMixin, CreateView):
     model = PermitApplication
@@ -85,15 +92,7 @@ class PermitApplicationCreateView(CustomLoginRequiredMixin, CreateView):
 class PermitApplicationListView(QueryParamFilterMixin, CustomLoginRequiredMixin, ListView):
     model = PermitApplication
     paginate_by = 10
-    template_name = 'permits/list_applications.html'
     context_object_name = 'applications'
-
-    def get_queryset(self) -> QuerySet[Any]:
-        filters = self.get_query_filters()[1]
-
-        applications = PermitApplication.objects.filter(
-            client=self.request.user, **filters).order_by('-created_at')
-        return applications
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -245,3 +244,9 @@ class PermitDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['permit'] = self.get_object().subclass
         return context
+
+
+class PermitListView(QueryParamFilterMixin, CustomLoginRequiredMixin, ListView):
+    model = Permit
+    paginate_by = 10
+    context_object_name = 'permits'
