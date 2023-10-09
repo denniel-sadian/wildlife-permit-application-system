@@ -160,7 +160,12 @@
                     {% endfor %}
                     <tr>
                         <th colspan="2">Total</th>
-                        <th>{{ object.paymentorder.total }}</th>
+                        <th>
+                            {{ object.paymentorder.total }}
+                            {% if object.paymentorder and object.paymentorder.paid %}
+                            <span class="w3-tag w3-round-xxlarge w3-green"><i class="fa fa-check-circle"></i> Paid</span>
+                            {% endif %}
+                        </th>
                     </tr>
                 </table>
             </div>
@@ -198,6 +203,11 @@
                 {% if object.status in 'SUBMITTED' %}
                 <a href="{% url 'unsubmit_application' pk=object.id %}" class="w3-btn w3-round-large w3-text-gray w3-border w3-border-gray">Unsubmit</a>
                 {% endif %}
+
+                {% if object.status == 'RELEASED' %}
+                <a href="" class="w3-btn w3-round-large w3-green">View Permit</a>
+                {% endif %}
+
             </div>
         </form>
         <script>
