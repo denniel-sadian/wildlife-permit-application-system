@@ -29,8 +29,8 @@ admin.autodiscover()
 
 urlpatterns = [
     path('', include('users.urls')),
-    path('species/', include('animals.urls')),
-    path('permits/', include('permits.urls')),
+    path('', include('animals.urls')),
+    path('', include('permits.urls')),
     path('admin/', admin.site.urls),
     path('ajax_select/', include(ajax_select_urls))
 ]
