@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Permits{% endblock %}
+
+{% block styles %}
+<style>
+    main .cont {
+        margin: 100px auto;
+        padding: 0px 20px;
+        width: 100%;
+        max-width: 1100px;
+    }
+
+    main .cont a {
+        color: blue;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="cont">
+        <h1>Permits</h1>
+        <p>Here are your permits.</p>
+        <div style="overflow-x:auto;">
+            <div class="filter-chips">
+                <a href="?status=ALL" class="w3-btn w3-small {% if 'ALL' == status %}w3-blue{% else %}w3-gray{% endif %} w3-text-white">All</a>
+                {% for i in statuses %}
+                <a href="?status={{ i.0 }}" class="w3-btn w3-small {% if i.0 == status %}w3-blue{% else %}w3-gray{% endif %} w3-text-white">{{ i.1 }}</a>
+                {% endfor %}
+            </div>
+            <div class="filter-chips">
+                <a href="?permit_type=ALL" class="w3-btn w3-small {% if 'ALL' == permit_type %}w3-blue{% else %}w3-gray{% endif %} w3-text-white">All</a>
+                {% for i in permit_types %}
+                <a href="?permit_type={{ i.0 }}" class="w3-btn w3-small {% if i.0 == permit_type %}w3-blue{% else %}w3-gray{% endif %} w3-text-white">{{ i.1 }}</a>
+                {% endfor %}
+            </div>
+            <table class="w3-table w3-table-all">
+                <tr>
+                    <th>No.</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Valid Until</th>
+                </tr>
+                {% for i in permits %}
+                <tr>
+                    <td class="robotic-txt"><a href="{% url 'permit_detail' pk=i.id %}">{{ i.permit_no }}</a></td>
+                    <td>{{ i.subclass.permit_type }}</td>
+                    <td><span class="w3-tag w3-round-xxlarge {{ i.status }}">{{ i.get_status_display }}</span></td>
+                    <td>{{ i.created_at }}</td>
+                    <td>{{ i.valid_until }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+
+        {% include 'ui/paginator.html' %}
+    </div>
+</main>
+{% endblock %}
