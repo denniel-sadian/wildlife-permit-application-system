@@ -19,6 +19,9 @@ urlpatterns = [
          name='create_application'),
 
     # Permits
+    path('permits/', views.PermitListView.as_view(),
+         name='permit_list'),
     path('permits/<int:pk>/', views.PermitDetailView.as_view(),
          name='permit_detail')
+
 ]
