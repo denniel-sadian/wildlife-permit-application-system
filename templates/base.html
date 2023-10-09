@@ -47,7 +47,7 @@
                 <div class="links" id="nav-links">
                     {% if user.is_authenticated and user.type == 'Client' %}
                     <a href="{% url 'list_applications' %}">Permit Applications</a>
-                    <a href="/ltpapplications/list.php?page=1">My Permits</a>
+                    <a href="{% url 'permit_list' %}">My Permits</a>
                     {% endif %}
 
                     {% if not user.is_authenticated %}
