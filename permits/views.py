@@ -23,7 +23,12 @@ from .models import (
     UploadedRequirement,
     TransportEntry,
     CollectionEntry,
-    Permit
+    Permit,
+    LocalTransportPermit,
+    WildlifeCollectorPermit,
+    WildlifeFarmPermit,
+    GratuitousPermit,
+    CertificateOfWildlifeRegistration
 )
 from .forms import (
     PermitApplicationForm,
@@ -39,7 +44,8 @@ class QueryParamFilterMixin:
     def get_query_filters(self):
         original_filters = {}
         for k, v in self.request.GET.items():
-            original_filters[k] = v
+            if k.split('__')[0] in self.filter_fields:
+                original_filters[k] = v
 
         modified_filters = {}
         for k, v in original_filters.items():
@@ -52,9 +58,16 @@ class QueryParamFilterMixin:
     def get_queryset(self) -> QuerySet[Any]:
         filters = self.get_query_filters()[1]
 
-        applications = self.model.objects.filter(
+        queryset = self.model.objects.filter(
             client=self.request.user, **filters).order_by('-created_at')
-        return applications
+        return queryset
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['permit_types'] = PermitType.choices
+        context['statuses'] = Status.choices
+        context.update(self.get_query_filters()[0])
+        return context
 
 
 class PermitApplicationCreateView(CustomLoginRequiredMixin, CreateView):
@@ -93,13 +106,7 @@ class PermitApplicationListView(QueryParamFilterMixin, CustomLoginRequiredMixin,
     model = PermitApplication
     paginate_by = 10
     context_object_name = 'applications'
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context['permit_types'] = PermitType.choices
-        context['statuses'] = Status.choices
-        context.update(self.get_query_filters()[0])
-        return context
+    filter_fields = ['permit_type', 'status']
 
 
 class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
@@ -250,3 +257,24 @@ class PermitListView(QueryParamFilterMixin, CustomLoginRequiredMixin, ListView):
     model = Permit
     paginate_by = 10
     context_object_name = 'permits'
+    template_name = 'permits/permit_list.html'
+    filter_fields = ['status', 'permit_type']
+
+    def get_queryset(self) -> QuerySet[Any]:
+        filters = self.get_query_filters()[1]
+        qs = None
+        if 'permit_type' in filters:
+            subclasses = {
+                str(PermitType.LTP): LocalTransportPermit,
+                str(PermitType.WFP): WildlifeFarmPermit,
+                str(PermitType.WCP): WildlifeCollectorPermit,
+                str(PermitType.CWR): CertificateOfWildlifeRegistration,
+                str(PermitType.GP): GratuitousPermit
+            }
+            qs = subclasses[filters['permit_type']].objects
+            del filters['permit_type']
+        else:
+            qs = self.model.objects
+
+        return qs.filter(
+            client=self.request.user, **filters).order_by('-created_at')
