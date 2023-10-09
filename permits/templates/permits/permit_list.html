@@ -47,7 +47,7 @@
                 </tr>
                 {% for i in permits %}
                 <tr>
-                    <td class="robotic-txt"><a href="{% url 'permit_detail' pk=i.id %}">{{ i.permit_no }}</a></td>
+                    <td class="robotic-txt"><a href="{% url 'permit_detail' pk=i.id %}" target="_blank">{{ i.permit_no }}</a></td>
                     <td>{{ i.subclass.permit_type }}</td>
                     <td><span class="w3-tag w3-round-xxlarge {{ i.status }}">{{ i.get_status_display }}</span></td>
                     <td>{{ i.created_at }}</td>

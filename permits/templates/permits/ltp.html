@@ -1,66 +1,43 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ permit.permit_no }}</title>
-    <style>
-        main {
-            width: 100%;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+{% extends 'permits/permit_base.html' %}
 
-        strong {
-            text-decoration: underline;
-        }
+{% load static %}
 
-        table {
-            width: 100%;
-            text-align: center;
-            border-top: 2px dashed gray;
-            border-bottom: 2px dashed gray;
-        }
+{% block styles %}
+{{ block.super }}
+<style>
+    strong {
+        text-decoration: underline;
+    }
 
-        .sig-line {
-            display: grid;
-            grid-template-columns: 1fr auto;
-        }
+     table {
+        width: 100%;
+        text-align: center;
+        border-top: 2px dashed gray;
+        border-bottom: 2px dashed gray;
+    }
 
-        .sig {
-            width: 250px;
-            height: 200px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            flex-direction: column;
-            background-image: url("{{ permit.signature.image.url }}");
-            background-position: bottom;
-            background-size: contain;
-            background-repeat: no-repeat;
-        }
+     .sig-line {
+        display: grid;
+        grid-template-columns: 1fr auto;
+    }
 
-        img, embed {
-            margin-top: 100px;
-            width: 100%;
-            height: 100%;
-        }
+     .sig {
+        width: 250px;
+        height: 200px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-direction: column;
+        background-image: url("{{ permit.signature.image.url }}");
+        background-position: bottom;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+</style>
+{% endblock styles %}
 
-        .qrcode-cont {
-            display: flex;
-            justify-content: right;
-            width: 100%;
-        }
-
-        #qrcode img {
-            margin: 0px;
-            width: 100px;
-            height: 100px;
-        }
-    </style>
-</head>
-<body>
-<main>
+{% block content %}
+    <main>
         <div class="qrcode-cont">
             <div id="qrcode"></div>
         </div>
@@ -135,5 +112,26 @@
         <p>No payment!</p>
         {% endif %}
     </main>
-</body>
-</html>
+{% endblock content %}
+
+{% block side %}
+<div>
+    <h3>Permit Details</h3>
+    <p>No: {{ permit.permit_no }}</p>
+    <p>Status: {{ permit.get_status_display }}</p>
+    <p>Created at: {{ permit.created_at }}</p>
+    <p>Valid until: {{ permit.valid_until }}</p>
+    <p>Official receipt no: {{ permit.payment_order.payment.receipt_no }}</p>
+    <p>Payment amount: Php {{ permit.payment_order.payment.amount }}</p>
+    <p>Transport location: {{ permit.transport_location }}</p>
+    <p>Transport date: {{ permit.transport_date }}</p>
+    <div>
+        <span>Species to transport: {{ permit.total_transport_quantity }}</span>
+        <ul>
+            {% for i in permit.species_to_transport.all %}
+            <li>{{ i.sub_species }} - {{ i.quantity }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock side %}
