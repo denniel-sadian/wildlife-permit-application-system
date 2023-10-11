@@ -3,10 +3,12 @@ from decimal import Decimal
 from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
+from django.contrib.contenttypes.models import ContentType
 
 from users.mixins import ModelMixin, validate_file_extension, validate_amount
 from permits.models import (
-    PermitApplication
+    PermitApplication,
+    Signature
 )
 
 
@@ -21,8 +23,6 @@ class PaymentOrder(ModelMixin, models.Model):
         PermitApplication, on_delete=models.CASCADE, null=True, blank=True)
     prepared_by = models.ForeignKey(
         'users.Admin', on_delete=models.CASCADE, related_name='prepared_payment_orders')
-    approved_by = models.ForeignKey(
-        'users.Admin', on_delete=models.CASCADE, null=True, blank=True)
     paid = models.BooleanField(default=False)
 
     @property
@@ -34,6 +34,14 @@ class PaymentOrder(ModelMixin, models.Model):
             )
         )['total']
         return total
+
+    @property
+    def signature(self):
+        try:
+            model_type = ContentType.objects.get_for_model(self.__class__)
+            return Signature.objects.get(content_type__id=model_type.id, object_id=self.subclass.id)
+        except Signature.DoesNotExist:
+            return None
 
     def __str__(self) -> str:
         return str(self.no)
