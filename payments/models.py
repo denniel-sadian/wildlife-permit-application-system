@@ -15,6 +15,7 @@ from permits.models import (
 class PaymentOrder(ModelMixin, models.Model):
     no = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
+    released_at = models.DateTimeField(null=True, blank=True)
     nature_of_doc_being_secured = models.CharField(
         'Nature of Application/Permit/Documents being secured', max_length=255)
     client = models.ForeignKey(
@@ -47,6 +48,10 @@ class PaymentOrder(ModelMixin, models.Model):
     @property
     def approved_by_signature(self):
         return self.signatures.exclude(person=self.prepared_by).first()
+
+    @property
+    def ready(self):
+        return self.prepared_by_signature and self.approved_by_signature
 
     def __str__(self) -> str:
         return str(self.no)
