@@ -2,7 +2,9 @@ from typing import Any
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.urls import reverse_lazy
+
+from permits.models import Signature
+from permits.admin import SignatureInline
 
 from .models import (
     PaymentOrder,
@@ -22,11 +24,10 @@ class PaymentOrderAdmin(admin.ModelAdmin):
     list_display = ('no', 'permit_application',
                     'paid', 'prepared_by', 'created_at')
     fields = ('no', 'nature_of_doc_being_secured',
-              'client', 'permit_application', 'prepared_by', 'approved_by', 'paid')
-    autocomplete_fields = ('permit_application', 'client',
-                           'approved_by', 'prepared_by')
+              'client', 'permit_application', 'prepared_by', 'paid')
+    autocomplete_fields = ('permit_application', 'client', 'prepared_by')
     search_fields = ('no', 'permit_application__no')
-    inlines = (PaymentOrderItemInline,)
+    inlines = (PaymentOrderItemInline, SignatureInline)
     change_form_template = 'payments/admin/paymentorder_changeform.html'
 
     def paid(self):
@@ -61,6 +62,17 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 
         obj.save()
         return super().save_model(request, obj, form, change)
+
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for obj in formset.deleted_objects:
+            obj.delete()
+        for instance in instances:
+            if (isinstance(instance, Signature)):
+                instance.person = request.user
+                instance.title = instance.person.title
+            instance.save()
+        formset.save_m2m()
 
 
 @admin.register(Payment)
