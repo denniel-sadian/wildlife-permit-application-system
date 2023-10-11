@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from typing import Any
 from django.contrib import admin
 from django.http import HttpResponseRedirect
@@ -23,9 +25,10 @@ class PaymentOrderItemInline(admin.TabularInline):
 @admin.register(PaymentOrder)
 class PaymentOrderAdmin(admin.ModelAdmin):
     list_display = ('no', 'permit_application',
-                    'paid', 'prepared_by', 'created_at')
+                    'paid', 'prepared_by', 'created_at', 'released_at')
     fields = ('no', 'nature_of_doc_being_secured',
-              'client', 'permit_application', 'prepared_by', 'paid')
+              'client', 'permit_application', 'prepared_by',
+              'paid', 'created_at', 'released_at')
     autocomplete_fields = ('permit_application', 'client', 'prepared_by')
     search_fields = ('no', 'permit_application__no')
     inlines = (PaymentOrderItemInline, SignatureInline)
@@ -41,7 +44,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
         if obj is None:
             return ()
         # Otherwise, when updating an existing record
-        return ('client', 'client', 'permit_application', 'prepared_by')
+        return ('client', 'permit_application', 'prepared_by', 'created_at', 'released_at')
 
     def response_change(self, request, obj: PaymentOrder):
         if obj:
@@ -62,6 +65,14 @@ class PaymentOrderAdmin(admin.ModelAdmin):
                 self.message_user(
                     request, 'Payment record has been made.', level=messages.SUCCESS)
                 return HttpResponseRedirect(payment.admin_url)
+
+        if 'release' in request.POST:
+            obj.released_at = datetime.now()
+            obj.save()
+
+            self.message_user(
+                request, 'Payment record has been released, and the client has been notified already.', level=messages.SUCCESS)
+            return HttpResponseRedirect('.')
 
         return super().response_change(request, obj)
 
