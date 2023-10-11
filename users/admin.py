@@ -26,7 +26,7 @@ class BaseUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'first_name', 'last_name', 'title'),
+            'fields': ('username', 'email', 'first_name', 'last_name', 'title', 'gender'),
         }),
     )
     add_form = CustomUserCreationForm
