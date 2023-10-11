@@ -63,7 +63,7 @@ class TransportEntryInline(admin.TabularInline):
 
 class SignatureInline(GenericStackedInline):
     model = Signature
-    fields = ('title', 'image')
+    fields = ('title', 'image', 'person')
     readonly_fields = ('person',)
     extra = 1
 
