@@ -113,6 +113,13 @@ class Permit(ModelMixin, models.Model):
         except Signature.DoesNotExist:
             return None
 
+    def save(self, *args, **kwargs):
+        if self.status == Status.RELEASED:
+            if application := self.application:
+                application.status = self.status
+                application.save()
+        return super().save(*args, **kwargs)
+
     def __str__(self):
         return str(self.permit_no)
 
