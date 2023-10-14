@@ -66,25 +66,12 @@ class SignatureInline(GenericStackedInline):
 
 class PermitBaseAdmin(admin.ModelAdmin):
     list_display = ('permit_no', 'status', 'client',
-                    'permittee', 'issued_date', 'valid_until', 'created_at')
-    fields = ('permit_no', 'status', 'or_no', 'issued_date',
+                    'issued_date', 'valid_until', 'created_at')
+    fields = ('permit_no', 'client', 'status', 'or_no', 'issued_date',
               'valid_until', 'uploaded_file')
-    readonly_fields = ('created_at',)
     search_fields = ('permit_no',)
     autocomplete_fields = ('client',)
     change_form_template = 'permits/admin/permit_changeform.html'
-
-    def get_readonly_fields(self, request, obj=None):
-        if obj is None:
-            return ()
-
-        read_only_fields = ['created_at', 'wfp', 'wcp']
-        if obj is not None and obj.client:
-            read_only_fields.append('client')
-        elif obj is not None and obj.permittee:
-            read_only_fields.append('permittee')
-
-        return read_only_fields
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)

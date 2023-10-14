@@ -5,7 +5,7 @@ from django.dispatch import Signal
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.auth.models import Group
 
-from .models import User, Client, Permittee
+from .models import User, Client
 from .emails import RegistrationEmailView
 
 
@@ -33,14 +33,5 @@ def handle_user_created(sender, user: User, **kwargs):
 def client_first_login(sender, user: User, request, **kwargs):
     """Clients' login signal."""
     if user.type is Client.__name__ and not user.is_initial_password_changed:
-        found_temp_permittee = Permittee.objects.filter(
-            first_name__icontains=user.first_name, last_name__icontains=user.last_name).first()
-        if found_temp_permittee:
-
-            # Assign the present permits
-            for permit in found_temp_permittee.temporarily_assigned_permits.all():
-                permit.client = user.subclass
-                permit.permittee = None
-                permit.save()
-
-            found_temp_permittee.delete()
+        # now what?
+        pass

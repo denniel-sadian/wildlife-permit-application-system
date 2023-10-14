@@ -7,7 +7,6 @@ from .models import (
     Client,
     Admin,
     Cashier,
-    Permittee,
     Signatory
 )
 
@@ -76,11 +75,3 @@ class SignatoryAdmin(BaseUserAdmin):
 @admin.register(Client)
 class ClientAdmin(BaseUserAdmin):
     pass
-
-
-@admin.register(Permittee)
-class PermitteeAdmin(admin.ModelAdmin):
-    list_display = ('last_name', 'first_name',
-                    'address', 'farm_name', 'farm_address')
-    search_fields = list_display
-    ordering = list_display
