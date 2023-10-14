@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse_lazy
@@ -5,6 +7,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
+from django.conf import settings
 
 from django_resized import ResizedImageField
 
@@ -114,6 +117,12 @@ class Permit(ModelMixin, models.Model):
             return Signature.objects.get(content_type__id=model_type.id, object_id=self.subclass.id)
         except Signature.DoesNotExist:
             return None
+
+    def calculate_validity_date(self):
+        if self.issued_date:
+            days_valid = settings.VALIDITY[self.type]
+            valid_until = self.issued_date + timedelta(days=days_valid)
+            self.valid_until = valid_until
 
     def save(self, *args, **kwargs):
         if self.status == Status.RELEASED:
