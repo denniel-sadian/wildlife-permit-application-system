@@ -18,6 +18,7 @@ class Species(models.Model):
 class SubSpecies(models.Model):
     main_species = models.ForeignKey(
         Species, on_delete=models.CASCADE, related_name='sub_species')
+    input_code = models.CharField(max_length=10, unique=True)
     common_name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255)
 
