@@ -95,7 +95,7 @@ class LocalTransportPermitAdmin(PermitBaseAdmin):
 
     def get_fields(self, request, obj):
         fields = super().get_fields(request, obj)
-        fields += ['wfp', 'wcp', 'transport_location', 'transport_date']
+        fields += ('wfp', 'wcp', 'transport_location', 'transport_date')
         return fields
 
 
