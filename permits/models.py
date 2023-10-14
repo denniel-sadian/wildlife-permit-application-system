@@ -147,7 +147,6 @@ class WildlifeCollectorPermit(Permit):
 
 
 class GratuitousPermit(Permit):
-    pass
 
     @property
     def permit_type(self):
@@ -155,7 +154,6 @@ class GratuitousPermit(Permit):
 
 
 class CertificateOfWildlifeRegistration(Permit):
-    pass
 
     @property
     def permit_type(self):
