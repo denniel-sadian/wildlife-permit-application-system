@@ -69,7 +69,7 @@ class Permit(ModelMixin, models.Model):
     permit_no = models.CharField(max_length=255, unique=True)
     status = models.CharField(choices=Status.choices, max_length=50)
     client = models.ForeignKey(
-        'users.Client', on_delete=models.CASCADE, blank=True, null=True, related_name='permits')
+        'users.Client', on_delete=models.CASCADE, null=True, related_name='permits')
     uploaded_file = models.FileField(
         upload_to='uploads/', null=True, blank=True, validators=[validate_file_extension])
     valid_until = models.DateField(null=True, blank=True)
