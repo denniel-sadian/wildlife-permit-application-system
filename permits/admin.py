@@ -132,6 +132,7 @@ class WildlifeFarmPermitAdmin(PermitBaseAdmin):
 
 class PermittedToCollectAnimalInline(admin.TabularInline):
     model = PermittedToCollectAnimal
+    autocomplete_fields = ('sub_species',)
     extra = 1
 
 
