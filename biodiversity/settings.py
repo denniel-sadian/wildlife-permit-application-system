@@ -211,4 +211,10 @@ TIME_ZONE = 'Asia/Manila'
 
 # Permits
 
-DAYS_VALID = 30
+VALIDITY = {
+    'LocalTransportPermit': int(os.getenv('VALIDITY_DAYS_LTP', '30')),
+    'WildlifeFarmPermit': int(os.getenv('VALIDITY_DAYS_WFP', '1825')),
+    'WildlifeCollectorPermit': int(os.getenv('VALIDITY_DAYS_WCP', '1825')),
+    'CertificateOfWildlifeRegistration': int(os.getenv('VALIDITY_DAYS_CWR', '30')),
+    'GratuitousPermit': int(os.getenv('VALIDITY_DAYS_GP', '30'))
+}
