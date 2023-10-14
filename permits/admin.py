@@ -1,15 +1,11 @@
 from typing import Any
 from datetime import datetime
-from datetime import timedelta
 
 from django.contrib import admin
 from django.contrib import messages
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
-from django.utils import timezone
-from django.conf import settings
-
 
 from payments.models import (
     PaymentOrder
@@ -71,8 +67,8 @@ class SignatureInline(GenericStackedInline):
 class PermitBaseAdmin(admin.ModelAdmin):
     list_display = ('permit_no', 'status', 'client',
                     'permittee', 'issued_date', 'valid_until', 'created_at')
-    fields = ('permit_no', 'status', 'issued_date',
-              'valid_until', 'or_no', 'uploaded_file')
+    fields = ('permit_no', 'status', 'or_no', 'issued_date',
+              'valid_until', 'uploaded_file')
     readonly_fields = ('created_at',)
     search_fields = ('permit_no',)
     autocomplete_fields = ('client',)
@@ -100,6 +96,10 @@ class PermitBaseAdmin(admin.ModelAdmin):
                 instance.title = instance.person.title
             instance.save()
         formset.save_m2m()
+
+    def save_model(self, request: Any, obj: Permit, form: Any, change: Any) -> None:
+        obj.calculate_validity_date()
+        return super().save_model(request, obj, form, change)
 
 
 @admin.register(LocalTransportPermit)
@@ -286,11 +286,9 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                     return HttpResponseRedirect('.')
 
                 if obj.permit_type == PermitType.LTP:
-                    days_valid = settings.VALIDITY[LocalTransportPermit.__name__]
                     ltp = LocalTransportPermit(
                         status=Status.DRAFT,
                         client=obj.client,
-                        valid_until=timezone.now()+timedelta(days=days_valid),
                         wfp=obj.client.current_wfp,
                         wcp=obj.client.current_wcp,
                         transport_location=obj.transport_location,
