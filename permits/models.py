@@ -75,7 +75,7 @@ class Permit(ModelMixin, models.Model):
         upload_to='uploads/', null=True, blank=True, validators=[validate_file_extension])
     valid_until = models.DateField(null=True, blank=True)
     created_at = models.DateField(auto_now_add=True)
-    issued_date = models.DateField(auto_now_add=True, null=True)
+    issued_date = models.DateField(null=True)
     payment_order = models.ForeignKey(
         'payments.PaymentOrder', on_delete=models.SET_NULL, blank=True, null=True)
     inspection = models.ForeignKey(
