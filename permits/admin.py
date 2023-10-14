@@ -286,10 +286,11 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                     return HttpResponseRedirect('.')
 
                 if obj.permit_type == PermitType.LTP:
+                    days_valid = settings.VALIDITY[LocalTransportPermit.__name__]
                     ltp = LocalTransportPermit(
                         status=Status.DRAFT,
                         client=obj.client,
-                        valid_until=timezone.now()+timedelta(days=settings.DAYS_VALID),
+                        valid_until=timezone.now()+timedelta(days=days_valid),
                         wfp=obj.client.current_wfp,
                         wcp=obj.client.current_wcp,
                         transport_location=obj.transport_location,
