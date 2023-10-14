@@ -8,7 +8,7 @@ class ClientRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = Client
-        fields = ('username', 'first_name', 'last_name', 'gender', 'business_name',
+        fields = ('username', 'first_name', 'last_name', 'gender',
                   'address', 'email', 'phone_number', 'agreed_to_terms_and_conditions')
 
     def clean_agreed_to_terms_and_conditions(self):

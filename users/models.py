@@ -64,7 +64,6 @@ class Client(User):
         verbose_name = 'Client'
 
     address = models.CharField(max_length=255)
-    business_name = models.CharField(max_length=255)
     agreed_to_terms_and_conditions = models.BooleanField(default=False)
 
     @property
