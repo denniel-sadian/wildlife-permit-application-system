@@ -37,81 +37,13 @@
 {% endblock styles %}
 
 {% block content %}
-    <main>
-        <div class="qrcode-cont">
-            <div id="qrcode"></div>
-        </div>
-
-        <h4>Wildlife Transport <br>
-            Permit No: {{ permit.permit_no }}</h4>
-        <h2 style="text-align: center">LOCAL TRANSPORT PERMIT</h2>
-        <p style="text-indent: 50px;">
-            Pursuant ot Republic Act 9147 dated July 30, 2001, <strong>{{ permit.client.name }}</strong> of <strong>{{ permit.client.address }}</strong>
-            is authorized to transport to <strong>{{ permit.transport_location }}</strong> the following wildlife for <strong>export</strong> purpose.</p>
-        <table>
-            <tr>
-                <th>Common/Scientific Name</th>
-                <th>Description</th>
-                <th>Quantity</th>
-            </tr>
-            {% for i in permit.species_to_transport.all %}
-            <tr>
-                <td>{{ i.sub_species.common_name }}/{{ i.sub_species.scientific_name }}</td>
-                <td>{{ i.description }}</td>
-                <td>{{ i.quantity }}</td>
-            </tr>
-            {% endfor %}
-            <tr>
-                <td></td>
-                <td></td>
-                <td><b>Total: {{ permit.total_transport_quantity }}</b></td>
-            </tr>
-        </table>
-        <p style="text-indent: 50px;">The above-mentioned specimens shall be transported by Air/Seaexpress on or
-            before <strong>{{ permit.transport_date }}</strong> and have been inspected, verified and found ni accordance
-            with
-            existing wildlife laws, rules and regulations.
-        </p>
-        <p style="text-indent: 50px;">
-            Local transport fee in the amount of <strong>₱ {{ permit.payment_order.payment.amount }}</strong> was paid under the DENR PENRO Official Receipt No.
-            <strong>{{ permit.payment_order.payment.receipt_no }}</strong> dated <strong>{{ ltp.updated_at }}</strong>.
-        </p>
-        <p style="text-indent: 50px;">This is to certifyfurther that this statement wasgiven me voluntarily and with
-            neither coercion nor promise of reward from the personnelofthe Department of Environment and Natural
-            Resources.</strong>
-        </p>
-        <div class="sig-line">
-            <div></div>
-            <div class="sig">
-                <span><b>{{ permit.signature.person.name }}</b></span>
-                <span>{{ permit.signature.title }}</span>
-            </div>
-        </div>
-
-        {% if permit.inspection.report_file %}
-        <embed src="{{ permit.inspection.report_file.url }}"/>
-        {% else %}
-        <p>No inspection report!</p>
-        {% endif %}
-
-        {% if permit.wfp.uploaded_file %}
-        <embed src="{{ permit.wfp.uploaded_file.url }}"/>
-        {% else %}
-        <p>No WFP!</p>
-        {% endif %}
-
-        {% if permit.wcp.uploaded_file %}
-        <embed src="{{ permit.wcp.uploaded_file.url }}"/>
-        {% else %}
-        <p>No WCP!</p>
-        {% endif %}
-
-        {% if permit.payment_order.payment.uploaded_receipt %}
-        <embed src="{{ permit.payment_order.payment.uploaded_receipt.url }}"/>
-        {% else %}
-        <p>No payment!</p>
-        {% endif %}
-    </main>
+<main>
+    {% if permit.uploaded_file %}
+    <embed src="{{ permit.uploaded_file.url }}"/>
+    {% else %}
+    <p>No uploaded file!</p>
+    {% endif %}
+</main>
 {% endblock content %}
 
 {% block side %}
@@ -123,15 +55,5 @@
     <p>Valid until: {{ permit.valid_until }}</p>
     <p>Official receipt no: {{ permit.payment_order.payment.receipt_no }}</p>
     <p>Payment amount: Php {{ permit.payment_order.payment.amount }}</p>
-    <p>Transport location: {{ permit.transport_location }}</p>
-    <p>Transport date: {{ permit.transport_date }}</p>
-    <div>
-        <span>Species to transport: {{ permit.total_transport_quantity }}</span>
-        <ul>
-            {% for i in permit.species_to_transport.all %}
-            <li>{{ i.sub_species }} - {{ i.quantity }}</li>
-            {% endfor %}
-        </ul>
-    </div>
 </div>
 {% endblock side %}
