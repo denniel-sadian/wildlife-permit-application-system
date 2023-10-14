@@ -348,7 +348,7 @@
                 <a href="{% url 'unsubmit_application' pk=object.id %}" class="w3-btn w3-round-large w3-text-gray w3-border w3-border-gray">Unsubmit</a>
                 {% endif %}
 
-                {% if object.status == 'RELEASED' %}
+                {% if object.status == 'RELEASED' and object.permit %}
                 <a href="{% url 'permit_detail' pk=object.permit.id %}" class="w3-btn w3-round-large w3-green" target="_blank">View Permit</a>
                 {% endif %}
 
