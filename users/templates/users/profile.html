@@ -30,7 +30,7 @@
         <p>
             Your latest <strong>Wildlife Farm Permit ({{ wfp.permit_no }})</strong> was <strong>created on {{ wfp.created_at }}</strong> and is <strong>valid until {{ wfp.valid_until }}</strong>.
             Your permit's status is currently <strong>"{{ wfp.current_status }}"</strong>.
-            {% if wfp.uploaded_file %}You can download this permit using <a href="{{ wfp.uploaded_file.url }}" target="_blank">this link</a>.{% endif %}
+            {% if wfp.uploaded_file %}You can download this permit using <a href="{% url 'permit_detail' pk=wfp.id %}" target="_blank">this link</a>.{% endif %}
         </p>
         {% else %}
         <p>You currently does not have a Wildlife Farm Permit.</p>
@@ -40,7 +40,7 @@
         <p>
             Your latest <strong>Wildlife Farm Permit ({{ wcp.permit_no }})</strong> was <strong>created on {{ wcp.created_at }}</strong> and is <strong>valid until {{ wcp.valid_until }}</strong>.
             Your permit's status is currently <strong>"{{ wcp.current_status }}"</strong>.
-            {% if wcp.uploaded_file %}You can download this permit using <a href="{{ wcp.uploaded_file.url }}" target="_blank">this link</a>.{% endif %}
+            {% if wcp.uploaded_file %}You can download this permit using <a href="{% url 'permit_detail' pk=wcp.id %}" target="_blank">this link</a>.{% endif %}
         </p>
         <p>According to your Wildlife Collector's Permit, you are only allowed to export these species.</p>
         <div style="overflow-x:auto;">
