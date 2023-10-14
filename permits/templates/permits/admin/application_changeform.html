@@ -27,7 +27,7 @@
             {% if original.permit %}
             <a href="{{ original.permit.admin_url  }}">View {{ original.get_permit_type_display }}</a>
             {% else %}
-            <input type="submit" value="Generate {{ original.get_permit_type_display }}" name="generate_permit">
+            <input type="submit" value="Create {{ original.get_permit_type_display }}" name="generate_permit">
             {% endif %}
         {% endif %}
     </div>
