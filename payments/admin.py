@@ -28,7 +28,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
                     'paid', 'prepared_by', 'created_at', 'released_at')
     fields = ('no', 'nature_of_doc_being_secured',
               'client', 'permit_application', 'prepared_by',
-              'paid', 'created_at', 'released_at')
+              'paid', 'released_at')
     autocomplete_fields = ('permit_application', 'client', 'prepared_by')
     search_fields = ('no', 'permit_application__no')
     inlines = (PaymentOrderItemInline, SignatureInline)
@@ -44,7 +44,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
         if obj is None:
             return ()
         # Otherwise, when updating an existing record
-        return ('client', 'permit_application', 'prepared_by', 'created_at', 'released_at')
+        return ('client', 'permit_application', 'prepared_by', 'released_at')
 
     def response_change(self, request, obj: PaymentOrder):
         if obj:
