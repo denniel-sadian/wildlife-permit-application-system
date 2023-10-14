@@ -20,7 +20,6 @@ class SubSpecies(models.Model):
         Species, on_delete=models.CASCADE, related_name='sub_species')
     common_name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255)
-    population = models.IntegerField()
 
     def __str__(self):
         return str(self.main_species.name + ' - ' + self.common_name)
