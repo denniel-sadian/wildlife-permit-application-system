@@ -19,7 +19,7 @@ class PaymentOrder(ModelMixin, models.Model):
     nature_of_doc_being_secured = models.CharField(
         'Nature of Application/Permit/Documents being secured', max_length=255)
     client = models.ForeignKey(
-        'users.Client', on_delete=models.CASCADE)
+        'users.Client', on_delete=models.CASCADE, null=True, blank=True)
     permit_application = models.OneToOneField(
         PermitApplication, on_delete=models.CASCADE, null=True, blank=True)
     prepared_by = models.ForeignKey(
