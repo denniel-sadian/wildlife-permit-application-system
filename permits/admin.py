@@ -69,27 +69,14 @@ class SignatureInline(GenericStackedInline):
 
 
 class PermitBaseAdmin(admin.ModelAdmin):
-    list_display = ('permit_no', 'status', 'client', 'permittee')
+    list_display = ('permit_no', 'status', 'client',
+                    'permittee', 'issued_date', 'valid_until', 'created_at')
+    fields = ('permit_no', 'status', 'issued_date',
+              'valid_until', 'or_no', 'uploaded_file')
+    readonly_fields = ('created_at',)
     search_fields = ('permit_no',)
-    autocomplete_fields = ('inspection', 'client',
-                           'permittee', 'payment_order')
+    autocomplete_fields = ('client',)
     change_form_template = 'permits/admin/permit_changeform.html'
-
-    def get_fields(self, request, obj=None):
-        fields = ['permit_no', 'status',
-                  'valid_until', 'uploaded_file', 'inspection', 'payment_order']
-
-        if obj:
-            fields.append('created_at')
-        else:
-            fields += ['client', 'permittee']
-
-        if obj is not None and obj.client:
-            fields.append('client')
-        elif obj is not None and obj.permittee:
-            fields.append('permittee')
-
-        return fields
 
     def get_readonly_fields(self, request, obj=None):
         if obj is None:
