@@ -74,7 +74,7 @@ class Permit(ModelMixin, models.Model):
     uploaded_file = models.FileField(
         upload_to='uploads/', null=True, blank=True, validators=[validate_file_extension])
     valid_until = models.DateField(null=True, blank=True)
-    or_no = models.CharField(max_length=100, null=True)
+    or_no = models.CharField('Order No.', max_length=100, null=True)
     created_at = models.DateField(auto_now_add=True)
     issued_date = models.DateField(null=True)
     payment_order = models.ForeignKey(
