@@ -17,6 +17,8 @@ urlpatterns = [
          name='unsubmit_application'),
     path('applications/create/', views.PermitApplicationCreateView.as_view(),
          name='create_application'),
+    path('uploaded_requirements/<int:pk>/', views.UploadedRequirementDeleteView.as_view(),
+         name='delete_uploaded_requirement'),
 
     # Permits
     path('permits/', views.PermitListView.as_view(),
