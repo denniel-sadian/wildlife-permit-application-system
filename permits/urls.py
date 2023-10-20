@@ -21,6 +21,8 @@ urlpatterns = [
          name='delete_uploaded_requirement'),
     path('transport_entries/<int:pk>/', views.TransportEntryDeleteView.as_view(),
          name='delete_transport_entry'),
+    path('requested_species/<int:pk>/', views.CollectionEntryDeleteView.as_view(),
+         name='delete_requested_species'),
 
     # Permits
     path('permits/', views.PermitListView.as_view(),
