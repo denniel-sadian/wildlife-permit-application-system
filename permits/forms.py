@@ -89,7 +89,7 @@ class UploadedRequirementForm(forms.ModelForm):
 
 class TransportEntryForm(TransportEntryBaseForm):
     sub_species = AutoCompleteSelectField(
-        'permitted-subspecies', required=True, help_text=None)
+        'permitted-subspecies', required=True, help_text=None, label='Species')
 
 
 class PermitApplicationForm(forms.ModelForm):
@@ -140,7 +140,7 @@ class PermitApplicationUpdateForm(forms.ModelForm):
 
 class CollectionEntryForm(forms.ModelForm):
     sub_species = AutoCompleteSelectField(
-        'subspecies', required=True, help_text=None)
+        'subspecies', required=True, help_text=None, label='Species')
 
     class Meta:
         model = CollectionEntry

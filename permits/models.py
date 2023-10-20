@@ -276,7 +276,8 @@ class PermitApplication(ModelMixin, models.Model):
 
 class TransportEntry(models.Model):
     sub_species = models.ForeignKey(
-        SubSpecies, on_delete=models.CASCADE, related_name='transportings')
+        SubSpecies, on_delete=models.CASCADE, related_name='transportings',
+        verbose_name='Species')
     permit_application = models.ForeignKey(
         PermitApplication, on_delete=models.CASCADE, related_name='requested_species_to_transport',
         blank=True, null=True)
@@ -292,7 +293,8 @@ class TransportEntry(models.Model):
 
 class CollectionEntry(models.Model):
     sub_species = models.ForeignKey(
-        SubSpecies, on_delete=models.CASCADE, related_name='collections')
+        SubSpecies, on_delete=models.CASCADE, related_name='collections',
+        verbose_name='Species')
     permit_application = models.ForeignKey(
         PermitApplication, on_delete=models.CASCADE, related_name='requested_species',
         blank=True, null=True)
