@@ -19,6 +19,8 @@ urlpatterns = [
          name='create_application'),
     path('uploaded_requirements/<int:pk>/', views.UploadedRequirementDeleteView.as_view(),
          name='delete_uploaded_requirement'),
+    path('transport_entries/<int:pk>/', views.TransportEntryDeleteView.as_view(),
+         name='delete_transport_entry'),
 
     # Permits
     path('permits/', views.PermitListView.as_view(),
