@@ -281,26 +281,28 @@
             {{ transport_entry.media }}
             <div class="extra-form">
                 <h3 id="{{ transport_entry.prefix }}">Transport Entries</h3>
-                <table class="w3-table w3-table-all w3-margin-bottom">
-                    <tr>
-                        <th>Species</th>
-                        <th>Description</th>
-                        <th>Quantity</th>
-                        {% if object.editable %}
-                        <th>Action</th>
-                        {% endif %}
-                    </tr>
-                    {% for i in object.requested_species_to_transport.all %}
-                    <tr>
-                        <td>{{ i.sub_species }}</td>
-                        <td>{{ i.description }}</td>
-                        <td>{{ i.quantity }}</td>
-                        {% if object.editable %}
-                        <td><a href="{% url 'delete_transport_entry' pk=i.id %}" class="w3-text-red"><i class="fa fa-trash-o"></i> Delete</a></td>
-                        {% endif %}
-                    </tr>
-                    {% endfor %}
-                </table>
+                <div style="overflow-x:auto;">
+                    <table class="w3-table w3-table-all w3-margin-bottom">
+                        <tr>
+                            <th>Species</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            {% if object.editable %}
+                            <th>Action</th>
+                            {% endif %}
+                        </tr>
+                        {% for i in object.requested_species_to_transport.all %}
+                        <tr>
+                            <td>{{ i.sub_species }}</td>
+                            <td>{{ i.description }}</td>
+                            <td>{{ i.quantity }}</td>
+                            {% if object.editable %}
+                            <td><a href="{% url 'delete_transport_entry' pk=i.id %}" class="w3-text-red"><i class="fa fa-trash-o"></i> Delete</a></td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
                 {% if object.editable %}
                 <div class="mini-form">
                     {% include 'ui/select.html' with field=transport_entry.sub_species %}
@@ -320,24 +322,26 @@
             {% csrf_token %}
             {{ requested_species.media }}
             <h3 id="{{ requested_species.prefix }}">Collection Entries</h3>
-            <table class="w3-table w3-table-all w3-margin-bottom">
-                <tr>
-                    <th>Species</th>
-                    <th>Quantity</th>
-                    {% if object.editable %}
-                    <th>Action</th>
-                    {% endif %}
-                </tr>
-                {% for i in object.requested_species.all %}
-                <tr>
-                    <td>{{ i.sub_species }}</td>
-                    <td>{{ i.quantity }}</td>
-                    {% if object.editable %}
-                    <td><a href="{% url 'delete_requested_species' pk=i.id %}" class="w3-text-red"><i class="fa fa-trash-o"></i> Delete</a></td>
-                    {% endif %}
-                </tr>
-                {% endfor %}
-            </table>
+            <div style="overflow-x:auto;">
+                <table class="w3-table w3-table-all w3-margin-bottom">
+                    <tr>
+                        <th>Species</th>
+                        <th>Quantity</th>
+                        {% if object.editable %}
+                        <th>Action</th>
+                        {% endif %}
+                    </tr>
+                    {% for i in object.requested_species.all %}
+                    <tr>
+                        <td>{{ i.sub_species }}</td>
+                        <td>{{ i.quantity }}</td>
+                        {% if object.editable %}
+                        <td><a href="{% url 'delete_requested_species' pk=i.id %}" class="w3-text-red"><i class="fa fa-trash-o"></i> Delete</a></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
             {% if object.editable %}
             <div class="mini-form">
                 {% include 'ui/select.html' with field=requested_species.sub_species %}
