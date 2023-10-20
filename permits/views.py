@@ -124,17 +124,13 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
-        transport_entries = self.object.requested_species_to_transport.all().order_by(
-            'sub_species__main_species')
         requested_species = self.object.requested_species.all().order_by(
             'sub_species__main_species', 'sub_species__common_name')
         extra = 1 if self.object.editable else 0
 
         if self.request.POST:
-            TransportEntryFormSet = forms.inlineformset_factory(
-                PermitApplication, TransportEntry, form=TransportEntryForm, extra=extra)
-            context['transport_entries'] = TransportEntryFormSet(
-                self.request.POST, self.request.FILES, instance=self.object, prefix='transports')
+            context['transport_entry'] = TransportEntryForm(
+                self.request.POST, self.request.FILES, prefix='transport_entry')
 
             CollectionEntryFormSet = forms.inlineformset_factory(
                 PermitApplication, CollectionEntry, form=CollectionEntryForm, extra=extra)
@@ -143,10 +139,8 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
             context['requirement'] = UploadedRequirementForm(
                 self.request.POST, self.request.FILES, prefix='requirement')
         else:
-            TransportEntryFormSet = forms.inlineformset_factory(
-                PermitApplication, TransportEntry, form=TransportEntryForm, extra=extra)
-            context['transport_entries'] = TransportEntryFormSet(
-                instance=self.object, queryset=transport_entries, prefix='transports')
+            context['transport_entry'] = TransportEntryForm(
+                prefix='transport_entry')
 
             CollectionEntryFormSet = forms.inlineformset_factory(
                 PermitApplication, CollectionEntry, form=CollectionEntryForm, extra=extra)
@@ -166,7 +160,7 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         context = self.get_context_data()
 
-        transport_entries = context['transport_entries']
+        transport_entry = context['transport_entry']
         requested_species = context['requested_species']
         requirement = context['requirement']
 
@@ -175,14 +169,16 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
             form.instance.client = self.request.user.subclass
             self.object = form.save()
 
-            if transport_entries.is_valid():
-                transport_entries.save()
+            transport_entry.instance.permit_application = self.object
+            if transport_entry.is_valid():
+                transport_entry.save()
+                self.last_edited_list = transport_entry.prefix
 
             if requested_species.is_valid():
                 requested_species.save()
 
+            requirement.instance.permit_application = self.object
             if requirement.is_valid():
-                requirement.instance.permit_application = self.object
                 requirement.save()
                 self.last_edited_list = requirement.prefix
 
@@ -282,9 +278,10 @@ class PermitListView(QueryParamFilterMixin, CustomLoginRequiredMixin, ListView):
             client=self.request.user, **filters).order_by('-created_at')
 
 
-class UploadedRequirementDeleteView(CustomLoginRequiredMixin, DeleteView):
-    model = UploadedRequirement
+class PermitApplicationItemDeleteView(CustomLoginRequiredMixin, DeleteView):
+    model = None
     current_permit_application = None
+    item_list = None
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
@@ -295,8 +292,18 @@ class UploadedRequirementDeleteView(CustomLoginRequiredMixin, DeleteView):
         return reverse_lazy(
             'update_application',
             kwargs={'pk': self.current_permit_application.pk}
-        ) + '#requirement'
+        ) + '#'+self.item_list
 
     def get(self, request, *args, **kwargs):
         self.get_object()
         return self.delete(request, *args, **kwargs)
+
+
+class UploadedRequirementDeleteView(PermitApplicationItemDeleteView):
+    model = UploadedRequirement
+    item_list = 'requirement'
+
+
+class TransportEntryDeleteView(PermitApplicationItemDeleteView):
+    model = TransportEntry
+    item_list = 'transport_entry'
