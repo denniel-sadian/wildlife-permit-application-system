@@ -12,10 +12,8 @@ from django.views.generic import DeleteView, RedirectView
 from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django import forms
 
 from users.views import CustomLoginRequiredMixin
-from users.models import Client
 from .models import (
     PermitApplication,
     PermitType,
@@ -124,34 +122,21 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
-        requested_species = self.object.requested_species.all().order_by(
-            'sub_species__main_species', 'sub_species__common_name')
-        extra = 1 if self.object.editable else 0
-
         if self.request.POST:
             context['transport_entry'] = TransportEntryForm(
                 self.request.POST, self.request.FILES, prefix='transport_entry')
-
-            CollectionEntryFormSet = forms.inlineformset_factory(
-                PermitApplication, CollectionEntry, form=CollectionEntryForm, extra=extra)
-            context['requested_species'] = CollectionEntryFormSet(
-                self.request.POST, self.request.FILES, instance=self.object, prefix='collection_entries')
+            context['requested_species'] = CollectionEntryForm(
+                self.request.POST, self.request.FILES,
+                prefix='requested_species')
             context['requirement'] = UploadedRequirementForm(
                 self.request.POST, self.request.FILES, prefix='requirement')
         else:
             context['transport_entry'] = TransportEntryForm(
                 prefix='transport_entry')
-
-            CollectionEntryFormSet = forms.inlineformset_factory(
-                PermitApplication, CollectionEntry, form=CollectionEntryForm, extra=extra)
-            context['requested_species'] = CollectionEntryFormSet(
-                instance=self.object, queryset=requested_species, prefix='collection_entries')
+            context['requested_species'] = CollectionEntryForm(
+                prefix='requested_species')
             context['requirement'] = UploadedRequirementForm(
                 prefix='requirement')
-
-        client: Client = self.request.user.subclass
-        if client.current_wcp:
-            context['allowed_species'] = client.current_wcp.allowed_species.all()
 
         context['needed_requirements'] = self.object.needed_requirements
 
@@ -174,8 +159,10 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
                 transport_entry.save()
                 self.last_edited_list = transport_entry.prefix
 
+            requested_species.instance.permit_application = self.object
             if requested_species.is_valid():
                 requested_species.save()
+                self.last_edited_list = requested_species.prefix
 
             requirement.instance.permit_application = self.object
             if requirement.is_valid():
@@ -307,3 +294,8 @@ class UploadedRequirementDeleteView(PermitApplicationItemDeleteView):
 class TransportEntryDeleteView(PermitApplicationItemDeleteView):
     model = TransportEntry
     item_list = 'transport_entry'
+
+
+class CollectionEntryDeleteView(PermitApplicationItemDeleteView):
+    model = CollectionEntry
+    item_list = 'requested_species'
