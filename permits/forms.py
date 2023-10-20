@@ -61,9 +61,6 @@ class TransportEntryBaseForm(forms.ModelForm):
                     raise forms.ValidationError(
                         f'The client is only allowed to transport a quanity of {permitted_species.quantity} '
                         f'for the species {sub_species}.')
-            else:
-                raise forms.ValidationError(
-                    'The client is not allowed to transport this species.')
         else:
             raise forms.ValidationError(
                 'The client does not have a WCP yet.')
@@ -78,6 +75,16 @@ class UploadedRequirementForm(forms.ModelForm):
     class Meta:
         model = UploadedRequirement
         fields = ('requirement', 'uploaded_file')
+
+    def clean_requirement(self):
+        requirement = self.cleaned_data.get('requirement')
+        application: PermitApplication = self.instance.permit_application
+        existing_requirement = application.requirements.filter(
+            requirement=requirement).first()
+        if existing_requirement is not None and (existing_requirement.id != self.instance.id):
+            raise forms.ValidationError(
+                'The requirement has been uploaded already.')
+        return requirement
 
 
 class TransportEntryForm(TransportEntryBaseForm):
@@ -146,5 +153,5 @@ class CollectionEntryForm(forms.ModelForm):
             sub_species=sub_species).first()
         if existing_entry is not None and (existing_entry.id != self.instance.id):
             raise forms.ValidationError(
-                'This species has been chosen.')
+                f'{sub_species} has been chosen already.')
         return sub_species
