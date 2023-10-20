@@ -113,14 +113,17 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
     model = PermitApplication
     form_class = PermitApplicationUpdateForm
     template_name = 'permits/update_application.html'
+    last_edited_list = None
 
     def get_success_url(self) -> str:
-        return reverse_lazy('update_application', kwargs={'pk': self.object.pk})
+        return reverse_lazy(
+            'update_application',
+            kwargs={'pk': self.object.pk}
+        ) + '' if not self.last_edited_list else '#'+self.last_edited_list
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
-        requirements = self.object.requirements.all()
         transport_entries = self.object.requested_species_to_transport.all().order_by(
             'sub_species__main_species')
         requested_species = self.object.requested_species.all().order_by(
@@ -128,11 +131,6 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
         extra = 1 if self.object.editable else 0
 
         if self.request.POST:
-            RequirementFormSet = forms.inlineformset_factory(
-                PermitApplication, UploadedRequirement, form=UploadedRequirementForm, extra=extra)
-            context['requirements'] = RequirementFormSet(
-                self.request.POST, self.request.FILES, instance=self.object, prefix='reqs')
-
             TransportEntryFormSet = forms.inlineformset_factory(
                 PermitApplication, TransportEntry, form=TransportEntryForm, extra=extra)
             context['transport_entries'] = TransportEntryFormSet(
@@ -142,12 +140,9 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
                 PermitApplication, CollectionEntry, form=CollectionEntryForm, extra=extra)
             context['requested_species'] = CollectionEntryFormSet(
                 self.request.POST, self.request.FILES, instance=self.object, prefix='collection_entries')
+            context['requirement'] = UploadedRequirementForm(
+                self.request.POST, self.request.FILES, prefix='requirement')
         else:
-            RequirementFormSet = forms.inlineformset_factory(
-                PermitApplication, UploadedRequirement, form=UploadedRequirementForm, extra=extra)
-            context['requirements'] = RequirementFormSet(
-                instance=self.object, queryset=requirements, prefix='reqs')
-
             TransportEntryFormSet = forms.inlineformset_factory(
                 PermitApplication, TransportEntry, form=TransportEntryForm, extra=extra)
             context['transport_entries'] = TransportEntryFormSet(
@@ -157,6 +152,8 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
                 PermitApplication, CollectionEntry, form=CollectionEntryForm, extra=extra)
             context['requested_species'] = CollectionEntryFormSet(
                 instance=self.object, queryset=requested_species, prefix='collection_entries')
+            context['requirement'] = UploadedRequirementForm(
+                prefix='requirement')
 
         client: Client = self.request.user.subclass
         if client.current_wcp:
@@ -169,23 +166,25 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         context = self.get_context_data()
 
-        requirements = context['requirements']
         transport_entries = context['transport_entries']
         requested_species = context['requested_species']
+        requirement = context['requirement']
 
         with transaction.atomic():
 
             form.instance.client = self.request.user.subclass
             self.object = form.save()
 
-            if requirements.is_valid():
-                requirements.save()
-
             if transport_entries.is_valid():
                 transport_entries.save()
 
             if requested_species.is_valid():
                 requested_species.save()
+
+            if requirement.is_valid():
+                requirement.instance.permit_application = self.object
+                requirement.save()
+                self.last_edited_list = requirement.prefix
 
         messages.success(
             self.request,
