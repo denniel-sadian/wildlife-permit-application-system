@@ -100,6 +100,25 @@
     .payment-order table tr * {
         white-space: pre-wrap !important;
     }
+
+    .list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .list-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        border-bottom: 1px solid lightgray;
+        border-right: 1px solid lightgray;
+        margin-bottom: 16px;
+    }
+
+    .list-item > * {
+        padding: 4px 8px;
+        display: flex;
+        align-items: center;
+    }
 </style>
 {% endblock %}
 
@@ -195,29 +214,26 @@
                     </ul>
                 </div>
                 {% endif %}
-                <h4>Uploaded Requirements:</h4>
-                {% for i in requirements %}
-                <div id="{{ requirements.prefix }}">
-                    <div class="mini-form">
-                        {{ i.id }}
-                        {{ i.permit_application }}
-                        {% include 'ui/select.html' with field=i.requirement %}
-                        {% include 'ui/fileinput.html' with field=i.uploaded_file %}
-                        {% if i.id.value and object.editable %}{% include 'ui/checkbox.html' with field=i.DELETE %}{% endif %}
+                <h4 id="{{ requirement.prefix }}">Uploaded Requirements:</h4>
+                <div class="list">
+                    {% for i in object.requirements.all %}
+                    <div class="list-item">
+                        <div><a href="{{ i.uploaded_file.url }}" target="_blank" class="w3-text-blue">{{ i.requirement.label }}</a></div>
+                        {% if object.editable %}
+                        <div><a href="{% url 'delete_uploaded_requirement' pk=i.id %}"><i class="fa fa-trash-o w3-text-red"></i></a></div>
+                        {% endif %}
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
                 {% if object.editable %}
+                <div class="mini-form">
+                    {% include 'ui/select.html' with field=requirement.requirement %}
+                    {% include 'ui/fileinput.html' with field=requirement.uploaded_file %}
+                </div>
                 <div class="buttons">
-                    <button type="button" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue" onclick="addForm('{{ requirements.prefix }}')">Add requirement</button>
+                    <button type="submit" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Add Requirement</button>
                 </div>
                 {% endif %}
-                <div id="{{ requirements.prefix }}-empty" style="display:none">
-                    <div class="mini-form">
-                        {% include 'ui/select.html' with field=requirements.empty_form.requirement %}
-                        {% include 'ui/fileinput.html' with field=requirements.empty_form.uploaded_file %}
-                    </div>
-                </div>
             </div>
 
             {% if object.paymentorder and object.paymentorder.released_at %}
