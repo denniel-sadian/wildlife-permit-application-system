@@ -154,24 +154,46 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
             form.instance.client = self.request.user.subclass
             self.object = form.save()
 
+            errors = []
+
             transport_entry.instance.permit_application = self.object
             if transport_entry.is_valid():
                 transport_entry.save()
                 self.last_edited_list = transport_entry.prefix
+            else:
+                for field, error_list in transport_entry.errors.items():
+                    for error in error_list:
+                        errors.append(error)
 
             requested_species.instance.permit_application = self.object
             if requested_species.is_valid():
                 requested_species.save()
                 self.last_edited_list = requested_species.prefix
+            else:
+                for field, error_list in requested_species.errors.items():
+                    for error in error_list:
+                        errors.append(error)
 
             requirement.instance.permit_application = self.object
             if requirement.is_valid():
                 requirement.save()
                 self.last_edited_list = requirement.prefix
+            else:
+                for field, error_list in requirement.errors.items():
+                    for error in error_list:
+                        errors.append(error)
 
-        messages.success(
-            self.request,
-            'Permit application has been saved')
+        selected_errors = [
+            error for error in errors if error != 'This field is required.']
+
+        if selected_errors:
+            for error in selected_errors:
+                messages.warning(self.request, error)
+        else:
+            messages.success(
+                self.request,
+                'Permit application has been saved')
+
         return super().form_valid(form)
 
 
