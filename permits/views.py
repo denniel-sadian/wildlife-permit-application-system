@@ -281,3 +281,23 @@ class PermitListView(QueryParamFilterMixin, CustomLoginRequiredMixin, ListView):
 
         return qs.filter(
             client=self.request.user, **filters).order_by('-created_at')
+
+
+class UploadedRequirementDeleteView(CustomLoginRequiredMixin, DeleteView):
+    model = UploadedRequirement
+    current_permit_application = None
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        self.current_permit_application = obj.permit_application
+        return obj
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'update_application',
+            kwargs={'pk': self.current_permit_application.pk}
+        ) + '#requirement'
+
+    def get(self, request, *args, **kwargs):
+        self.get_object()
+        return self.delete(request, *args, **kwargs)
