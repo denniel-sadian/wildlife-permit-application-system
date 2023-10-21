@@ -7,6 +7,8 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.urls import reverse_lazy
 
+from users.mixins import AdminMixin
+
 from permits.models import Signature
 
 from .models import (
@@ -23,7 +25,7 @@ class PaymentOrderItemInline(admin.TabularInline):
 
 
 @admin.register(PaymentOrder)
-class PaymentOrderAdmin(admin.ModelAdmin):
+class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
     list_display = ('no', 'permit_application',
                     'paid', 'prepared_by', 'created_at', 'released_at')
     fields = ('no', 'nature_of_doc_being_secured',
@@ -45,21 +47,6 @@ class PaymentOrderAdmin(admin.ModelAdmin):
             return ()
         # Otherwise, when updating an existing record
         return ('client', 'permit_application', 'prepared_by', 'released_at')
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        try:
-            payment_order = PaymentOrder.objects.get(id=object_id)
-        except PaymentOrder.DoesNotExist:
-            payment_order = None
-
-        extra_context = extra_context or {}
-        extra_context['current_user_has_signed'] = False
-        for sign in payment_order.signatures:
-            if sign.person == request.user:
-                extra_context['current_user_has_signed'] = True
-                break
-
-        return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
     def response_change(self, request, obj):
         if 'remove_sign' in request.POST:
