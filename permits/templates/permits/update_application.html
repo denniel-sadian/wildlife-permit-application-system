@@ -214,14 +214,14 @@
                             <div class="sign">
                                 <img src="{{ object.paymentorder.prepared_by_signature.image.url }}">
                                 <span>{{ object.paymentorder.prepared_by_signature.person.name }}</span>
-                                <span class="w3-small" style="font-weight:normal">{{ object.paymentorder.prepared_by_signature.title }}</span>
+                                <span class="w3-small" style="font-weight:normal">{{ object.paymentorder.prepared_by_signature.person.title }}</span>
                             </div>
                         </th>
                         <th>
                             <div class="sign">
                                 <img src="{{ object.paymentorder.approved_by_signature.image.url }}">
                                 <span>{{ object.paymentorder.approved_by_signature.person.name }}</span>
-                                <span class="w3-small" style="font-weight:normal">{{ object.paymentorder.approved_by_signature.title }}</span>
+                                <span class="w3-small" style="font-weight:normal">{{ object.paymentorder.approved_by_signature.person.signature_image }}</span>
                             </div>
                         </th>
                     </tr>

@@ -14,4 +14,5 @@
         {% if original.permit_application %}<a href="{{ original.permit_application.admin_url }}">View Permit Application</a>{% endif %}
     </div>
 
+    {% include 'ui/signature_list.html' with signatures=original.signatures %}
 {% endblock %}

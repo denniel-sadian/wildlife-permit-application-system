@@ -4,7 +4,7 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=36" />
+    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=37" />
 {% endblock %}
 
 {% block submit_buttons_bottom %}
@@ -25,7 +25,16 @@
             {% if not original.released_at and original.ready %}
             <input type="submit" value="Release" name="release">
             {% endif %}
+
+            {% if current_user_has_signed %}
+            <input type="submit" value="Remove Your Signature" name="remove_sign">
+            {% else %}
+            <input type="submit" value="Sign" name="add_sign">
+            {% endif %}
         {% endif %}
     </div>
+
+    {% include 'ui/signature_list.html' with signatures=original.signatures %}
+</div>
 
 {% endblock %}

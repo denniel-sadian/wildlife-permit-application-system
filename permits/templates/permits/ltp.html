@@ -28,7 +28,7 @@
         justify-content: flex-end;
         align-items: center;
         flex-direction: column;
-        background-image: url("{{ permit.signature.image.url }}");
+        background-image: url("{{ permit.signature.person.signature_image }}");
         background-position: bottom;
         background-size: contain;
         background-repeat: no-repeat;
@@ -84,7 +84,7 @@
             <div></div>
             <div class="sig">
                 <span><b>{{ permit.signature.person.name }}</b></span>
-                <span>{{ permit.signature.title }}</span>
+                <span>{{ permit.signature.person.title }}</span>
             </div>
         </div>
 
