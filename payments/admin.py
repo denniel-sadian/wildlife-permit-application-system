@@ -61,22 +61,16 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
-    def response_change(self, request, obj: PaymentOrder):
+    def response_change(self, request, obj):
         if 'remove_sign' in request.POST:
-            for sign in obj.signatures:
-                if sign.person == request.user:
-                    sign.delete()
-                    self.message_user(
-                        request, 'Your signature has been removed.',
-                        level=messages.SUCCESS)
-                    return HttpResponseRedirect('.')
+            Signature.remove(request.user, obj)
+            self.message_user(
+                request, 'Your signature has been removed.',
+                level=messages.SUCCESS)
+            return HttpResponseRedirect('.')
 
         if 'add_sign' in request.POST:
-            if request.user.title and request.user.signature_image:
-                Signature(
-                    person=request.user,
-                    content_object=obj
-                ).save()
+            if Signature.create(request.user, obj):
                 self.message_user(
                     request,
                     'Your signature has been attached.',
