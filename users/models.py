@@ -5,7 +5,11 @@ from django.contrib.auth.models import UserManager
 from model_utils.managers import InheritanceManager
 from phonenumber_field.modelfields import PhoneNumberField
 
-from permits.models import WildlifeCollectorPermit, WildlifeFarmPermit
+from permits.models import (
+    Status,
+    WildlifeCollectorPermit,
+    WildlifeFarmPermit
+)
 
 from .mixins import ModelMixin
 
@@ -70,7 +74,8 @@ class Client(User):
     def current_wcp(self):
         try:
             wcp = WildlifeCollectorPermit.objects \
-                .filter(client=self).latest('created_at')
+                .filter(client=self, status=Status.RELEASED) \
+                .latest('created_at')
         except WildlifeCollectorPermit.DoesNotExist:
             wcp = None
         return wcp
@@ -79,7 +84,8 @@ class Client(User):
     def current_wfp(self):
         try:
             wfp = WildlifeFarmPermit.objects \
-                .filter(client=self).latest('created_at')
+                .filter(client=self, status=Status.RELEASED) \
+                .latest('created_at')
         except WildlifeFarmPermit.DoesNotExist:
             wfp = None
         return wfp
