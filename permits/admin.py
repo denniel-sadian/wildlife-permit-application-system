@@ -6,13 +6,15 @@ from django.contrib import messages
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
+from django import forms
+from django.db.models import Q
 
 from payments.models import (
     PaymentOrder
 )
 
-from .forms import (
-    TransportEntryBaseForm
+from animals.models import (
+    SubSpecies
 )
 
 from .models import (
@@ -44,8 +46,49 @@ class UploadedRequirementInline(admin.StackedInline):
     autocomplete_fields = ('requirement',)
 
 
-class TransportEntryForm(TransportEntryBaseForm):
-    pass
+class TransportEntryForm(forms.ModelForm):
+
+    class Meta:
+        model = TransportEntry
+        fields = ('sub_species', 'quantity', 'description')
+
+    def clean_sub_species(self):
+        # Make sure double transport for the same species is forbidden
+        sub_species = self.cleaned_data.get('sub_species')
+        ltp: LocalTransportPermit = self.instance.ltp
+        existing_transport = ltp.species_to_transport.filter(
+            sub_species=sub_species).first()
+        if existing_transport is not None and (existing_transport.id != self.instance.id):
+            raise forms.ValidationError(
+                'This species has been chosen for transport already.')
+
+        # Make sure only collected species are chosen for transport
+        allowed = SubSpecies.objects.filter(Q(species_permitted__wcp__client=ltp.client) &
+                                            Q(common_name__exact=sub_species.common_name)).first()
+        if not allowed:
+            raise forms.ValidationError(
+                'The client is not allowed to transport this species.')
+
+        return sub_species
+
+    def clean_quantity(self):
+        sub_species = self.cleaned_data.get('sub_species')
+        quantity = self.cleaned_data.get('quantity')
+
+        wcp: WildlifeCollectorPermit = self.instance.ltp.client.current_wcp
+        if wcp:
+            permitted_species: PermittedToCollectAnimal = wcp.allowed_species.filter(
+                sub_species=sub_species).first()
+            if permitted_species:
+                if quantity > permitted_species.quantity:
+                    raise forms.ValidationError(
+                        f'The client is only allowed to transport a quanity of {permitted_species.quantity} '
+                        f'for the species {sub_species}.')
+        else:
+            raise forms.ValidationError(
+                'The client does not have a WCP yet.')
+
+        return quantity
 
 
 class TransportEntryInline(admin.TabularInline):
@@ -85,7 +128,7 @@ class PermitBaseAdmin(admin.ModelAdmin):
         formset.save_m2m()
 
     def save_model(self, request: Any, obj: Permit, form: Any, change: Any) -> None:
-        obj.calculate_validity_date()
+        # obj.calculate_validity_date()
         return super().save_model(request, obj, form, change)
 
 
@@ -93,7 +136,9 @@ class PermitBaseAdmin(admin.ModelAdmin):
 class LocalTransportPermitAdmin(PermitBaseAdmin):
     fields = ('permit_no', 'status', 'client', 'wfp', 'wcp',
               'transport_date', 'transport_location', 'payment_order',
-              'issued_date', 'valid_until', 'uploaded_file')
+              'inspection', 'issued_date', 'valid_until', 'uploaded_file')
+    autocomplete_fields = ('client', 'wfp', 'wcp', 'payment_order',
+                           'inspection')
     inlines = (TransportEntryInline, SignatureInline)
 
 
