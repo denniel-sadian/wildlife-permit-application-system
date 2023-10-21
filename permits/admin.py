@@ -91,10 +91,9 @@ class PermitBaseAdmin(admin.ModelAdmin):
 
 @admin.register(LocalTransportPermit)
 class LocalTransportPermitAdmin(PermitBaseAdmin):
-    fields = ('permit_no', 'client', 'status', 'issued_date',
-              'valid_until', 'uploaded_file', 'wfp', 'wcp',
-              'payment_order', 'transport_location',
-              'transport_date')
+    fields = ('permit_no', 'status', 'client', 'wfp', 'wcp',
+              'transport_date', 'transport_location', 'payment_order',
+              'issued_date', 'valid_until', 'uploaded_file')
     inlines = (TransportEntryInline, SignatureInline)
 
 
