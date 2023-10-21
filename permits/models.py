@@ -365,3 +365,16 @@ class Signature(models.Model):
         indexes = [
             models.Index(fields=["content_type", "object_id"]),
         ]
+
+    @staticmethod
+    def create(user, obj):
+        if user.title and user.signature_image:
+            sign = Signature(person=user, content_object=obj)
+            sign.save()
+            return sign
+
+    @staticmethod
+    def remove(user, obj):
+        for sign in obj.signatures:
+            if sign.person == user:
+                sign.delete()
