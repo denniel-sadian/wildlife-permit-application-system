@@ -55,7 +55,6 @@ class TransportEntryForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         sub_species = cleaned_data.get('sub_species')
-        client = None
         try:
             client = cleaned_data['ltp'].client
         except KeyError:
