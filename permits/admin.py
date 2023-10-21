@@ -193,7 +193,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
         return ('client', 'permit_type')
 
     def get_fieldsets(self, request: HttpRequest, obj: Any | None = ...):
-        fields = ['no', 'permit_type', 'status', 'client']
+        fields = ['no', 'status', 'permit_type', 'client']
 
         if obj and obj.permit_type == PermitType.LTP:
             fields.append('transport_date')
