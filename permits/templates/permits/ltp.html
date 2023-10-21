@@ -28,7 +28,7 @@
         justify-content: flex-end;
         align-items: center;
         flex-direction: column;
-        background-image: url("{{ permit.signature.person.signature_image.url }}");
+        background-image: url("{% if permit.signature.person.signature_image %}{{ permit.signature.person.signature_image.url }}{% endif %}");
         background-position: bottom;
         background-size: contain;
         background-repeat: no-repeat;
