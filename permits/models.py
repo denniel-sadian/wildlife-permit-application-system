@@ -368,7 +368,10 @@ class Signature(models.Model):
 
     @staticmethod
     def create(user, obj):
-        if user.title and user.signature_image:
+        sign = obj.signatures.filter(person=user).first()
+        if sign:
+            return sign
+        elif user.title and user.signature_image:
             sign = Signature(person=user, content_object=obj)
             sign.save()
             return sign
