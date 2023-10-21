@@ -1,10 +1,12 @@
 from typing import Any
+from django.db import models
 
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.views.generic import FormView
 from django.views.generic import TemplateView
+from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.views import LoginView
@@ -79,12 +81,20 @@ class HomeView(TemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class ProfileView(CustomLoginRequiredMixin, TemplateView):
+class ProfileView(CustomLoginRequiredMixin, UpdateView):
+    model = User
+    fields = ('first_name', 'last_name', 'gender', 'phone_number',
+              'title', 'signature_image')
     template_name = 'users/profile.html'
+    success_url = reverse_lazy('profile')
 
-    def get(self, request, *args, **kwargs):
-        client: Client = request.user.subclass
-        context = self.get_context_data(**kwargs)
-        context['wfp'] = client.current_wfp
-        context['wcp'] = client.current_wcp
-        return self.render_to_response(context)
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()
+        if user.type == Client.__name__:
+            context['wfp'] = user.subclass.current_wfp
+            context['wcp'] = user.subclass.current_wcp
+        return context
