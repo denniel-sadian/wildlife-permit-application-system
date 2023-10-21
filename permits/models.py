@@ -228,6 +228,11 @@ class PermitApplication(ModelMixin, models.Model):
         Permit, on_delete=models.SET_NULL, null=True, blank=True)
 
     @property
+    def total_transport_quantity(self):
+        return self.requested_species_to_transport.aggregate(
+            total=Coalesce(Sum(F('quantity')), Value(0, models.IntegerField())))['total']
+
+    @property
     def needed_requirements(self):
         needed_requirements = []
         for needed_requirement in RequirementList.objects.get(permit_type=self.permit_type).items.all():
@@ -349,6 +354,20 @@ class Inspection(ModelMixin, models.Model):
     def signatures(self):
         model_type = ContentType.objects.get_for_model(self.__class__)
         return Signature.objects.filter(content_type__id=model_type.id, object_id=self.id)
+
+    @property
+    def day(self):
+        if 10 <= self.scheduled_date.day % 100 <= 20:
+            suffix = 'th'
+        else:
+            suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(
+                self.scheduled_date.day % 10, 'th')
+        return f'{self.scheduled_date.day}{suffix}'
+
+    @property
+    def month_and_year(self):
+        month = self.scheduled_date.strftime('%B')
+        return f'{month} {self.scheduled_date.year}'
 
     def __str__(self):
         return str(self.no)
