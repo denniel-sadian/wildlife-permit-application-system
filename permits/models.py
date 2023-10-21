@@ -298,9 +298,6 @@ class CollectionEntry(models.Model):
     permit_application = models.ForeignKey(
         PermitApplication, on_delete=models.CASCADE, related_name='requested_species',
         blank=True, null=True)
-    wcp = models.ForeignKey(
-        WildlifeCollectorPermit, on_delete=models.CASCADE, related_name='allowed_animals',
-        blank=True, null=True)
     quantity = models.IntegerField()
 
     class Meta:
