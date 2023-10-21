@@ -54,19 +54,24 @@ class TransportEntryForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        ltp = cleaned_data['ltp']
         sub_species = cleaned_data.get('sub_species')
+        client = None
+        try:
+            client = cleaned_data['ltp'].client
+        except KeyError:
+            client = cleaned_data['permit_application'].client
 
         # Make sure only collected species are chosen for transport
-        allowed = SubSpecies.objects.filter(Q(species_permitted__wcp__client=ltp.client) &
-                                            Q(common_name__exact=sub_species.common_name)).first()
+        allowed = SubSpecies.objects.filter(
+            Q(species_permitted__wcp__client=client)
+            & Q(common_name__exact=sub_species.common_name)).first()
         if not allowed:
             raise forms.ValidationError(
                 f'The client is not allowed to transport {sub_species}.')
 
         # Make sure the quantity does not exeed the allowed quantity
         quantity = cleaned_data.get('quantity')
-        wcp: WildlifeCollectorPermit = ltp.client.current_wcp
+        wcp: WildlifeCollectorPermit = client.current_wcp
         if wcp:
             permitted_species: PermittedToCollectAnimal = wcp.allowed_species.filter(
                 sub_species=sub_species).first()
@@ -75,6 +80,12 @@ class TransportEntryForm(forms.ModelForm):
                     raise forms.ValidationError(
                         f'The client is only allowed to transport a quanity of {permitted_species.quantity} '
                         f'for the species {sub_species}.')
+            else:
+                raise forms.ValidationError(
+                    f'The client is not allowed to transport {sub_species}.')
+        else:
+            raise forms.ValidationError(
+                f'The client is not allowed to transport {sub_species}.')
 
 
 class TransportEntryInline(admin.TabularInline):
@@ -98,7 +109,7 @@ class PermitBaseAdmin(admin.ModelAdmin):
                     'issued_date', 'valid_until', 'created_at')
     fields = ('permit_no', 'client', 'status', 'or_no', 'issued_date',
               'valid_until', 'uploaded_file')
-    search_fields = ('permit_no',)
+    search_fields = ('permit_no', 'client__first_name', 'client__last_name')
     autocomplete_fields = ('client',)
     change_form_template = 'permits/admin/permit_changeform.html'
 
@@ -115,8 +126,9 @@ class PermitBaseAdmin(admin.ModelAdmin):
 
     def save_model(self, request: Any, obj: Permit, form: Any, change: Any) -> None:
         super().save_model(request, obj, form, change)
-        obj.calculate_validity_date()
-        obj.save()
+        if obj is not None and obj.valid_until is None:
+            obj.calculate_validity_date()
+            obj.save()
 
 
 @admin.register(LocalTransportPermit)
@@ -287,22 +299,22 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                                   level=messages.ERROR)
                 return HttpResponseRedirect('.')
 
-        if 'generate_permit' in request.POST:
+        if 'create_permit' in request.POST:
             if obj.permit is None:
                 if not hasattr(obj, 'paymentorder') or (hasattr(obj, 'paymentorder') and not obj.paymentorder.paid):
                     self.message_user(
                         request,
                         'Please make sure first that there is a payment order and that it has been '
-                        'paid already before generating the very permit record.', level=messages.ERROR)
-                    return HttpResponseRedirect('.')
-
-                if not hasattr(obj, 'inspection'):
-                    self.message_user(
-                        request,
-                        'Cannot generate the permit because there is no inspection report.', level=messages.ERROR)
+                        'paid already before creating the very permit record.', level=messages.ERROR)
                     return HttpResponseRedirect('.')
 
                 if obj.permit_type == PermitType.LTP:
+                    if not hasattr(obj, 'inspection'):
+                        self.message_user(
+                            request,
+                            'Cannot generate the permit because there is no inspection report.', level=messages.ERROR)
+                        return HttpResponseRedirect('.')
+
                     ltp = LocalTransportPermit(
                         status=Status.DRAFT,
                         client=obj.client,
@@ -311,12 +323,12 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                         transport_location=obj.transport_location,
                         transport_date=obj.transport_date,
                         payment_order=obj.paymentorder,
-                        inspection=obj.inspection
-                    )
+                        inspection=obj.inspection,
+                        issued_date=datetime.now())
                     ltp.save()
                     formatted_date = datetime.now().strftime("%Y-%m")
                     day_part = datetime.now().day
-                    ltp.permit_no = f'PMDQ-{obj.permit_type}-{formatted_date}-{day_part}-{ltp.id}'
+                    ltp.permit_no = f'MIMAROPA-{obj.permit_type}-{formatted_date}-{day_part}-{ltp.id}'
                     ltp.save()
                     for i in obj.requested_species_to_transport.all():
                         i.ltp = ltp
@@ -325,6 +337,30 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                     obj.save()
 
                     return HttpResponseRedirect(ltp.admin_url)
+
+                if obj.permit_type == PermitType.WCP:
+                    wcp = WildlifeCollectorPermit(
+                        status=Status.DRAFT,
+                        client=obj.client,
+                        or_no=obj.paymentorder.payment.receipt_no,
+                        issued_date=datetime.now())
+                    wcp.save()
+                    formatted_date = datetime.now().strftime("%Y-%m")
+                    day_part = datetime.now().day
+                    wcp.permit_no = f'MIMAROPA-{obj.permit_type}-{formatted_date}-{day_part}-{wcp.id}'
+                    wcp.save()
+                    print('Shit', obj.requested_species.all())
+                    for i in obj.requested_species.all():
+                        collection = PermittedToCollectAnimal(
+                            wcp=wcp,
+                            sub_species=i.sub_species,
+                            quantity=i.quantity)
+                        collection.save()
+                        print('tangna', collection)
+                    obj.permit = Permit.objects.select_subclasses().get(id=wcp.id)
+                    obj.save()
+
+                    return HttpResponseRedirect(wcp.admin_url)
 
         return super().response_change(request, obj)
 
