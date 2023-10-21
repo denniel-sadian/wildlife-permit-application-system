@@ -21,9 +21,9 @@
     flex-wrap: wrap;
     margin-bottom: 50px;
     gap: 8px;
+    justify-content: end;
 }
-.signatures .sign {
-    border-radius: 8px;
+.sign {
     width: 100%;
     max-width: 200px;
     display: flex;
@@ -33,14 +33,66 @@
     padding: 8px;
     text-align: center;
 }
-.signatures .sign img {
+.sign img {
     width: 100%;
     height: auto;
     margin-bottom: -20px;
 }
-.signatures .sign .name {
+.sign .name {
+    border-top: 1.8px solid black;
+    padding: 0px 20px;
     font-weight: bold;
+    white-space: nowrap;
 }
-.signatures .sign .title {
+.sign .title {
     font-style: italic;
+}
+
+.inspection {
+    width: 100%;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.inspection .date-cont {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 50px;
+}
+
+.inspection .date-item {
+    text-align: center;
+}
+
+.inspection .actual-date {
+    border-bottom: 1.5px solid black;
+    padding: 0px 8px;
+}
+
+.underlined {
+    font-weight: bold;
+    border-bottom: 1.5px solid black;
+    padding: 0px 12px;
+    white-space: nowrap;
+}
+
+.inspection table {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.inspection .four-signs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 20px;
+}
+
+.inspection .four-signs > div {
+    display: flex;
+    justify-content: center;
+}
+.inspection p {
+    margin-bottom: 30px;
 }
