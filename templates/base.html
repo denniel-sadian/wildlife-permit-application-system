@@ -8,7 +8,7 @@
             content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"
             name="viewport"
         />
-        <link rel="stylesheet" href="{% static 'css/global.css' %}?v=49" />
+        <link rel="stylesheet" href="{% static 'css/global.css' %}?v=50" />
         <link rel="stylesheet" href="{% static 'css/w3.css' %}?v=34" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -55,12 +55,12 @@
                     <a href="{% url 'registration' %}">Register</a>
                     {% endif %}
 
-                    {% if user.is_authenticated and user.type == 'Client' %}
-                    <a href="{% url 'profile' %}"><b><i class="fa fa-user-circle-o"></i> {{ user.name }}</b></a>
-                    {% endif %}
-
                     {% if user.is_authenticated and user.is_staff %}
                     <a href="{% url 'admin:index' %}"><b><i class="fa fa-cogs"></i> Management</b></a>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}"><b><i class="fa fa-user-circle-o"></i> {{ user.name }}</b></a>
                     {% endif %}
                 </div>
             </div>
