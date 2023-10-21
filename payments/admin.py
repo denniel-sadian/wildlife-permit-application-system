@@ -1,13 +1,13 @@
 from datetime import datetime
 
 from typing import Any
+
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.http.request import HttpRequest
+from django.urls import reverse_lazy
 
 from permits.models import Signature
-from permits.admin import SignatureInline
 
 from .models import (
     PaymentOrder,
@@ -31,7 +31,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
               'paid', 'released_at')
     autocomplete_fields = ('permit_application', 'client', 'prepared_by')
     search_fields = ('no', 'permit_application__no')
-    inlines = (PaymentOrderItemInline, SignatureInline)
+    inlines = (PaymentOrderItemInline,)
     change_form_template = 'payments/admin/paymentorder_changeform.html'
 
     def paid(self):
@@ -46,7 +46,50 @@ class PaymentOrderAdmin(admin.ModelAdmin):
         # Otherwise, when updating an existing record
         return ('client', 'permit_application', 'prepared_by', 'released_at')
 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        try:
+            payment_order = PaymentOrder.objects.get(id=object_id)
+        except PaymentOrder.DoesNotExist:
+            payment_order = None
+
+        extra_context = extra_context or {}
+        extra_context['current_user_has_signed'] = False
+        for sign in payment_order.signatures:
+            if sign.person == request.user:
+                extra_context['current_user_has_signed'] = True
+                break
+
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
+
     def response_change(self, request, obj: PaymentOrder):
+        if 'remove_sign' in request.POST:
+            for sign in obj.signatures:
+                if sign.person == request.user:
+                    sign.delete()
+                    self.message_user(
+                        request, 'Your signature has been removed.',
+                        level=messages.SUCCESS)
+                    return HttpResponseRedirect('.')
+
+        if 'add_sign' in request.POST:
+            if request.user.title and request.user.signature_image:
+                Signature(
+                    person=request.user,
+                    content_object=obj
+                ).save()
+                self.message_user(
+                    request,
+                    'Your signature has been attached.',
+                    level=messages.SUCCESS)
+                return HttpResponseRedirect('.')
+            else:
+                self.message_user(
+                    request,
+                    'Sorry, but you cannot sign yet without your position or signature. '
+                    'Please complete your profile first.',
+                    level=messages.WARNING)
+                return HttpResponseRedirect(reverse_lazy('profile'))
+
         if 'create_payment' in request.POST:
             if not hasattr(obj, 'payment'):
                 payment = Payment(receipt_no=obj.no,
@@ -74,17 +117,6 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 
         obj.save()
         return super().save_model(request, obj, form, change)
-
-    def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=False)
-        for obj in formset.deleted_objects:
-            obj.delete()
-        for instance in instances:
-            if (isinstance(instance, Signature)):
-                instance.person = request.user
-                instance.title = instance.person.title
-            instance.save()
-        formset.save_m2m()
 
 
 @admin.register(Payment)
