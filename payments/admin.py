@@ -47,14 +47,6 @@ class PaymentOrderAdmin(admin.ModelAdmin):
         return ('client', 'permit_application', 'prepared_by', 'released_at')
 
     def response_change(self, request, obj: PaymentOrder):
-        if obj:
-            if not obj.prepared_by_signature:
-                self.message_user(
-                    request, 'The one who prepared the payment order needs to sign.', level=messages.WARNING)
-            if not obj.approved_by_signature:
-                self.message_user(
-                    request, 'A payment signatory needs to sign this payment order.', level=messages.WARNING)
-
         if 'create_payment' in request.POST:
             if not hasattr(obj, 'payment'):
                 payment = Payment(receipt_no=obj.no,
