@@ -1,0 +1,59 @@
+<div class="inspection">
+
+    <div class="date-cont">
+        <div class="date-item">
+            <div class="actual-date">
+                <span>{{ inspection.scheduled_date }}</span>
+            </div>
+            <span>Date</span>
+        </div>
+    </div>
+
+    <h1 style="font-weight:bold; text-align:center;">INSPECTION REPORT OF WILDLIFE</h1>
+
+    <p>TO WHOM IT MAY CONCERN</p>
+
+    <p style="text-indent:50px;">
+        This is to ceritfy that on this date, the undersigned has undertaken the inspection of wildlife
+        in the <span class="underlined">DENR-PENRO Marinduque</span> of <span class="underlined">{{ inspection.permit_application.client.name }}</span>
+        and has found the following wildlife.
+    </p>
+
+    <table>
+        <tr>
+            <th>Kind of Species</th>
+            <th>Quantity</th>
+        </tr>
+        {% for i in inspection.permit_application.requested_species_to_transport.all %}
+        <tr>
+            <td>{{ i.sub_species }}</td>
+            <td>{{ i.quantity }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <th>Total</th>
+            <td>{{ inspection.permit_application.total_transport_quantity }}</td>
+        </tr>
+    </table>
+
+    <p style="text-indent:50px;">
+        The inspection was made in the presence of <span class="underlined">{{ inspection.permit_application.client.name }}</span>
+        at the above address.
+    </p>
+
+    <h2 style="font-weight:bold; text-align:center;">CERTIFICATE OF CONCURRENCE</h2>
+
+    <p style="text-indent:50px;">
+        This is to certify that the inspection report of <span class="underlined">{{ inspection.permit_application.client.name }}</span>
+        the PAWD, Region <span class="underlined">IV-MIMAROPA</span> is/are true and correct and has been done this
+        <span class="underlined">{{ inspection.day }}</span> day of <span class="underlined">{{ inspection.month_and_year }}</span>.
+    </p>
+
+    <p>
+        This is to certify further that this statement was given me voluntarily and with neither coercion nor
+        promise of reward from the personnel of the Department of Environment and Natural Resources.
+    </p>
+
+    {% include 'ui/signature_list.html' with signatures=inspection.signatures %}
+
+</div>
