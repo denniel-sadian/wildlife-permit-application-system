@@ -4,7 +4,7 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=36" />
+    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=37" />
 {% endblock %}
 
 {% block submit_buttons_bottom %}
@@ -12,6 +12,12 @@
 
     <div class="submit-row custom-row">
         {% if original.permit_application %}<a href="{{ original.permit_application.admin_url }}">View Permit Application</a>{% endif %}
+
+        {% if current_user_has_signed %}
+        <input type="submit" value="Remove Your Signature" name="remove_sign">
+        {% else %}
+        <input type="submit" value="Sign" name="add_sign">
+        {% endif %}
     </div>
 
     {% include 'ui/signature_list.html' with signatures=original.signatures %}
