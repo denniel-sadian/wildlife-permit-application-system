@@ -14,20 +14,22 @@
         {% if original.submittable and not original.paymentorder %}
         <input type="submit" value="Generate Payment Order" name="generate_payment_order">
         {% elif original.paymentorder %}
-        <a href="{{ original.paymentorder.admin_url }}">View Payment Order</a>
+        <a href="{{ original.paymentorder.admin_url }}" target="_blank">View Payment Order</a>
         {% endif %}
 
-        {% if not original.inspection %}
-        <input type="submit" value="Start Inspection" name="create_inspection">
-        {% else %}
-        <a href="{{ original.inspection.admin_url }}">View Inspection</a>
+        {% if original.permit_type == 'LTP' %}
+            {% if not original.inspection %}
+            <input type="submit" value="Start Inspection" name="create_inspection">
+            {% else %}
+            <a href="{{ original.inspection.admin_url }}" target="_blank">View Inspection</a>
+            {% endif %}
         {% endif %}
 
         {% if request.user.type == 'Admin' %}
             {% if original.permit %}
-            <a href="{{ original.permit.admin_url  }}">View {{ original.get_permit_type_display }}</a>
+            <a href="{{ original.permit.admin_url  }}" target="_blank">View {{ original.get_permit_type_display }}</a>
             {% else %}
-            <input type="submit" value="Create {{ original.get_permit_type_display }}" name="generate_permit">
+            <input type="submit" value="Create {{ original.get_permit_type_display }}" name="create_permit">
             {% endif %}
         {% endif %}
     </div>
