@@ -9,8 +9,6 @@ from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
 from django.conf import settings
 
-from django_resized import ResizedImageField
-
 from model_utils.managers import InheritanceManager
 
 from users.mixins import ModelMixin
@@ -343,9 +341,9 @@ class Inspection(ModelMixin, models.Model):
         validators=[validate_file_extension])
 
     @property
-    def is_pdf(self):
-        if self.report_file:
-            return self.report_file.name.lower().endswith('.pdf')
+    def signatures(self):
+        model_type = ContentType.objects.get_for_model(self.__class__)
+        return Signature.objects.filter(content_type__id=model_type.id, object_id=self.id)
 
     def __str__(self):
         return str(self.no)
@@ -357,8 +355,6 @@ class Signature(models.Model):
     content_object = GenericForeignKey("content_type", "object_id")
     person = models.ForeignKey(
         'users.User', on_delete=models.CASCADE, blank=True, null=True)
-    title = models.CharField(max_length=100, null=True, blank=True)
-    image = ResizedImageField(upload_to='signs/')
 
     class Meta:
         indexes = [
