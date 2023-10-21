@@ -5,11 +5,9 @@ from typing import Any
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.urls import reverse_lazy
 
 from users.mixins import AdminMixin
 
-from permits.models import Signature
 
 from .models import (
     PaymentOrder,
@@ -49,28 +47,6 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
         return ('client', 'permit_application', 'prepared_by', 'released_at')
 
     def response_change(self, request, obj):
-        if 'remove_sign' in request.POST:
-            Signature.remove(request.user, obj)
-            self.message_user(
-                request, 'Your signature has been removed.',
-                level=messages.SUCCESS)
-            return HttpResponseRedirect('.')
-
-        if 'add_sign' in request.POST:
-            if Signature.create(request.user, obj):
-                self.message_user(
-                    request,
-                    'Your signature has been attached.',
-                    level=messages.SUCCESS)
-                return HttpResponseRedirect('.')
-            else:
-                self.message_user(
-                    request,
-                    'Sorry, but you cannot sign yet without your position or signature. '
-                    'Please complete your profile first.',
-                    level=messages.WARNING)
-                return HttpResponseRedirect(reverse_lazy('profile'))
-
         if 'create_payment' in request.POST:
             if not hasattr(obj, 'payment'):
                 payment = Payment(receipt_no=obj.no,
