@@ -4,7 +4,7 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=37" />
+    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=38" />
 {% endblock %}
 
 {% block submit_buttons_bottom %}
@@ -20,5 +20,5 @@
         {% endif %}
     </div>
 
-    {% include 'ui/signature_list.html' with signatures=original.signatures %}
+    {% include 'ui/inspection.html' with inspection=original %}
 {% endblock %}
