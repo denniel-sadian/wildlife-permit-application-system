@@ -79,7 +79,7 @@ class Permit(ModelMixin, models.Model):
     payment_order = models.ForeignKey(
         'payments.PaymentOrder', on_delete=models.SET_NULL, null=True)
     inspection = models.ForeignKey(
-        'Inspection', on_delete=models.SET_NULL, blank=True, null=True)
+        'Inspection', on_delete=models.SET_NULL, null=True)
 
     objects = InheritanceManager()
 
