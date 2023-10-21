@@ -199,6 +199,11 @@ class LocalTransportPermit(Permit):
         return self.species_to_transport.aggregate(
             total=Coalesce(Sum(F('quantity')), Value(0, models.IntegerField())))['total']
 
+    @property
+    def signatures(self):
+        model_type = ContentType.objects.get_for_model(self.__class__)
+        return Signature.objects.filter(content_type__id=model_type.id, object_id=self.id)
+
 
 class PermitApplication(ModelMixin, models.Model):
     no = models.CharField(max_length=255)
