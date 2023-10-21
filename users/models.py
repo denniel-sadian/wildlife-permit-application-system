@@ -4,6 +4,7 @@ from django.contrib.auth.models import UserManager
 
 from model_utils.managers import InheritanceManager
 from phonenumber_field.modelfields import PhoneNumberField
+from django_resized import ResizedImageField
 
 from permits.models import (
     Status,
@@ -47,11 +48,13 @@ class User(ModelMixin, AbstractUser):
 
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    title = models.CharField(max_length=100, null=True)
+    title = models.CharField('Position', max_length=100, null=True)
     gender = models.CharField(choices=Gender.choices, max_length=10)
     email = models.EmailField(unique=True)
     phone_number = PhoneNumberField(max_length=14)
     is_initial_password_changed = models.BooleanField(default=False)
+    signature_image = ResizedImageField(
+        upload_to='signs/', null=True, blank=True)
 
     @property
     def name(self):
