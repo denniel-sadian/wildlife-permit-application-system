@@ -126,9 +126,11 @@ class PermitBaseAdmin(admin.ModelAdmin):
 
     def save_model(self, request: Any, obj: Permit, form: Any, change: Any) -> None:
         super().save_model(request, obj, form, change)
-        if obj is not None and obj.valid_until is None:
-            obj.calculate_validity_date()
-            obj.save()
+
+        if obj is not None:
+            if obj.valid_until is None:
+                obj.calculate_validity_date()
+                obj.save()
 
 
 @admin.register(LocalTransportPermit)
@@ -375,6 +377,38 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                     obj.save()
 
                     return HttpResponseRedirect(wfp.admin_url)
+
+                if obj.permit_type == PermitType.GP:
+                    gp = GratuitousPermit(
+                        status=Status.DRAFT,
+                        client=obj.client,
+                        or_no=obj.paymentorder.payment.receipt_no,
+                        issued_date=datetime.now())
+                    gp.save()
+                    formatted_date = datetime.now().strftime("%Y-%m")
+                    day_part = datetime.now().day
+                    gp.permit_no = f'MIMAROPA-{obj.permit_type}-{formatted_date}-{day_part}-{gp.id}'
+                    gp.save()
+                    obj.permit = Permit.objects.select_subclasses().get(id=gp.id)
+                    obj.save()
+
+                    return HttpResponseRedirect(gp.admin_url)
+
+                if obj.permit_type == PermitType.CWR:
+                    cwr = CertificateOfWildlifeRegistration(
+                        status=Status.DRAFT,
+                        client=obj.client,
+                        or_no=obj.paymentorder.payment.receipt_no,
+                        issued_date=datetime.now())
+                    cwr.save()
+                    formatted_date = datetime.now().strftime("%Y-%m")
+                    day_part = datetime.now().day
+                    cwr.permit_no = f'MIMAROPA-{obj.permit_type}-{formatted_date}-{day_part}-{cwr.id}'
+                    cwr.save()
+                    obj.permit = Permit.objects.select_subclasses().get(id=cwr.id)
+                    obj.save()
+
+                    return HttpResponseRedirect(cwr.admin_url)
 
         return super().response_change(request, obj)
 
