@@ -1,0 +1,12 @@
+<h3>Signatures:</h3>
+<div class="signatures">
+    {% for i in signatures %}
+    <div class="sign">
+        {% if i.person.signature_image %}
+        <img src="{{ i.person.signature_image.url }}">
+        {% endif %}
+        <span class="name">{{ i.person.name }}</span>
+        <span class="title">{{ i.person.title }}</span>
+    </div>
+    {% endfor %}
+</div>
