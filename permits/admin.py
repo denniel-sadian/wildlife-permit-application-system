@@ -3,11 +3,11 @@ from datetime import datetime
 
 from django.contrib import admin
 from django.contrib import messages
-from django.contrib.contenttypes.admin import GenericStackedInline
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
 from django import forms
 from django.db.models import Q
+from django.urls import reverse_lazy
 
 from payments.models import (
     PaymentOrder
@@ -96,13 +96,6 @@ class TransportEntryInline(admin.TabularInline):
     verbose_name_plural = 'Transport Entries'
 
 
-class SignatureInline(GenericStackedInline):
-    model = Signature
-    fields = ('title', 'image', 'person')
-    readonly_fields = ('person',)
-    extra = 1
-
-
 class PermitBaseAdmin(admin.ModelAdmin):
     list_display = ('permit_no', 'status', 'client',
                     'issued_date', 'valid_until', 'created_at')
@@ -131,6 +124,52 @@ class PermitBaseAdmin(admin.ModelAdmin):
                 obj.calculate_validity_date()
                 obj.save()
 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        try:
+            permit = Permit.objects.get(id=object_id).subclass
+        except PaymentOrder.DoesNotExist:
+            permit = None
+
+        extra_context = extra_context or {}
+        extra_context['current_user_has_signed'] = False
+        for sign in permit.signatures:
+            if sign.person == request.user:
+                extra_context['current_user_has_signed'] = True
+                break
+
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
+
+    def response_change(self, request, obj: PaymentOrder):
+        if 'remove_sign' in request.POST:
+            for sign in obj.signatures:
+                if sign.person == request.user:
+                    sign.delete()
+                    self.message_user(
+                        request, 'Your signature has been removed.',
+                        level=messages.SUCCESS)
+                    return HttpResponseRedirect('.')
+
+        if 'add_sign' in request.POST:
+            if request.user.title and request.user.signature_image:
+                Signature(
+                    person=request.user,
+                    content_object=obj
+                ).save()
+                self.message_user(
+                    request,
+                    'Your signature has been attached.',
+                    level=messages.SUCCESS)
+                return HttpResponseRedirect('.')
+            else:
+                self.message_user(
+                    request,
+                    'Sorry, but you cannot sign yet without your position or signature. '
+                    'Please complete your profile first.',
+                    level=messages.WARNING)
+                return HttpResponseRedirect(reverse_lazy('profile'))
+
+        return super().response_change(request, obj)
+
 
 @admin.register(LocalTransportPermit)
 class LocalTransportPermitAdmin(PermitBaseAdmin):
@@ -139,7 +178,7 @@ class LocalTransportPermitAdmin(PermitBaseAdmin):
               'inspection', 'issued_date', 'valid_until', 'uploaded_file')
     autocomplete_fields = ('client', 'wfp', 'wcp', 'payment_order',
                            'inspection')
-    inlines = (TransportEntryInline, SignatureInline)
+    inlines = (TransportEntryInline,)
 
 
 @admin.register(WildlifeFarmPermit)
