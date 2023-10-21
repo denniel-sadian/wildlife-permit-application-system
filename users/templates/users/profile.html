@@ -10,7 +10,7 @@
         margin: 100px auto;
         padding: 0px 20px;
         width: 100%;
-        max-width: 1100px;
+        max-width: 1000px;
     }
 
     main a {
@@ -26,46 +26,62 @@
 
         <h1>Good day, {{ user.name }}</h1>
 
-        {% if wfp %}
-        <p>
-            Your latest <strong>Wildlife Farm Permit ({{ wfp.permit_no }})</strong> was <strong>created on {{ wfp.created_at }}</strong> and is <strong>valid until {{ wfp.valid_until }}</strong>.
-            Your permit's status is currently <strong>"{{ wfp.current_status }}"</strong>.
-            {% if wfp.uploaded_file %}You can download this permit using <a href="{% url 'permit_detail' pk=wfp.id %}" target="_blank">this link</a>.{% endif %}
-        </p>
-        {% else %}
-        <p>You currently does not have a Wildlife Farm Permit.</p>
-        {% endif %}
+        <form action="" method="POST" enctype="multipart/form-data" class="w3-margin-bottom">
+            {% csrf_token %}
+            {% include 'ui/inputbox.html' with field=form.first_name %}
+            {% include 'ui/inputbox.html' with field=form.last_name %}
+            {% include 'ui/inputbox.html' with field=form.phone_number %}
+            {% include 'ui/inputbox.html' with field=form.gender %}
 
-        {% if wcp %}
-        <p>
-            Your latest <strong>Wildlife Farm Permit ({{ wcp.permit_no }})</strong> was <strong>created on {{ wcp.created_at }}</strong> and is <strong>valid until {{ wcp.valid_until }}</strong>.
-            Your permit's status is currently <strong>"{{ wcp.current_status }}"</strong>.
-            {% if wcp.uploaded_file %}You can download this permit using <a href="{% url 'permit_detail' pk=wcp.id %}" target="_blank">this link</a>.{% endif %}
-        </p>
-        <p>According to your Wildlife Collector's Permit, you are only allowed to export these species.</p>
-        <div style="overflow-x:auto;">
-          <table class="w3-table w3-table-all">
-            <tr>
-                <th>Species</th>
-                <th>Quantity</th>
-            </tr>
-            {% for entry in wcp.allowed_species.all %}
-            <tr>
-                <td>{{ entry.sub_species }}</td>
-                <td>{{ entry.quantity }}</td>
-            </tr>
-            {% endfor %}
-          </table>
-        </div>
-        {% else %}
-        <p>You currently does not have a Wildlife Collector's Permit.</p>
-        {% endif %}
+            {% if user.type != 'Client' %}
+            {% include 'ui/inputbox.html' with field=form.title %}
+            {% include 'ui/fileinput.html' with field=form.signature_image %}
+            {% endif %}
 
-        <div class="buttons">
-            <a href="{% url 'logout' %}" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Logout</a>
-            <a href="{% url 'password_change' %}" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Change Password</a>
-            <a href="{% url 'create_application' %}" class="w3-btn w3-round-large w3-blue">Apply For Permit</a>
-        </div>
+            <div class="buttons">
+                <a href="{% url 'logout' %}" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Logout</a>
+                <a href="{% url 'password_change' %}" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Change Password</a>
+                <input type="submit" value="Save" class="w3-btn w3-round-large w3-blue">
+            </div>
+        </form>
+
+        {% if user.type == 'Client' %}
+            <hr>
+            {% if wfp %}
+            <p>
+                Your latest <strong>Wildlife Farm Permit ({{ wfp.permit_no }})</strong> was <strong>created on {{ wfp.created_at }}</strong> and is <strong>valid until {{ wfp.valid_until }}</strong>.
+                Your permit's status is currently <strong>"{{ wfp.current_status }}"</strong>.
+                {% if wfp.uploaded_file %}You can download this permit using <a href="{% url 'permit_detail' pk=wfp.id %}" target="_blank">this link</a>.{% endif %}
+            </p>
+            {% else %}
+            <p>You currently does not have a Wildlife Farm Permit.</p>
+            {% endif %}
+
+            {% if wcp %}
+            <p>
+                Your latest <strong>Wildlife Farm Permit ({{ wcp.permit_no }})</strong> was <strong>created on {{ wcp.created_at }}</strong> and is <strong>valid until {{ wcp.valid_until }}</strong>.
+                Your permit's status is currently <strong>"{{ wcp.current_status }}"</strong>.
+                {% if wcp.uploaded_file %}You can download this permit using <a href="{% url 'permit_detail' pk=wcp.id %}" target="_blank">this link</a>.{% endif %}
+            </p>
+            <p>According to your Wildlife Collector's Permit, you are only allowed to export these species.</p>
+            <div style="overflow-x:auto;">
+              <table class="w3-table w3-table-all">
+                <tr>
+                    <th>Species</th>
+                    <th>Quantity</th>
+                </tr>
+                {% for entry in wcp.allowed_species.all %}
+                <tr>
+                    <td>{{ entry.sub_species }}</td>
+                    <td>{{ entry.quantity }}</td>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+            {% else %}
+            <p>You currently does not have a Wildlife Collector's Permit.</p>
+            {% endif %}
+        {% endif %}
     </div>
 </main>
 {% endblock %}
