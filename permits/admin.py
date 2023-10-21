@@ -349,18 +349,32 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                     day_part = datetime.now().day
                     wcp.permit_no = f'MIMAROPA-{obj.permit_type}-{formatted_date}-{day_part}-{wcp.id}'
                     wcp.save()
-                    print('Shit', obj.requested_species.all())
                     for i in obj.requested_species.all():
                         collection = PermittedToCollectAnimal(
                             wcp=wcp,
                             sub_species=i.sub_species,
                             quantity=i.quantity)
                         collection.save()
-                        print('tangna', collection)
                     obj.permit = Permit.objects.select_subclasses().get(id=wcp.id)
                     obj.save()
 
                     return HttpResponseRedirect(wcp.admin_url)
+
+                if obj.permit_type == PermitType.WFP:
+                    wfp = WildlifeFarmPermit(
+                        status=Status.DRAFT,
+                        client=obj.client,
+                        or_no=obj.paymentorder.payment.receipt_no,
+                        issued_date=datetime.now())
+                    wfp.save()
+                    formatted_date = datetime.now().strftime("%Y-%m")
+                    day_part = datetime.now().day
+                    wfp.permit_no = f'MIMAROPA-{obj.permit_type}-{formatted_date}-{day_part}-{wfp.id}'
+                    wfp.save()
+                    obj.permit = Permit.objects.select_subclasses().get(id=wfp.id)
+                    obj.save()
+
+                    return HttpResponseRedirect(wfp.admin_url)
 
         return super().response_change(request, obj)
 
