@@ -7,7 +7,8 @@ from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
 from django import forms
 from django.db.models import Q
-from django.urls import reverse_lazy
+
+from users.mixins import AdminMixin
 
 from payments.models import (
     PaymentOrder
@@ -96,7 +97,7 @@ class TransportEntryInline(admin.TabularInline):
     verbose_name_plural = 'Transport Entries'
 
 
-class PermitBaseAdmin(admin.ModelAdmin):
+class PermitBaseAdmin(AdminMixin, admin.ModelAdmin):
     list_display = ('permit_no', 'status', 'client',
                     'issued_date', 'valid_until', 'created_at')
     fields = ('permit_no', 'client', 'status', 'or_no', 'issued_date',
@@ -123,46 +124,6 @@ class PermitBaseAdmin(admin.ModelAdmin):
             if obj.valid_until is None:
                 obj.calculate_validity_date()
                 obj.save()
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        try:
-            permit = Permit.objects.get(id=object_id).subclass
-        except PaymentOrder.DoesNotExist:
-            permit = None
-
-        extra_context = extra_context or {}
-        extra_context['current_user_has_signed'] = False
-        for sign in permit.signatures:
-            if sign.person == request.user:
-                extra_context['current_user_has_signed'] = True
-                break
-
-        return super().change_view(request, object_id, form_url, extra_context=extra_context)
-
-    def response_change(self, request, obj):
-        if 'remove_sign' in request.POST:
-            Signature.remove(request.user, obj)
-            self.message_user(
-                request, 'Your signature has been removed.',
-                level=messages.SUCCESS)
-            return HttpResponseRedirect('.')
-
-        if 'add_sign' in request.POST:
-            if Signature.create(request.user, obj):
-                self.message_user(
-                    request,
-                    'Your signature has been attached.',
-                    level=messages.SUCCESS)
-                return HttpResponseRedirect('.')
-            else:
-                self.message_user(
-                    request,
-                    'Sorry, but you cannot sign yet without your position or signature. '
-                    'Please complete your profile first.',
-                    level=messages.WARNING)
-                return HttpResponseRedirect(reverse_lazy('profile'))
-
-        return super().response_change(request, obj)
 
 
 @admin.register(LocalTransportPermit)
@@ -463,7 +424,7 @@ class RequirementAdmin(admin.ModelAdmin):
 
 
 @admin.register(Inspection)
-class InspectionAdmin(admin.ModelAdmin):
+class InspectionAdmin(AdminMixin, admin.ModelAdmin):
     list_display = ('no', 'scheduled_date')
     search_fields = ('no',)
     autocomplete_fields = ('permit_application', 'inspecting_officer')
