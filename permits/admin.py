@@ -91,12 +91,11 @@ class PermitBaseAdmin(admin.ModelAdmin):
 
 @admin.register(LocalTransportPermit)
 class LocalTransportPermitAdmin(PermitBaseAdmin):
+    fields = ('permit_no', 'client', 'status', 'issued_date',
+              'valid_until', 'uploaded_file', 'wfp', 'wcp',
+              'payment_order', 'transport_location',
+              'transport_date')
     inlines = (TransportEntryInline, SignatureInline)
-
-    def get_fields(self, request, obj):
-        fields = super().get_fields(request, obj)
-        fields += ('wfp', 'wcp', 'transport_location', 'transport_date')
-        return fields
 
 
 @admin.register(WildlifeFarmPermit)
