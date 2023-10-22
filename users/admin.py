@@ -7,7 +7,8 @@ from .models import (
     Client,
     Admin,
     Cashier,
-    Signatory
+    Signatory,
+    Validator
 )
 
 from .signals import user_created
@@ -74,4 +75,9 @@ class SignatoryAdmin(BaseUserAdmin):
 
 @admin.register(Client)
 class ClientAdmin(BaseUserAdmin):
+    pass
+
+
+@admin.register(Validator)
+class ValidatorAdmin(BaseUserAdmin):
     pass
