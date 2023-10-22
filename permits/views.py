@@ -37,6 +37,9 @@ from .forms import (
     TransportEntryForm,
     CollectionEntryForm
 )
+from .filters import (
+    PermitApplicationFilter
+)
 
 
 class QueryParamFilterMixin:
@@ -102,16 +105,25 @@ class PermitApplicationCreateView(CustomLoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class PermitApplicationListView(QueryParamFilterMixin, CustomLoginRequiredMixin, ListView):
+class PermitApplicationListView(CustomLoginRequiredMixin, ListView):
     model = PermitApplication
     paginate_by = 10
     context_object_name = 'applications'
-    filter_fields = ['permit_type', 'status']
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['tab'] = 'applications'
+        filters = PermitApplicationFilter(
+            self.request.GET, request=self.request)
+        context['filters'] = filters
         return context
+
+    def get_queryset(self) -> QuerySet[Any]:
+        qs = super().get_queryset()
+        filters = PermitApplicationFilter(
+            self.request.GET, request=self.request, queryset=qs)
+        print('yasss', filters.qs)
+        return filters.qs
 
 
 class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
