@@ -178,7 +178,7 @@ class RemarksInline(admin.TabularInline):
 
 
 @admin.register(PermitApplication)
-class PermitApplicationAdmin(admin.ModelAdmin):
+class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
     list_display = ('no', 'permit_type', 'client', 'status',
                     'submittable', 'created_at')
     list_filter = ('permit_type', 'status',)
