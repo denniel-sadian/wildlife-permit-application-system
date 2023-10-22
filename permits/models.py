@@ -273,7 +273,7 @@ class PermitApplication(ModelMixin, models.Model):
         if self.permit_type == PermitType.WCP:
             if self.requested_species.count() == 0:
                 return False
-            if self.names_and_addresses_of_authorized_collectors_or_trappers is None:
+            if not self.names_and_addresses_of_authorized_collectors_or_trappers:
                 return False
 
         return True
@@ -346,23 +346,22 @@ class Inspection(ModelMixin, models.Model):
     scheduled_date = models.DateField(blank=True, null=True)
     inspecting_officer = models.ForeignKey(
         'users.Admin', on_delete=models.CASCADE, blank=True, null=True)
-    report_file = models.FileField(
-        upload_to='inspection_reports/', blank=True, null=True,
-        validators=[validate_file_extension])
 
     @property
     def day(self):
-        if 10 <= self.scheduled_date.day % 100 <= 20:
-            suffix = 'th'
-        else:
-            suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(
-                self.scheduled_date.day % 10, 'th')
-        return f'{self.scheduled_date.day}{suffix}'
+        if self.scheduled_date:
+            if 10 <= self.scheduled_date.day % 100 <= 20:
+                suffix = 'th'
+            else:
+                suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(
+                    self.scheduled_date.day % 10, 'th')
+            return f'{self.scheduled_date.day}{suffix}'
 
     @property
     def month_and_year(self):
-        month = self.scheduled_date.strftime('%B')
-        return f'{month} {self.scheduled_date.year}'
+        if self.scheduled_date:
+            month = self.scheduled_date.strftime('%B')
+            return f'{month} {self.scheduled_date.year}'
 
     def __str__(self):
         return str(self.no)
