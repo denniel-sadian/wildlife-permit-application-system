@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/w3.css' %}?v=34" />
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="https://kit.fontawesome.com/209b41c676.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     {% block styles %}
     <style>
         body {
@@ -21,6 +22,12 @@
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
+            padding: 12px;
+        }
+
+        embed {
+            width: 100%;
+            height: auto;
         }
 
         hr {
@@ -39,43 +46,65 @@
             height: 100px;
         }
 
-        aside {
-            width: 30%;
-            height: 100%;
-            top: 0px;
-            right: 0px;
-            position: fixed !important;
-            padding: 50px 10px 10px 10px;
-            overflow-x: auto;
-            display: none;
+        .validated {
+            background-color: #ddffdd;
+        }
+        .used {
+            background-color: #ffe1b4;
+        }
+        .expired {
+            background-color: #ffdddd;
+        }
+        .nothing {
+            background-color: #ddffff;
         }
 
-        .topright {
-            top: 0px;
-            right: 0px;
-            position:fixed;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .permit-info {
+            padding: 18px;
+            border-radius: 8px;
         }
     </style>
     {% endblock styles %}
 </head>
 <body>
-    {% block content %}
-    {% endblock content %}
-    <button onclick="$('#sidebar').toggle()" id="side-opener" class="w3-btn topright"><i class="fa fa-bars"></i></button>
-    <aside class="w3-light-gray w3-animate-right w3-card" id="sidebar">
-        <button class="w3-btn topright" onclick="$('#sidebar').toggle()"><i class="fa fa-times"></i></button>
-        {% block side %}
-        {% endblock side %}
-    </aside>
+    <main>
+        <div class="permit-info {{ status }}">
+            <div class="qrcode-cont">
+                <div id="qrcode"></div>
+            </div>
+
+            {% if status == 'validated' %}
+            <h3><i class="fa fa-check-circle w3-text-green"></i> Successfully Validated</h3>
+            <p>
+                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" has been validated successfully.
+            </p>
+            {% elif status == 'used' %}
+            <h3><i class="fa fa-info-circle w3-text-orange"></i> Already Used</h3>
+            <p>
+                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" has been used already.
+            </p>
+            {% elif status == 'expired' %}
+            <h3><i class="fa fa-exclamation-circle w3-text-pink"></i> Already Expired</h3>
+            <p>
+                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" is already expired and can no longer be used.
+            </p>
+            {% else %}
+            <h3><i class="fa fa-info-circle w3-text-blue"></i> Permit Info</h3>
+            <p>
+                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" currently has the status "{{ permit.current_status }}"
+                and waiting to get validated. It was issued on {{ permit.issued_date }} and is valid until {{ permit.valid_until }}.
+            </p>
+            {% endif %}
+        </div>
+
+        <hr>
+
+        {% block content %}{% endblock content %}
+    </main>
 
     <script>
         $(function () {
-
+            new QRCode(document.getElementById('qrcode'), '{{ permit.validation_url }}');
         })
     </script>
 </body>
