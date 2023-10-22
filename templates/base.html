@@ -92,27 +92,5 @@
         {% endif %}
 
         {% block scripts %}{% endblock %}
-
-        <script>
-            $(function () {
-                $("#nav-btn").click(function () {
-                    $("#nav-links").toggle();
-                });
-
-                [...document.querySelectorAll("a")].forEach((e) => {
-                    const url = new URL(e.href);
-                    for (let [k, v] of new URLSearchParams(
-                        window.location.search
-                    ).entries()) {
-                        if (url.searchParams.get(k) == null) {
-                            url.searchParams.set(k, v);
-                        }
-                    }
-                    e.href = url.toString();
-                });
-            });
-
-
-        </script>
     </body>
 </html>
