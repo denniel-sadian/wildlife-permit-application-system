@@ -12,6 +12,7 @@ from django.views.generic import DeleteView, RedirectView
 from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.utils.http import urlencode
 
 from users.views import CustomLoginRequiredMixin
 from .models import (
@@ -26,7 +27,8 @@ from .models import (
     WildlifeCollectorPermit,
     WildlifeFarmPermit,
     GratuitousPermit,
-    CertificateOfWildlifeRegistration
+    CertificateOfWildlifeRegistration,
+    Validation
 )
 from .forms import (
     PermitApplicationForm,
@@ -203,7 +205,7 @@ class PermitApplicationDeleteView(DeleteView):
     success_url = reverse_lazy('list_applications')
 
 
-class SubmitRedirectView(SingleObjectMixin, RedirectView):
+class SubmitRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, RedirectView):
     model = PermitApplication
 
     def get_redirect_url(self, *args: Any, **kwargs: Any):
@@ -256,7 +258,18 @@ class PermitDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['permit'] = self.get_object().subclass
+        permit: Permit = self.get_object().subclass
+        context['permit'] = permit
+
+        if 'validated' in self.request.GET and permit.status == Status.USED:
+            context['status'] = 'validated'
+        elif permit.current_status == Status.EXPIRED:
+            context['status'] = 'expired'
+        elif permit.current_status == Status.USED:
+            context['status'] = 'used'
+        else:
+            context['status'] = 'nothing'
+
         return context
 
 
@@ -321,3 +334,27 @@ class TransportEntryDeleteView(PermitApplicationItemDeleteView):
 class CollectionEntryDeleteView(PermitApplicationItemDeleteView):
     model = CollectionEntry
     item_list = 'requested_species'
+
+
+class ValidateRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, RedirectView):
+    model = Permit
+
+    def get_object(self, queryset=None):
+        permit_no = self.request.GET['permit_no']
+        or_no = self.request.GET['or_no']
+        return Permit.objects.get(permit_no=permit_no, or_no=or_no)
+
+    def get_redirect_url(self, *args: Any, **kwargs: Any):
+        permit: Permit = self.get_object()
+
+        params = ''
+        if not hasattr(permit, 'validation') and permit.current_status == Status.RELEASED:
+            Validation.objects.create(
+                permit=permit, validator=self.request.user)
+            permit.status = Status.USED
+            permit.save()
+            params = '?'+urlencode({'validated': True})
+
+        return reverse_lazy(
+            'permit_detail',
+            kwargs={'pk': permit.id}) + params
