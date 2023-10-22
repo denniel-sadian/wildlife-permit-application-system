@@ -37,11 +37,6 @@ class PaymentOrder(ModelMixin, models.Model):
         return total
 
     @property
-    def signatures(self):
-        model_type = ContentType.objects.get_for_model(self.__class__)
-        return Signature.objects.filter(content_type__id=model_type.id, object_id=self.id)
-
-    @property
     def prepared_by_signature(self):
         return self.signatures.filter(person=self.prepared_by).first()
 
