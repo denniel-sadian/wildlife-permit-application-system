@@ -221,54 +221,6 @@
             </div>
             {% endif %}
         </form>
-
-        <script>
-            /*
-            const allowedSpecies = JSON.parse(`[
-                {% for i in allowed_species %}
-                {
-                    "id": {{ i.sub_species.id }},
-                    "name": "{{ i }}",
-                    "quantity": {{ i.quantity }}
-                },{% endfor %}]`
-                .replace(',]', ']'));
-
-            function addForm(prefix) {
-                var total = $(`#id_${prefix}-TOTAL_FORMS`);
-                var totalForms = parseInt(total.val());
-                var emptyFormStr = $(`#${prefix}-empty`).html().replaceAll('__prefix__', totalForms);
-                var newForm = $(emptyFormStr);
-                $(`#${prefix}`).append(newForm);
-                total.val(totalForms+1);
-
-                $(window).trigger('init-autocomplete');
-            }
-
-            function limitQuantity(animalInput) {
-                if (animalInput.val()) {
-                    const quantity = allowedSpecies.find(obj => obj.id == animalInput.val()).quantity;
-                    const quantityInput = $('#'+animalInput.attr('id').replace('sub_species', 'quantity'));
-                    quantityInput.attr('max', quantity);
-                }
-            }
-
-            function limitAllowedAnimals() {
-                let inputs = $('#{{ transport_entries.prefix }}').find('input:hidden');
-                inputs.each(function () {
-                    if ($(this).attr('id').includes('sub_species')) {
-                        limitQuantity($(this));
-                        $(this).on('change', function () {
-                            limitQuantity($(this));
-                        });
-                    }
-                })
-            }
-
-            $(function () {
-                limitAllowedAnimals();
-            });
-            */
-        </script>
     </div>
 </main>
 {% endblock %}
