@@ -2,9 +2,11 @@ from datetime import timedelta
 
 from django.db import models
 from django.utils import timezone
+from django.utils.http import urlencode
 from django.urls import reverse_lazy
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
 from django.conf import settings
@@ -87,7 +89,8 @@ class Permit(ModelMixin, models.Model):
         if self.valid_until:
             is_still_valid = self.valid_until >= timezone.now().date()
             if not is_still_valid:
-                return Status.EXPIRED
+                self.status = Status.EXPIRED
+                self.save()
         return self.status
 
     @property
@@ -106,12 +109,13 @@ class Permit(ModelMixin, models.Model):
         return application
 
     @property
-    def signature(self):
-        try:
-            model_type = ContentType.objects.get_for_model(self.__class__)
-            return Signature.objects.get(content_type__id=model_type.id, object_id=self.subclass.id)
-        except Signature.DoesNotExist:
-            return None
+    def validation_url(self):
+        domain = get_current_site(None).name
+        protocol = 'https' if settings.USE_HTTPS else 'http'
+        params = urlencode(
+            {'permit_no': self.permit_no or '', 'or_no': self.or_no or ''})
+        path = reverse_lazy('validate_permit')
+        return f'{protocol}://{domain}{path}?{params}'
 
     def calculate_validity_date(self):
         if self.issued_date:
@@ -396,4 +400,4 @@ class Signature(models.Model):
 class Validation(models.Model):
     validated_at = models.DateTimeField(auto_now_add=True)
     validator = models.ForeignKey('users.User', on_delete=models.CASCADE)
-    permit = models.ForeignKey(Permit, on_delete=models.CASCADE)
+    permit = models.OneToOneField(Permit, on_delete=models.CASCADE)
