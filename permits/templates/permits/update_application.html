@@ -90,7 +90,7 @@
 
                 <input type="submit" id="add-req-form" class="w3-btn w3-round-large w3-blue" value="Save">
 
-                {% if object.needed_requirements_are_submitted %}<a href="{% url 'submit_application' pk=object.id %}" class="w3-btn w3-round-large w3-green">Submit</a>{% endif %}
+                {% if object.submittable %}<a href="{% url 'submit_application' pk=object.id %}" class="w3-btn w3-round-large w3-green">Submit</a>{% endif %}
                 {% endif %}
 
                 {% if object.status in 'SUBMITTED' %}
