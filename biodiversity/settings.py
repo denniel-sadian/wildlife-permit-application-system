@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
-    'guardian',
     'phonenumber_field',
     'django_yubin',
     'dal',
@@ -113,7 +112,6 @@ AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'guardian.backends.ObjectPermissionBackend'
 )
 
 ANONYMOUS_USER_NAME = None
