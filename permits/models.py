@@ -22,6 +22,7 @@ class Status(models.TextChoices):
     RETURNED = 'RETURNED', 'Returned'
     ACCEPTED = 'ACCEPTED', 'Accepted'
     RELEASED = 'RELEASED', 'Released'
+    USED = 'USED', 'Used'
     EXPIRED = 'EXPIRED', 'Expired'
 
 
