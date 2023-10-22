@@ -92,5 +92,12 @@
         {% endif %}
 
         {% block scripts %}{% endblock %}
+        <script>
+            $(function() {
+                $('#nav-btn').click(function () {
+                    $('#nav-links').toggle();
+                });
+            })
+        </script>
     </body>
 </html>
