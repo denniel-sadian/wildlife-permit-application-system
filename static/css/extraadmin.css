@@ -96,3 +96,70 @@
 .inspection p {
     margin-bottom: 30px;
 }
+
+
+.payment-order {
+    max-width: 600px;
+    width: 100%;
+    margin: 50px auto;
+    padding: 8px;
+    border-radius: 8px;
+    border: 2px solid lightgray;
+    box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+}
+.payment-order .header-cont {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.payment-order .header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+.payment-order .header img {
+    width: 55px;
+    height: 55px;
+}
+.payment-order .header .logo {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+}
+.payment-order .header .text {
+    padding-left: 15px;
+}
+.payment-order table {
+    width: 100%;
+}
+/* Style the table to have a border-collapse style similar to Excel */
+.payment-order table {
+    border-collapse: collapse;
+    border-top: 1px solid black;
+    border-left: 1px solid black;
+}
+/* Style the table rows (tr) with a bottom border */
+.payment-order tr {
+    border-bottom: 1px solid #000; /* Change color as needed */
+}
+/* Style the table cells (td) with both right and bottom borders */
+.payment-order th, .payment-order td {
+    border-right: 1px solid #000; /* Change color as needed */
+    border-bottom: 1px solid #000; /* Change color as needed */
+    padding: 5px; /* Optional: Add padding for better spacing */
+}
+.payment-order .payment-sign {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+.payment-order .payment-sign img {
+    width: 200px;
+    height: auto;
+    margin-bottom: -30px;
+}
+.payment-order table tr * {
+    white-space: pre-wrap !important;
+}
