@@ -1,5 +1,4 @@
 from typing import Any
-from django.db import models
 
 from django.http import HttpResponse
 from django.urls import reverse_lazy
