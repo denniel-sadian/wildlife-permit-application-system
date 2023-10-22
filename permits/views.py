@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
-from django.db import transaction
+from django.db import models, transaction
 from django.http import HttpResponse
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
@@ -15,6 +15,8 @@ from django.contrib import messages
 from django.utils.http import urlencode
 
 from users.views import CustomLoginRequiredMixin
+from users.models import Client, Validator
+
 from .models import (
     PermitApplication,
     Status,
@@ -237,7 +239,9 @@ class PermitDetailView(DetailView):
     model = Permit
 
     def get_queryset(self):
-        return super().get_queryset().filter(client=self.request.user)
+        if isinstance(self.request.user.subclass, Client):
+            return super().get_queryset().filter(client=self.request.user)
+        return super().get_queryset()
 
     def get_template_names(self) -> list[str]:
         try:
@@ -325,9 +329,11 @@ class ValidateRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, Redirect
     model = Permit
 
     def get_object(self, queryset=None):
-        permit_no = self.request.GET['permit_no']
-        or_no = self.request.GET['or_no']
-        return Permit.objects.get(permit_no=permit_no, or_no=or_no)
+        if isinstance(self.request.user.subclass, Validator):
+            permit_no = self.request.GET['permit_no']
+            or_no = self.request.GET['or_no']
+            return Permit.objects.get(permit_no=permit_no, or_no=or_no)
+        raise Permit.DoesNotExist('You are not a validator.')
 
     def get_redirect_url(self, *args: Any, **kwargs: Any):
         permit: Permit = self.get_object()
