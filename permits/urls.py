@@ -25,9 +25,10 @@ urlpatterns = [
          name='delete_requested_species'),
 
     # Permits
+    path('permits/validate/', views.ValidateRedirectView.as_view(),
+         name='validate_permit'),
     path('permits/', views.PermitListView.as_view(),
          name='permit_list'),
     path('permits/<int:pk>/', views.PermitDetailView.as_view(),
          name='permit_detail')
-
 ]
