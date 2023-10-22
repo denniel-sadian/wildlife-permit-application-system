@@ -14,10 +14,12 @@
         {% if original.application %}<a href="{{ original.application.admin_url }}">View Permit Application</a>{% endif %}
         {% if original.type == 'LocalTransportPermit' %}<a href="{{ original.preview_url }}" target="_blank">View Preview</a>{% endif %}
 
-        {% if current_user_has_signed %}
-        <input type="submit" value="Remove Your Signature" name="remove_sign">
-        {% else %}
-        <input type="submit" value="Sign" name="add_sign">
+        {% if original.type == 'LocalTransportPermit' %}
+            {% if current_user_has_signed %}
+            <input type="submit" value="Remove Your Signature" name="remove_sign">
+            {% else %}
+            <input type="submit" value="Sign" name="add_sign">
+            {% endif %}
         {% endif %}
     </div>
 
