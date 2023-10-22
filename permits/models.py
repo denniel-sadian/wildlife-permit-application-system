@@ -266,7 +266,9 @@ class PermitApplication(ModelMixin, models.Model):
         if self.permit_type == PermitType.LTP:
             if self.requested_species_to_transport.count() == 0:
                 return False
-            if self.transport_date is None:
+            if not self.transport_date:
+                return False
+            if not self.transport_location:
                 return False
 
         # For WCP
