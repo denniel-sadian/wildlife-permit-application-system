@@ -318,6 +318,7 @@ class PermitApplicationAdmin(admin.ModelAdmin):
                         transport_location=obj.transport_location,
                         transport_date=obj.transport_date,
                         payment_order=obj.paymentorder,
+                        or_no=obj.paymentorder.no,
                         inspection=obj.inspection,
                         issued_date=datetime.now())
                     ltp.save()
