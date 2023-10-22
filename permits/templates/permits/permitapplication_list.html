@@ -25,6 +25,10 @@
         <h1>Permit Applications</h1>
         <p>Here are your permit applications.</p>
 
+        <div class="buttons">
+            <a href="{% url 'create_application' %}" class="w3-btn w3-round-large w3-green">Apply for Permit</a>
+        </div>
+
         <form method="GET" class="w3-panel w3-pale-blue w3-round-large w3-padding">
             {% include 'ui/inputbox.html' with field=filters.form.search %}
             {% include 'ui/inputbox.html' with field=filters.form.permit_type %}
