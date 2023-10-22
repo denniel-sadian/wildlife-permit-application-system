@@ -391,3 +391,9 @@ class Signature(models.Model):
         for sign in obj.signatures:
             if sign.person == user:
                 sign.delete()
+
+
+class Validation(models.Model):
+    validated_at = models.DateTimeField(auto_now_add=True)
+    validator = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    permit = models.ForeignKey(Permit, on_delete=models.CASCADE)
