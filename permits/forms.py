@@ -112,7 +112,8 @@ class PermitApplicationForm(forms.ModelForm):
                     "You currently don't have the needed permits WFP or WCP.")
 
         in_progress_application = PermitApplication.objects.filter(
-            client=client, permit_type=permit_type).exclude(status=Status.RELEASED).first()
+            client=client, permit_type=permit_type).exclude(
+                status__in=[Status.RELEASED, Status.EXPIRED, Status.USED]).first()
         if in_progress_application:
             return forms.ValidationError(
                 "You currently have an in progress application for this permit type.")
