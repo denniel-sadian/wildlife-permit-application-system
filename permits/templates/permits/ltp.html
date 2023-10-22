@@ -20,97 +20,64 @@
 {% endblock styles %}
 
 {% block content %}
-    <main>
-        <div class="qrcode-cont">
-            <div id="qrcode"></div>
-        </div>
+<h4>Wildlife Transport <br>
+    Permit No: {{ permit.permit_no }}</h4>
+<h2 style="text-align: center">LOCAL TRANSPORT PERMIT</h2>
+<p style="text-indent: 50px;">
+    Pursuant ot Republic Act 9147 dated July 30, 2001, <span class="underlined">{{ permit.client.name }}</span> of <span class="underlined">{{ permit.client.address }}</span>
+    is authorized to transport to <span class="underlined">{{ permit.transport_location }}</span> the following wildlife for <span class="underlined">export</span> purpose.</p>
+<table>
+    <tr>
+        <th>Common/Scientific Name</th>
+        <th>Description</th>
+        <th>Quantity</th>
+    </tr>
+    {% for i in permit.species_to_transport.all %}
+    <tr>
+        <td>{{ i.sub_species.common_name }}/{{ i.sub_species.scientific_name }}</td>
+        <td>{{ i.description }}</td>
+        <td>{{ i.quantity }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td></td>
+        <td></td>
+        <td><b>Total: {{ permit.total_transport_quantity }}</b></td>
+    </tr>
+</table>
+<p style="text-indent: 50px;">The above-mentioned specimens shall be transported by Air/Seaexpress on or
+    before <span class="underlined">{{ permit.transport_date }}</span> and have been inspected, verified and found ni accordance
+    with
+    existing wildlife laws, rules and regulations.
+</p>
+<p style="text-indent: 50px;">
+    Local transport fee in the amount of <span class="underlined">₱ {{ permit.payment_order.payment.amount }}</span> was paid under the DENR PENRO Official Receipt No.
+    <span class="underlined">{{ permit.payment_order.payment.receipt_no }}</span> dated <span class="underlined">{{ ltp.updated_at }}</span>.
+</p>
+<p style="text-indent: 50px;">This is to certifyfurther that this statement wasgiven me voluntarily and with
+    neither coercion nor promise of reward from the personnelofthe Department of Environment and Natural
+    Resources.</span>
+</p>
+{% include 'ui/signature_list.html' with signatures=permit.signatures %}
 
-        <h4>Wildlife Transport <br>
-            Permit No: {{ permit.permit_no }}</h4>
-        <h2 style="text-align: center">LOCAL TRANSPORT PERMIT</h2>
-        <p style="text-indent: 50px;">
-            Pursuant ot Republic Act 9147 dated July 30, 2001, <span class="underlined">{{ permit.client.name }}</span> of <span class="underlined">{{ permit.client.address }}</span>
-            is authorized to transport to <span class="underlined">{{ permit.transport_location }}</span> the following wildlife for <span class="underlined">export</span> purpose.</p>
-        <table>
-            <tr>
-                <th>Common/Scientific Name</th>
-                <th>Description</th>
-                <th>Quantity</th>
-            </tr>
-            {% for i in permit.species_to_transport.all %}
-            <tr>
-                <td>{{ i.sub_species.common_name }}/{{ i.sub_species.scientific_name }}</td>
-                <td>{{ i.description }}</td>
-                <td>{{ i.quantity }}</td>
-            </tr>
-            {% endfor %}
-            <tr>
-                <td></td>
-                <td></td>
-                <td><b>Total: {{ permit.total_transport_quantity }}</b></td>
-            </tr>
-        </table>
-        <p style="text-indent: 50px;">The above-mentioned specimens shall be transported by Air/Seaexpress on or
-            before <span class="underlined">{{ permit.transport_date }}</span> and have been inspected, verified and found ni accordance
-            with
-            existing wildlife laws, rules and regulations.
-        </p>
-        <p style="text-indent: 50px;">
-            Local transport fee in the amount of <span class="underlined">₱ {{ permit.payment_order.payment.amount }}</span> was paid under the DENR PENRO Official Receipt No.
-            <span class="underlined">{{ permit.payment_order.payment.receipt_no }}</span> dated <span class="underlined">{{ ltp.updated_at }}</span>.
-        </p>
-        <p style="text-indent: 50px;">This is to certifyfurther that this statement wasgiven me voluntarily and with
-            neither coercion nor promise of reward from the personnelofthe Department of Environment and Natural
-            Resources.</span>
-        </p>
-        {% include 'ui/signature_list.html' with signatures=permit.signatures %}
+<hr>
 
-        <hr>
+{% include 'ui/inspection.html' with inspection=permit.application.inspection %}
 
-        {% include 'ui/inspection.html' with inspection=permit.application.inspection %}
+{% if permit.wfp.uploaded_file %}
+<embed src="{{ permit.wfp.uploaded_file.url }}" class="added-file"/>
+{% endif %}
 
-        {% if permit.wfp.uploaded_file %}
-        <embed src="{{ permit.wfp.uploaded_file.url }}" class="added-file"/>
-        {% else %}
-        <p>No WFP!</p>
-        {% endif %}
+<hr>
 
-        <hr>
+{% if permit.wcp.uploaded_file %}
+<embed src="{{ permit.wcp.uploaded_file.url }}" class="added-file"/>
+{% endif %}
 
-        {% if permit.wcp.uploaded_file %}
-        <embed src="{{ permit.wcp.uploaded_file.url }}" class="added-file"/>
-        {% else %}
-        <p>No WCP!</p>
-        {% endif %}
+<hr>
 
-        <hr>
+{% if permit.payment_order.payment.uploaded_receipt %}
+<embed src="{{ permit.payment_order.payment.uploaded_receipt.url }}" class="added-file"/>
+{% endif %}
 
-        {% if permit.payment_order.payment.uploaded_receipt %}
-        <embed src="{{ permit.payment_order.payment.uploaded_receipt.url }}" class="added-file"/>
-        {% else %}
-        <p>No payment!</p>
-        {% endif %}
-    </main>
 {% endblock content %}
-
-{% block side %}
-<div>
-    <h3>Permit Details</h3>
-    <p>No: {{ permit.permit_no }}</p>
-    <p>Status: {{ permit.get_status_display }}</p>
-    <p>Created at: {{ permit.created_at }}</p>
-    <p>Valid until: {{ permit.valid_until }}</p>
-    <p>Official receipt no: {{ permit.payment_order.payment.receipt_no }}</p>
-    <p>Payment amount: Php {{ permit.payment_order.payment.amount }}</p>
-    <p>Transport location: {{ permit.transport_location }}</p>
-    <p>Transport date: {{ permit.transport_date }}</p>
-    <div>
-        <span>Species to transport: {{ permit.total_transport_quantity }}</span>
-        <ul>
-            {% for i in permit.species_to_transport.all %}
-            <li>{{ i.sub_species }} - {{ i.quantity }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-</div>
-{% endblock side %}
