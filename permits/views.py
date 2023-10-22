@@ -23,11 +23,6 @@ from .models import (
     TransportEntry,
     CollectionEntry,
     Permit,
-    LocalTransportPermit,
-    WildlifeCollectorPermit,
-    WildlifeFarmPermit,
-    GratuitousPermit,
-    CertificateOfWildlifeRegistration,
     Validation
 )
 from .forms import (
@@ -38,7 +33,8 @@ from .forms import (
     CollectionEntryForm
 )
 from .filters import (
-    PermitApplicationFilter
+    PermitApplicationFilter,
+    PermitFilter
 )
 
 
@@ -113,17 +109,15 @@ class PermitApplicationListView(CustomLoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['tab'] = 'applications'
-        filters = PermitApplicationFilter(
+        context['filters'] = PermitApplicationFilter(
             self.request.GET, request=self.request)
-        context['filters'] = filters
         return context
 
     def get_queryset(self) -> QuerySet[Any]:
         qs = super().get_queryset()
         filters = PermitApplicationFilter(
             self.request.GET, request=self.request, queryset=qs)
-        print('yasss', filters.qs)
-        return filters.qs
+        return filters.qs.order_by('-created_at')
 
 
 class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
@@ -290,36 +284,24 @@ class PermitDetailView(DetailView):
         return context
 
 
-class PermitListView(QueryParamFilterMixin, CustomLoginRequiredMixin, ListView):
+class PermitListView(CustomLoginRequiredMixin, ListView):
     model = Permit
     paginate_by = 10
     context_object_name = 'permits'
     template_name = 'permits/permit_list.html'
-    filter_fields = ['status', 'permit_type']
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['tab'] = 'permits'
+        context['filters'] = PermitFilter(
+            self.request.GET, request=self.request)
         return context
 
     def get_queryset(self) -> QuerySet[Any]:
-        filters = self.get_query_filters()[1]
-        qs = None
-        if 'permit_type' in filters:
-            subclasses = {
-                str(PermitType.LTP): LocalTransportPermit,
-                str(PermitType.WFP): WildlifeFarmPermit,
-                str(PermitType.WCP): WildlifeCollectorPermit,
-                str(PermitType.CWR): CertificateOfWildlifeRegistration,
-                str(PermitType.GP): GratuitousPermit
-            }
-            qs = subclasses[filters['permit_type']].objects
-            del filters['permit_type']
-        else:
-            qs = self.model.objects
-
-        return qs.filter(
-            client=self.request.user, **filters).order_by('-created_at')
+        qs = super().get_queryset()
+        filters = PermitFilter(
+            self.request.GET, request=self.request, queryset=qs)
+        return filters.qs.order_by('-created_at')
 
 
 class PermitApplicationItemDeleteView(CustomLoginRequiredMixin, DeleteView):
