@@ -106,6 +106,7 @@
 
         {% if object.permit_type == 'LTP' %}
         <form class="extra-form" action="" method="POST" enctype="multipart/form-data">
+            <div style="display:none;">{{ form }}</div>
             {% csrf_token %}
             {{ transport_entry.media }}
             <div class="extra-form">
@@ -148,6 +149,7 @@
 
         {% if object.permit_type == 'WCP' %}
         <form class="extra-form" action="" method="POST" enctype="multipart/form-data">
+            <div style="display:none;">{{ form }}</div>
             {% csrf_token %}
             {{ requested_species.media }}
             <h3 id="{{ requested_species.prefix }}">Collection Entries</h3>
@@ -184,6 +186,7 @@
         {% endif %}
 
         <form class="extra-form" action="" method="POST" enctype="multipart/form-data">
+            <div style="display:none;">{{ form }}</div>
             {% csrf_token %}
             {{ requirement.media }}
             {% if needed_requirements %}
