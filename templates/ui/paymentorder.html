@@ -1,0 +1,94 @@
+{% load static %}
+
+<div class="payment-order">
+    <div class="header-cont">
+        <div class="header">
+            <div class="logo">
+                <img src="{% static 'img/brand.png' %}" />
+            </div>
+            <div class="text">
+                <span>Republic of the Philippines</span><br>
+                <span>Department of Environment and Natural Resources</span><br>
+                <span>PENRO Marinduque</span><br>
+            </div>
+        </div>
+    </div>
+    <table>
+        <tr>
+            <th colspan="3" style="text-align:center;">Assesment of Fees and Charges</th>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <th style="text-align:center;">(Wildlife)</th>
+        </tr>
+        <tr>
+            <th>Bill No. {{ paymentorder.no }}</th>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <th>Date: {{ paymentorder.created_at }}</th>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <th>Name/Payee: {{ paymentorder.client.name }}</th>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <th>Address: {{ paymentorder.client.address }}</th>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <th>Nature of Application/Permit/Documents being secured:</th>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td colspan="3">{{ paymentorder.nature_of_doc_being_secured }}</td>
+        </tr>
+    </table>
+    <table style="margin-top:10px;">
+        <tr>
+            <th style="text-align:center;">Legal Basis (DAO/SEC)</th>
+            <th style="text-align:center;">Description and Computation of Fees and Charges Assessed</th>
+            <th style="text-align:center;">Amount</th>
+        </tr>
+        {% for i in paymentorder.items.all %}
+        <tr>
+            <td style="text-align:center;">{{ i.legal_basis }}</td>
+            <td style="text-align:center;">{{ i.description }}</td>
+            <td style="text-align:center;">{{ i.amount }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <th colspan="2" style="text-align:center;">TOTAL</th>
+            <th style="text-align:center;">{{ paymentorder.total }}</th>
+        </tr>
+    </table>
+    <table style="margin-top:10px;">
+        <tr>
+            <th>Prepared by:</th>
+            <th>Approved by:</th>
+        </tr>
+        <tr>
+            <th>
+                <div class="payment-sign">
+                    <img src="{{ paymentorder.prepared_by_signature.person.signature_image.url }}">
+                    <span>{{ paymentorder.prepared_by_signature.person.name }}</span>
+                    <span style="font-weight:normal; font-size:12px!important;">{{ paymentorder.prepared_by_signature.person.title }}</span>
+                </div>
+            </th>
+            <th>
+                <div class="payment-sign">
+                    <img src="{{ paymentorder.approved_by_signature.person.signature_image.url }}">
+                    <span>{{ paymentorder.approved_by_signature.person.name }}</span>
+                    <span style="font-weight:normal; font-size:12px!important;">{{ paymentorder.approved_by_signature.person.title }}</span>
+                </div>
+            </th>
+        </tr>
+        <tr>
+            <th colspan="2">Released Date: {{ paymentorder.released_at }}</th>
+        </tr>
+        <tr>
+            <th colspan="2">Status: {% if paymentorder.paid %}<span>Paid</span>{% else %}<span>Waiting for payment</span>{% endif %}</th>
+        </tr>
+    </table>
+</div>
