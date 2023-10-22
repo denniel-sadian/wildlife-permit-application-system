@@ -435,7 +435,8 @@ disable=raw-checker-failed,
         missing-function-docstring,
         invalid-name,
         protected-access,
-        import-outside-toplevel
+        import-outside-toplevel,
+        attribute-defined-outside-init
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
