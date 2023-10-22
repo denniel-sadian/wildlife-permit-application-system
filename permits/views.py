@@ -108,6 +108,11 @@ class PermitApplicationListView(QueryParamFilterMixin, CustomLoginRequiredMixin,
     context_object_name = 'applications'
     filter_fields = ['permit_type', 'status']
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['tab'] = 'applications'
+        return context
+
 
 class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
     model = PermitApplication
@@ -279,6 +284,11 @@ class PermitListView(QueryParamFilterMixin, CustomLoginRequiredMixin, ListView):
     context_object_name = 'permits'
     template_name = 'permits/permit_list.html'
     filter_fields = ['status', 'permit_type']
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['tab'] = 'permits'
+        return context
 
     def get_queryset(self) -> QuerySet[Any]:
         filters = self.get_query_filters()[1]

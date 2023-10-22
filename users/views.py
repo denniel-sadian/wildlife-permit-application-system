@@ -30,6 +30,11 @@ class CustomLoginRequiredMixin(LoginRequiredMixin):
 
 class CustomLoginView(LoginView):
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['tab'] = 'login'
+        return context
+
     def get_default_redirect_url(self):
         super().get_default_redirect_url()
         if not self.request.user.is_initial_password_changed:
@@ -43,6 +48,11 @@ class ClientRegistrationView(FormView):
     template_name = 'users/registration.html'
     form_class = ClientRegistrationForm
     success_url = reverse_lazy('login')
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['tab'] = 'register'
+        return context
 
     def form_valid(self, form):
         '''If the form is valid, redirect to the supplied URL.'''
@@ -93,6 +103,7 @@ class ProfileView(CustomLoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['tab'] = 'profile'
         user = self.get_object()
         if user.type == Client.__name__:
             context['wfp'] = user.subclass.current_wfp
