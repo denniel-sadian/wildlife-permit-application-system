@@ -123,3 +123,13 @@ class Cashier(User):
     def save(self, *args, **kwargs):
         self.is_staff = True
         super().save(*args, **kwargs)
+
+
+class Validator(User):
+
+    class Meta:
+        verbose_name = 'Validator'
+
+    def save(self, *args, **kwargs):
+        self.is_staff = True
+        super().save(*args, **kwargs)
