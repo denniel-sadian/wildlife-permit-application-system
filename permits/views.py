@@ -236,6 +236,9 @@ class UnsubmitRedirectView(SingleObjectMixin, RedirectView):
 class PermitDetailView(DetailView):
     model = Permit
 
+    def get_queryset(self):
+        return super().get_queryset().filter(client=self.request.user)
+
     def get_template_names(self) -> list[str]:
         try:
             templates = {
