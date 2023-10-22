@@ -15,10 +15,11 @@ class AdminMixin:
 
         extra_context = extra_context or {}
         extra_context['current_user_has_signed'] = False
-        for sign in obj.signatures:
-            if sign.person == request.user:
-                extra_context['current_user_has_signed'] = True
-                break
+        if obj:
+            for sign in obj.signatures:
+                if sign.person == request.user:
+                    extra_context['current_user_has_signed'] = True
+                    break
 
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
