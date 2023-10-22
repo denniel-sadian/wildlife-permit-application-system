@@ -156,7 +156,8 @@
     align-items: center;
 }
 .payment-order .payment-sign img {
-    width: 200px;
+    width: 100%;
+    max-width: 200px;
     height: auto;
     margin-bottom: -30px;
 }

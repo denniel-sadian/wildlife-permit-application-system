@@ -64,10 +64,6 @@
             {% include 'ui/inputbox.html' with field=form.names_and_addresses_of_authorized_collectors_or_trappers %}
             {% endif %}
 
-            {% if object.paymentorder and object.paymentorder.released_at %}
-            {% include 'ui/paymentorder.html' with paymentorder=object.paymentorder %}
-            {% endif %}
-
             {% if object.remarks.count != 0 %}
             <div>
                 <h4>Admin Remarks:</h4>
@@ -221,6 +217,12 @@
             </div>
             {% endif %}
         </form>
+
+        {% if object.paymentorder and object.paymentorder.released_at %}
+        <h3 style="text-align:center;">Payment Order</h3>
+        {% include 'ui/paymentorder.html' with paymentorder=object.paymentorder %}
+        {% endif %}
+
     </div>
 </main>
 {% endblock %}
