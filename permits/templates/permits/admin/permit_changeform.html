@@ -20,6 +20,8 @@
             {% else %}
             <input type="submit" value="Sign" name="add_sign">
             {% endif %}
+
+            {% if original.status != 'RELEASED' %}<input type="submit" value="Release" name="release">{% endif %}
         {% endif %}
     </div>
 
