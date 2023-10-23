@@ -59,11 +59,16 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                 return HttpResponseRedirect(payment.admin_url)
 
         if 'release' in request.POST:
-            obj.released_at = datetime.now()
-            obj.save()
-
-            self.message_user(
-                request, 'Payment record has been released, and the client has been notified already.', level=messages.SUCCESS)
+            if obj.total != 0:
+                obj.released_at = datetime.now()
+                obj.save()
+                self.message_user(
+                    request, 'Payment record has been released, and the client has been notified already.', level=messages.SUCCESS)
+            else:
+                self.message_user(
+                    request,
+                    'Cannot release this payment order with 0 amount to pay.',
+                    level=messages.ERROR)
             return HttpResponseRedirect('.')
 
         return super().response_change(request, obj)
@@ -81,3 +86,14 @@ class PaymentAdmin(admin.ModelAdmin):
     exclude = ('json_response',)
     autocomplete_fields = ('payment_order',)
     change_form_template = 'payments/admin/payment_changeform.html'
+
+    def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
+        if not change:
+            obj.prepared_by = request.user.subclass
+
+        if obj.uploaded_receipt:
+            obj.payment_order.paid = True
+            obj.payment_order.save()
+
+        obj.save()
+        return super().save_model(request, obj, form, change)
