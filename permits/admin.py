@@ -239,6 +239,11 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
         for instance in instances:
             if (isinstance(instance, Remarks)):
                 instance.user = request.user
+
+                # Admin has added some remarks, so we return the application
+                form.instance.status = Status.RETURNED
+                form.save()
+
             instance.save()
         formset.save_m2m()
 
@@ -278,7 +283,8 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 self.message_user(
                     request, 'Inspection has started already.', level=messages.WARNING)
                 return HttpResponseRedirect(obj.inspection.admin_url)
-            if obj.submittable and obj.status != Status.DRAFT:
+            if obj.submittable and obj.status != Status.DRAFT \
+                    and hasattr(obj, 'paymentorder') and obj.paymentorder.paid:
                 inspection = Inspection(
                     permit_application=obj,
                     no=obj.no+'-inspection')
@@ -290,7 +296,8 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 self.message_user(request,
                                   f'Please make sure the permit application is submittable '
                                   f'and no longer on status {Status.DRAFT} (i.e. should be ACCEPTED) '
-                                  'before starting the inspection.',
+                                  'before starting the inspection. Also, please make sure that '
+                                  'the client has paid the payment order already.',
                                   level=messages.ERROR)
                 return HttpResponseRedirect('.')
 
