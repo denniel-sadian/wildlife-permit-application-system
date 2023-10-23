@@ -75,7 +75,15 @@ class SignatoryAdmin(BaseUserAdmin):
 
 @admin.register(Client)
 class ClientAdmin(BaseUserAdmin):
-    pass
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'first_name', 'last_name', 'gender'),
+        }),
+    )
+    list_display = ('username', 'email', 'first_name',
+                    'last_name', 'is_initial_password_changed', 'is_active',
+                    'date_joined', 'last_login')
 
 
 @admin.register(Validator)
