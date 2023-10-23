@@ -194,7 +194,7 @@ MEDIA_URL = '/media/'
 # EMAILS
 
 EMAIL_BACKEND = os.getenv(
-    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+    'EMAIL_BACKEND', 'sendgrid_backend.SendgridBackend')
 
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
@@ -202,15 +202,15 @@ SENDGRID_SANDBOX_MODE_IN_DEBUG = json.loads(
     os.getenv('SENDGRID_SANDBOX_MODE_IN_DEBUG', 'false'))
 
 DEFAULT_FROM_EMAIL = os.getenv(
-    'DEFAULT_FROM_EMAIL', 'sadiandenniel@gmail.com')
+    'DEFAULT_FROM_EMAIL', 'PENRO <denniel@lambda-tech.ph>')
 
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'mail')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.sendgrid.net')
 
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'apikey')
 
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
-EMAIL_PORT = os.getenv('EMAIL_PORT', '1025')
+EMAIL_PORT = os.getenv('EMAIL_PORT', '587')
 
 EMAIL_USE_TLS = json.loads(os.getenv('EMAIL_USE_TLS', 'false'))
 
