@@ -8,6 +8,9 @@ from django.http import HttpResponseRedirect
 class AdminMixin:
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
+        from payments.models import PaymentOrder
+        from payments.models import Payment
+
         try:
             obj = self.model.objects.get(id=object_id)
         except self.model.DoesNotExist:
@@ -23,6 +26,10 @@ class AdminMixin:
 
         extra_context['user_has_edit_perm'] = request.user.subclass.has_perm(
             f'{self.model._meta.app_label}.change_{self.model._meta.model_name}')
+        extra_context['user_has_edit_perm_paymentorder'] = request.user.subclass.has_perm(
+            f'{PaymentOrder._meta.app_label}.change_{PaymentOrder._meta.model_name}')
+        extra_context['user_has_edit_perm_payment'] = request.user.subclass.has_perm(
+            f'{Payment._meta.app_label}.change_{Payment._meta.model_name}')
 
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
