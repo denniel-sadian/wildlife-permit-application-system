@@ -19,10 +19,11 @@ services:
       DB_NAME: ${DB_NAME:-biodiversity_db}
       DB_USER: ${DB_USER:-denr}
       DB_PASSWORD: ${DB_PASSWORD:-denr}
-      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-sadiandenniel@gmail.com}
+      EMAIL_BACKEND: ${EMAIL_BACKEND:-django.core.mail.backends.smtp.EmailBackend}
       STATICFILES_STORAGE: ${STATICFILES_STORAGE:-django.contrib.staticfiles.storage.StaticFilesStorage}
       EMAIL_HOST: ${EMAIL_HOST:-mail}
       EMAIL_PORT: ${EMAIL_PORT:-1025}
+      EMAIL_USE_TLS: ${EMAIL_USE_TLS:-false}
     depends_on:
       - db
       - mail
