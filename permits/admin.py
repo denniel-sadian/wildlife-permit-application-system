@@ -117,6 +117,20 @@ class PermitBaseAdmin(AdminMixin, admin.ModelAdmin):
             instance.save()
         formset.save_m2m()
 
+    def response_change(self, request, obj):
+        if 'release' in request.POST:
+            if obj.status not in [Status.RELEASED, Status.USED, Status.EXPIRED]:
+                obj.status = Status.RELEASED
+                obj.save()
+                self.message_user(
+                    request, 'The permit has been released.', level=messages.SUCCESS)
+            else:
+                self.message_user(
+                    request, 'The permit cannot be released because of the current status.', level=messages.ERROR)
+            return HttpResponseRedirect('.')
+
+        return super().response_change(request, obj)
+
     def save_model(self, request: Any, obj: Permit, form: Any, change: Any) -> None:
         super().save_model(request, obj, form, change)
 
@@ -248,6 +262,18 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
         formset.save_m2m()
 
     def response_change(self, request, obj: PermitApplication):
+        if 'accept' in request.POST:
+            if obj.status in [Status.DRAFT, Status.RETURNED]:
+                obj.status = Status.ACCEPTED
+                obj.save()
+                self.message_user(
+                    request, 'The application has been accepted.', level=messages.SUCCESS)
+            else:
+                self.message_user(
+                    request, 'Cannot be accepted.',
+                    level=messages.ERROR)
+            return HttpResponseRedirect('.')
+
         if 'generate_payment_order' in request.POST:
             if hasattr(obj, 'paymentorder'):
                 self.message_user(
