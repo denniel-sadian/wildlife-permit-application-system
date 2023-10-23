@@ -111,10 +111,19 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-DATABASE_URL = os.environ.get('DATABASE_URL')
-db_from_env = dj_database_url.config(
-    default=DATABASE_URL, conn_max_age=500, ssl_require=True)
-DATABASES['default'].update(db_from_env)
+if DEBUG:
+    DATABASES['default']['ENGINE'] = os.environ.get(
+        'DB_ENGINE', 'django.db.backends.postgresql')
+    DATABASES['default']['NAME'] = os.environ.get('DB_NAME', 'biodiversity_db')
+    DATABASES['default']['USER'] = os.environ.get('DB_USER', 'denr')
+    DATABASES['default']['PASSWORD'] = os.environ.get('DB_PASSWORD', 'denr')
+    DATABASES['default']['HOST'] = os.environ.get('DB_HOST', 'db')
+    DATABASES['default']['PORT'] = os.environ.get('DB_PORT', '5432')
+else:
+    DATABASE_URL = os.environ.get('DATABASE_URL')
+    db_from_env = dj_database_url.config(
+        default=DATABASE_URL, conn_max_age=500, ssl_require=True)
+    DATABASES['default'].update(db_from_env)
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -172,7 +181,8 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = os.environ.get(
+    'STATICFILES_STORAGE', 'whitenoise.storage.CompressedStaticFilesStorage')
 
 # Media files
 
