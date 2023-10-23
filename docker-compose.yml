@@ -12,7 +12,7 @@ services:
       SECRET_KEY: ${SECRET_KEY:-queenladygaga}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-["*"]}
       DEBUG: ${DEBUG:-true}
-      PORT: ${PORT:-8080}
+      PORT: ${PORT:-8000}
       DB_ENGINE: ${DB_ENGINE:-django.db.backends.postgresql}
       DB_HOST: ${DB_HOST:-db}
       DB_PORT: ${DB_PORT:-5432}
@@ -20,6 +20,7 @@ services:
       DB_USER: ${DB_USER:-denr}
       DB_PASSWORD: ${DB_PASSWORD:-denr}
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-sadiandenniel@gmail.com}
+      STATICFILES_STORAGE: ${STATICFILES_STORAGE:-django.contrib.staticfiles.storage.StaticFilesStorage}
       EMAIL_HOST: ${EMAIL_HOST:-mail}
       EMAIL_PORT: ${EMAIL_PORT:-1025}
     depends_on:
