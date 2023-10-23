@@ -39,6 +39,7 @@ USE_HTTPS = json.loads(os.getenv('USE_HTTPS', 'false'))
 SITE_ID = os.getenv('SITE_ID', 1)
 
 ALLOWED_HOSTS = json.loads(os.getenv('ALLOWED_HOSTS', '["*"]'))
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Application definition
