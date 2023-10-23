@@ -1,14 +1,32 @@
-FROM python:3.11
+FROM python:3.11-alpine
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
+# set work directory
 WORKDIR /app
 
-COPY requirements.txt /app/
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV DEBUG 0
 
-RUN pip install --upgrade pip
+# install psycopg2
+RUN apk update \
+    && apk add --virtual build-essential gcc python3-dev musl-dev \
+    && apk add postgresql-dev \
+    && pip install psycopg2
 
+# install dependencies
+COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . /app/
+# copy project
+COPY . .
+
+# collect static files
+RUN python manage.py collectstatic --noinput
+
+# add and run as non-root user
+RUN adduser -D denniel
+USER denniel
+
+# run gunicorn
+CMD gunicorn biodiversity.wsgi:application --bind 0.0.0.0:$PORT
