@@ -104,7 +104,7 @@
 
     <script>
         $(function () {
-            new QRCode(document.getElementById('qrcode'), '{{ permit.validation_url }}');
+            new QRCode(document.getElementById('qrcode'), '{{ DOMAIN }}{{ permit.validation_url }}');
         })
     </script>
 </body>
