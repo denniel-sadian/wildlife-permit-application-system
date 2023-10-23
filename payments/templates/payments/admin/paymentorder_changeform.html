@@ -12,7 +12,7 @@
 
     <div class="submit-row custom-row">
         {% if not original.payment%}
-        {% if user_has_edit_perm %}<input type="submit" value="Create Payment" name="create_payment">{% endif %}
+        {% if user_has_edit_perm and user_has_edit_perm_payment %}<input type="submit" value="Create Payment" name="create_payment">{% endif %}
         {%  else %}
         {% if original.payment %}<a href="{{ original.payment.admin_url }}">View Payment</a>{% endif %}
         {% endif %}

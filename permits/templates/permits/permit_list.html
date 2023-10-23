@@ -40,7 +40,8 @@
                     <th>No.</th>
                     <th>Type</th>
                     <th>Status</th>
-                    <th>Created At</th>
+                    <th>Creation Date</th>
+                    <th>Issued Date</th>
                     <th>Valid Until</th>
                 </tr>
                 {% for i in permits %}
@@ -49,6 +50,7 @@
                     <td>{{ i.subclass.permit_type }}</td>
                     <td><span class="w3-tag w3-round-xxlarge {{ i.status }}">{{ i.get_status_display }}</span></td>
                     <td>{{ i.created_at }}</td>
+                    <td>{{ i.issued_date }}</td>
                     <td>{{ i.valid_until }}</td>
                 </tr>
                 {% endfor %}

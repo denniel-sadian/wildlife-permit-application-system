@@ -88,7 +88,7 @@
             <th colspan="2">Released Date: {{ paymentorder.released_at }}</th>
         </tr>
         <tr>
-            <th colspan="2">Status: {% if paymentorder.paid %}<span>Paid</span>{% else %}<span>Waiting for payment</span>{% endif %}</th>
+            <th colspan="2">Status: {% if paymentorder.paid %}<span class="paid">Paid</span>{% else %}<span class="unpaid">Waiting for payment</span>{% endif %}</th>
         </tr>
     </table>
 </div>
