@@ -39,7 +39,8 @@ USE_HTTPS = json.loads(os.getenv('USE_HTTPS', 'false'))
 SITE_ID = os.getenv('SITE_ID', 1)
 
 ALLOWED_HOSTS = json.loads(os.getenv('ALLOWED_HOSTS', '["*"]'))
-CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = json.loads(os.getenv(
+    'CSRF_TRUSTED_ORIGINS', '["https://denr-penro-8a40c4e87d0b.herokuapp.com/"]'))
 
 
 # Application definition
