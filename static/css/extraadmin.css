@@ -164,3 +164,9 @@
 .payment-order table tr * {
     white-space: pre-wrap !important;
 }
+.paid {
+    color: #4CAF50;
+}
+.unpaid {
+    color: #f44336;
+}
