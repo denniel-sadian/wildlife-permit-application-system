@@ -15,6 +15,8 @@ import json
 from pathlib import Path
 
 from dotenv import load_dotenv
+import dj_database_url
+
 
 load_dotenv()
 
@@ -103,14 +105,14 @@ WSGI_APPLICATION = 'biodiversity.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('DB_NAME', 'bringme_db'),
-        'USER': os.getenv('DB_USER', 'bringme'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'bringme'),
-        'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': os.getenv('DB_PORT', '5432')
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+DATABASE_URL = os.environ.get('DATABASE_URL')
+db_from_env = dj_database_url.config(
+    default=DATABASE_URL, conn_max_age=500, ssl_require=True)
+DATABASES['default'].update(db_from_env)
 
 AUTH_USER_MODEL = 'users.User'
 
