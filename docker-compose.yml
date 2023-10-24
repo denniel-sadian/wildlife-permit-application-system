@@ -24,6 +24,10 @@ services:
       EMAIL_HOST: ${EMAIL_HOST:-mail}
       EMAIL_PORT: ${EMAIL_PORT:-1025}
       EMAIL_USE_TLS: ${EMAIL_USE_TLS:-false}
+      USE_S3: ${USE_S3:-false}
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
+      AWS_STORAGE_BUCKET_NAME:
     depends_on:
       - db
       - mail
