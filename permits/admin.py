@@ -78,7 +78,7 @@ class TransportEntryForm(forms.ModelForm):
             if permitted_species:
                 if quantity > permitted_species.quantity:
                     raise forms.ValidationError(
-                        f'The client is only allowed to transport a quanity of {permitted_species.quantity} '
+                        f'The client is only allowed to transport a quantity of {permitted_species.quantity} '
                         f'for the species {sub_species}.')
             else:
                 raise forms.ValidationError(
