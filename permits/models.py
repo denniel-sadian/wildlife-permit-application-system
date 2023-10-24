@@ -1,8 +1,9 @@
 from datetime import timedelta
+import json
+import base64
 
 from django.db import models
 from django.utils import timezone
-from django.utils.http import urlencode
 from django.urls import reverse_lazy
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -109,10 +110,12 @@ class Permit(ModelMixin, models.Model):
 
     @property
     def validation_url(self):
-        params = urlencode(
+        data = json.dumps(
             {'permit_no': self.permit_no or '', 'or_no': self.or_no or ''})
+        url_safe_base64 = base64.urlsafe_b64encode(
+            data.encode('utf-8')).decode('utf-8')
         path = reverse_lazy('validate_permit')
-        return f'{path}?{params}'
+        return f'{path}?data={url_safe_base64}'
 
     def calculate_validity_date(self):
         if self.issued_date:

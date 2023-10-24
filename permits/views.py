@@ -1,5 +1,7 @@
 from typing import Any
 from datetime import datetime
+import base64
+import json
 
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
@@ -330,9 +332,9 @@ class ValidateRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, Redirect
 
     def get_object(self, queryset=None):
         if isinstance(self.request.user.subclass, Validator):
-            permit_no = self.request.GET['permit_no']
-            or_no = self.request.GET['or_no']
-            return Permit.objects.get(permit_no=permit_no, or_no=or_no)
+            data = json.loads(base64.urlsafe_b64decode(
+                self.request.GET['data']).decode('utf-8'))
+            return Permit.objects.get(permit_no=data['permit_no'], or_no=data['or_no'])
         raise Permit.DoesNotExist('You are not a validator.')
 
     def get_redirect_url(self, *args: Any, **kwargs: Any):
