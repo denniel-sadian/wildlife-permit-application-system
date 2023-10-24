@@ -23,6 +23,3 @@ COPY . .
 
 # collect static files
 RUN python manage.py collectstatic --noinput
-
-# run gunicorn
-CMD gunicorn biodiversity.wsgi:application --bind 0.0.0.0:$PORT
