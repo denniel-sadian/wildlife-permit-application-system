@@ -10,6 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
 from django.conf import settings
+from django.core.validators import MinValueValidator
 
 from model_utils.managers import InheritanceManager
 
@@ -175,7 +176,7 @@ class PermittedToCollectAnimal(models.Model):
         SubSpecies, on_delete=models.CASCADE, related_name='species_permitted')
     wcp = models.ForeignKey(
         WildlifeCollectorPermit, on_delete=models.CASCADE, related_name='allowed_species')
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
         unique_together = ('sub_species', 'wcp')
@@ -309,7 +310,7 @@ class TransportEntry(models.Model):
     ltp = models.ForeignKey(
         LocalTransportPermit, on_delete=models.SET_NULL, related_name='species_to_transport',
         blank=True, null=True)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(validators=[MinValueValidator(1)])
     description = models.CharField(max_length=100)
 
     class Meta:
@@ -323,7 +324,7 @@ class CollectionEntry(models.Model):
     permit_application = models.ForeignKey(
         PermitApplication, on_delete=models.CASCADE, related_name='requested_species',
         blank=True, null=True)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
         unique_together = ('sub_species', 'permit_application')
