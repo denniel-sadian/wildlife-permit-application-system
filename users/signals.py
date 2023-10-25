@@ -6,7 +6,7 @@ from django.contrib.auth.signals import user_logged_in
 from django.contrib.auth.models import Group
 
 from .models import User, Client
-from .emails import RegistrationEmailView
+from .tasks import send_account_created_email
 
 
 user_created = Signal()
@@ -18,7 +18,9 @@ def handle_user_created(sender, user: User, **kwargs):
     temporary_password = str(uuid.uuid4())
     user.set_password(temporary_password)
     user.save()
-    RegistrationEmailView(user, temporary_password).send()
+
+    # Send mail
+    send_account_created_email.delay(user.id, temporary_password)
 
     # Assign the user to the right group
     try:
