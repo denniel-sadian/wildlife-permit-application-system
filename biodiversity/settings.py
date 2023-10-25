@@ -251,6 +251,34 @@ PHONENUMBER_DEFAULT_REGION = 'PH'
 TIME_ZONE = 'Asia/Manila'
 
 
+# LOGGING
+
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': (
+                '[%(asctime)s: %(levelname)s/%(name)s:%(lineno)d] %(message)s'),
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        '': {  # root logger
+            'handlers': ['console'],
+            'level': LOG_LEVEL,
+        },
+    },
+}
+
+
 # Permits
 
 VALIDITY = {
