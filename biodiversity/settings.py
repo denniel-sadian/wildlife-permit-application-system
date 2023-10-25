@@ -16,6 +16,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 import dj_database_url
+from celery.schedules import crontab
 
 
 load_dotenv()
@@ -276,6 +277,22 @@ LOGGING = {
             'level': LOG_LEVEL,
         },
     },
+}
+
+
+# CELERY
+
+CELERY_BROKER_URL = 'redis://redis:6379'
+
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+
+CELERY_TIMEZONE = TIME_ZONE
+
+CELERY_BEAT_SCHEDULE = {
+    'check_permit_validity': {
+        'task': 'permits.tasks.check_permit_validity',
+        'schedule': crontab()
+    }
 }
 
 
