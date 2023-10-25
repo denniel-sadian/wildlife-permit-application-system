@@ -3,6 +3,9 @@ build:
     web: Dockerfile
 run:
   web: gunicorn biodiversity.wsgi:application --bind 0.0.0.0:$PORT
+  worker:
+    image: web
+    command: celery -A biodiversity worker -B -l INFO
 release:
   image: web
   command:
