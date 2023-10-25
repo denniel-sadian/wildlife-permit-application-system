@@ -8,7 +8,7 @@ services:
       - .:/app
     ports:
       - ${PORT:-8000}:${PORT:-8000}
-    environment:
+    environment: &api-environment
       SECRET_KEY: ${SECRET_KEY:-queenladygaga}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-["*"]}
       DEBUG: ${DEBUG:-true}
@@ -32,6 +32,19 @@ services:
       - db
       - mail
 
+  worker:
+    depends_on:
+      - app  # just so `app` will be built first, then we can use its image as this service's image
+    image: biodiversity-app:latest
+    volumes:
+      - .:/app
+    environment: *api-environment
+    command:
+      - /bin/sh
+      - -c
+      - pip install -r requirements.txt
+        && celery -A biodiversity worker -B -l INFO
+
   db:
     image: postgres:13
     volumes:
@@ -45,6 +58,12 @@ services:
     image: mailhog/mailhog
     ports:
       - 8025:8025
+
+  redis:
+    image: redis:6.2.6-alpine
+    ports:
+      - 6379:6379
+
 
 volumes:
   biodiversity_db:
