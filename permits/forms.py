@@ -126,6 +126,7 @@ class PermitApplicationUpdateForm(forms.ModelForm):
     class Meta:
         model = PermitApplication
         fields = ('transport_date', 'transport_location',
+                  'farm_name', 'farm_address',
                   'names_and_addresses_of_authorized_collectors_or_trappers')
         widgets = {
             'transport_date': forms.DateInput(attrs={'type': 'date'})
