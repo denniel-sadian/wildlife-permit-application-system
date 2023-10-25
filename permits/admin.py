@@ -47,51 +47,9 @@ class UploadedRequirementInline(admin.StackedInline):
     autocomplete_fields = ('requirement',)
 
 
-class TransportEntryForm(forms.ModelForm):
-
-    class Meta:
-        model = TransportEntry
-        fields = ('ltp', 'sub_species', 'quantity', 'description')
-
-    def clean(self):
-        cleaned_data = super().clean()
-        sub_species = cleaned_data.get('sub_species')
-        try:
-            client = cleaned_data['ltp'].client
-        except KeyError:
-            client = cleaned_data['permit_application'].client
-
-        # Make sure only collected species are chosen for transport
-        allowed = SubSpecies.objects.filter(
-            Q(species_permitted__wcp__client=client)
-            & Q(common_name__exact=sub_species.common_name)).first()
-        if not allowed:
-            raise forms.ValidationError(
-                f'The client is not allowed to transport {sub_species}.')
-
-        # Make sure the quantity does not exeed the allowed quantity
-        quantity = cleaned_data.get('quantity')
-        wcp: WildlifeCollectorPermit = client.current_wcp
-        if wcp:
-            permitted_species: PermittedToCollectAnimal = wcp.allowed_species.filter(
-                sub_species=sub_species).first()
-            if permitted_species:
-                if quantity > permitted_species.quantity:
-                    raise forms.ValidationError(
-                        f'The client is only allowed to transport a quantity of {permitted_species.quantity} '
-                        f'for the species {sub_species}.')
-            else:
-                raise forms.ValidationError(
-                    f'The client is not allowed to transport {sub_species}.')
-        else:
-            raise forms.ValidationError(
-                f'The client is not allowed to transport {sub_species}.')
-
-
 class TransportEntryInline(admin.TabularInline):
     fields = ('sub_species', 'quantity')
     model = TransportEntry
-    form = TransportEntryForm
     extra = 1
     autocomplete_fields = ('sub_species',)
     verbose_name_plural = 'Transport Entries'
