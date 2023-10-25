@@ -152,7 +152,8 @@ class LocalTransportPermitAdmin(PermitBaseAdmin):
 
 @admin.register(WildlifeFarmPermit)
 class WildlifeFarmPermitAdmin(PermitBaseAdmin):
-    pass
+    fields = ('permit_no', 'client', 'status', 'farm_name', 'farm_address',
+              'or_no', 'issued_date', 'valid_until', 'uploaded_file')
 
 
 class PermittedToCollectAnimalInline(admin.TabularInline):
@@ -163,6 +164,8 @@ class PermittedToCollectAnimalInline(admin.TabularInline):
 
 @admin.register(WildlifeCollectorPermit)
 class WildlifeCollectorPermitAdmin(PermitBaseAdmin):
+    fields = ('permit_no', 'client', 'status', 'farm_name', 'farm_address',
+              'or_no', 'issued_date', 'valid_until', 'uploaded_file')
     inlines = (PermittedToCollectAnimalInline,)
 
 
@@ -194,17 +197,17 @@ class RemarksInline(admin.TabularInline):
 @admin.register(PermitApplication)
 class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
     list_display = ('no', 'permit_type', 'client', 'status',
-                    'submittable', 'created_at')
+                    'acceptable', 'created_at')
     list_filter = ('permit_type', 'status',)
     search_fields = ('no', 'permit_type', 'client__first_name',
                      'client__last_name', 'status')
     autocomplete_fields = ('client',)
     change_form_template = 'permits/admin/application_changeform.html'
 
-    def submittable(self, obj):
+    def acceptable(self, obj):
         return obj.submittable
 
-    submittable.boolean = True
+    acceptable.boolean = True
 
     def get_readonly_fields(self, request, obj=None):
         # If obj is None, it means we are adding a new record
@@ -263,7 +266,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
 
     def response_change(self, request, obj: PermitApplication):
         if 'accept' in request.POST:
-            if obj.status in [Status.DRAFT, Status.RETURNED]:
+            if obj.status in [Status.DRAFT, Status.RETURNED, Status.SUBMITTED]:
                 obj.status = Status.ACCEPTED
                 obj.save()
                 self.message_user(
@@ -372,7 +375,9 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                         status=Status.DRAFT,
                         client=obj.client,
                         or_no=obj.paymentorder.payment.receipt_no,
-                        issued_date=datetime.now())
+                        issued_date=datetime.now(),
+                        farm_name=obj.farm_name,
+                        farm_address=obj.farm_address)
                     wcp.save()
                     formatted_date = datetime.now().strftime("%Y-%m")
                     day_part = datetime.now().day
@@ -394,7 +399,9 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                         status=Status.DRAFT,
                         client=obj.client,
                         or_no=obj.paymentorder.payment.receipt_no,
-                        issued_date=datetime.now())
+                        issued_date=datetime.now(),
+                        farm_name=obj.farm_name,
+                        farm_address=obj.farm_address)
                     wfp.save()
                     formatted_date = datetime.now().strftime("%Y-%m")
                     day_part = datetime.now().day
