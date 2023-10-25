@@ -64,6 +64,11 @@
             {% include 'ui/inputbox.html' with field=form.names_and_addresses_of_authorized_collectors_or_trappers %}
             {% endif %}
 
+            {% if object.permit_type in 'WCP WFP' %}
+            {% include 'ui/inputbox.html' with field=form.farm_name %}
+            {% include 'ui/inputbox.html' with field=form.farm_address %}
+            {% endif %}
+
             <hr>
 
             <div class="buttons">

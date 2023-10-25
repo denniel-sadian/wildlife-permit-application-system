@@ -11,7 +11,7 @@
     {{ block.super }}
 
     <div class="submit-row custom-row">
-        {% if original.status in 'DRAFT RETURNED' and user_has_edit_perm %}<input type="submit" value="Accept" name="accept">{% endif %}
+        {% if original.status in 'DRAFT RETURNED SUBMITTED' and user_has_edit_perm %}<input type="submit" value="Accept" name="accept">{% endif %}
 
         {% if original.submittable and not original.paymentorder %}
         {% if user_has_edit_perm %}<input type="submit" value="Generate Payment Order" name="generate_payment_order">{% endif %}
