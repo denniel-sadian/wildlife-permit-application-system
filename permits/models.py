@@ -81,6 +81,8 @@ class Permit(ModelMixin, models.Model):
         'payments.PaymentOrder', on_delete=models.SET_NULL, null=True)
     inspection = models.ForeignKey(
         'Inspection', on_delete=models.SET_NULL, null=True)
+    farm_name = models.CharField(max_length=255, null=True)
+    farm_address = models.CharField(max_length=255, null=True)
 
     objects = InheritanceManager()
 
@@ -213,6 +215,8 @@ class PermitApplication(ModelMixin, models.Model):
     status = models.CharField(choices=Status.choices, max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    farm_name = models.CharField(max_length=255, null=True, blank=True)
+    farm_address = models.CharField(max_length=255, null=True, blank=True)
 
     # LTP
     transport_date = models.DateField(null=True, blank=True)
@@ -273,10 +277,21 @@ class PermitApplication(ModelMixin, models.Model):
 
         # For WCP
         if self.permit_type == PermitType.WCP:
+            needed_fields = [
+                'names_and_addresses_of_authorized_collectors_or_trappers',
+                'farm_name', 'farm_address']
+            for field in needed_fields:
+                if not hasattr(self, field) or (hasattr(self, field) and not getattr(self, field)):
+                    return False
             if self.requested_species.count() == 0:
                 return False
-            if not self.names_and_addresses_of_authorized_collectors_or_trappers:
-                return False
+
+        # For WFP
+        if self.permit_type == PermitType.WFP:
+            needed_fields = ['farm_name', 'farm_address']
+            for field in needed_fields:
+                if not hasattr(self, field) or (hasattr(self, field) and not getattr(self, field)):
+                    return False
 
         return True
 
