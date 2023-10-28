@@ -13,7 +13,8 @@ from .models import (
 )
 from .emails import (
     PreparedPaymentOrderEmailView,
-    SignedPaymentOrderEmailView
+    SignedPaymentOrderEmailView,
+    ReleasedPaymentOrderEmailView
 )
 
 
@@ -38,3 +39,10 @@ def notify_admins_about_signed_payment_order(payment_order_id):
     admins = get_admins_who_can_receive_emails()
     for admin in admins:
         SignedPaymentOrderEmailView(admin, payment_order).send()
+
+
+@shared_task
+def notify_client_about_released_payment_order(payment_order_id):
+    payment_order = PaymentOrder.objects.get(id=payment_order_id)
+    ReleasedPaymentOrderEmailView(
+        payment_order.permit_application.client, payment_order).send()
