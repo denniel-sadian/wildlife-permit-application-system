@@ -31,3 +31,9 @@ class AcceptedApplicationEmailView(BaseApplicationEmailView):
     subject_template_name = 'permits/emails/application_accepted/subject.txt'
     body_template_name = 'permits/emails/application_accepted/body.txt'
     html_body_template_name = 'permits/emails/application_accepted/body.html'
+
+
+class ReturnedApplicationEmailView(BaseApplicationEmailView):
+    subject_template_name = 'permits/emails/application_returned/subject.txt'
+    body_template_name = 'permits/emails/application_returned/body.txt'
+    html_body_template_name = 'permits/emails/application_returned/body.html'
