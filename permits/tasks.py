@@ -13,21 +13,36 @@ from .models import (
     Permit
 )
 from .emails import (
-    SubmittedApplicationEmailView
+    SubmittedApplicationEmailView,
+    UnsubmittedApplicationEmailView
 )
 
 
 logger = logging.getLogger(__name__)
 
 
+def get_admins_who_can_receive_emails():
+    admins = Admin.objects.filter(
+        is_active=True, is_initial_password_changed=True)
+    return admins
+
+
 @shared_task
 def notify_admins_about_submitted_application(application_id):
     application: PermitApplication = PermitApplication.objects.get(
         id=application_id)
-    admins = Admin.objects.filter(
-        is_active=True, is_initial_password_changed=True)
+    admins = get_admins_who_can_receive_emails()
     for admin in admins:
         SubmittedApplicationEmailView(admin, application).send()
+
+
+@shared_task
+def notify_admins_about_unsubmitted_application(application_id):
+    application: PermitApplication = PermitApplication.objects.get(
+        id=application_id)
+    admins = get_admins_who_can_receive_emails()
+    for admin in admins:
+        UnsubmittedApplicationEmailView(admin, application).send()
 
 
 @shared_task
