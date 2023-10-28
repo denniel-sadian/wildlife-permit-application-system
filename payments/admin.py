@@ -18,7 +18,8 @@ from .models import (
 from .signals import (
     payment_order_prepared,
     payment_order_signed,
-    payment_order_released
+    payment_order_released,
+    payment_order_paid
 )
 
 
@@ -122,6 +123,9 @@ class PaymentAdmin(admin.ModelAdmin):
 
         obj.payment_order.paid = bool(obj.uploaded_receipt)
         obj.payment_order.save()
+        if obj.payment_order.paid:
+            payment_order_paid.send(
+                sender=self.__class__, payment_order=obj.payment_order)
 
         obj.save()
         return super().save_model(request, obj, form, change)
