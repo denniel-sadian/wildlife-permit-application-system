@@ -9,7 +9,8 @@ from .models import (
 from .tasks import (
     notify_signatories_about_prepared_payment_order,
     notify_admins_about_signed_payment_order,
-    notify_client_about_released_payment_order
+    notify_client_about_released_payment_order,
+    notify_client_about_paid_payment_order
 )
 
 
@@ -19,6 +20,7 @@ logger = logging.getLogger(__name__)
 payment_order_prepared = Signal()
 payment_order_signed = Signal()
 payment_order_released = Signal()
+payment_order_paid = Signal()
 
 
 @receiver(payment_order_prepared)
@@ -39,4 +41,11 @@ def receive_payment_order_signed(sender, payment_order: PaymentOrder, **kwargs):
 def receive_payment_order_released(sender, payment_order: PaymentOrder, **kwargs):
     logger.info('Payment order %s has been released.', payment_order.no)
     notify_client_about_released_payment_order.delay(
+        payment_order_id=payment_order.id)
+
+
+@receiver(payment_order_paid)
+def receive_payment_order_paid(sender, payment_order: PaymentOrder, **kwargs):
+    logger.info('Payment order %s has been paid.', payment_order.no)
+    notify_client_about_paid_payment_order.delay(
         payment_order_id=payment_order.id)
