@@ -5,6 +5,7 @@ from typing import Any
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+from django.http.request import HttpRequest
 
 from users.mixins import AdminMixin
 
@@ -52,7 +53,8 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                 payment = Payment(receipt_no=obj.no,
                                   payment_order=obj,
                                   amount=obj.total,
-                                  payment_type=PaymentType.OTC)
+                                  payment_type=PaymentType.OTC,
+                                  created_by=request.user)
                 payment.save()
                 self.message_user(
                     request, 'Payment record has been made.', level=messages.SUCCESS)
@@ -87,9 +89,14 @@ class PaymentAdmin(admin.ModelAdmin):
     autocomplete_fields = ('payment_order',)
     change_form_template = 'payments/admin/payment_changeform.html'
 
+    def delete_model(self, request: HttpRequest, obj: Any) -> None:
+        obj.payment_order.paid = False
+        obj.payment_order.save()
+        return super().delete_model(request, obj)
+
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         if not change:
-            obj.prepared_by = request.user.subclass
+            obj.created_by = request.user.subclass
 
         obj.payment_order.paid = bool(obj.uploaded_receipt)
         obj.payment_order.save()
