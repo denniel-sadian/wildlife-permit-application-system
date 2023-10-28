@@ -1,0 +1,18 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+    <h1>Signed Payment Order {{ payment_order.no }}</h1>
+
+    <p>Good day, {{ user.name }}.</p>
+
+    <p>
+        The payment order with no. <a href="{{ DOMAIN }}{{ payment_order.admin_url }}">{{ payment_order.no }}</a>
+        has been signed by {{ payment_order.approved_by_signature.person.name }}.
+    </p>
+
+</body>
+</html>
