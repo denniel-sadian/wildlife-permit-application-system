@@ -241,7 +241,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 self.message_user(
                     request, 'Order of Payment has been created already.', level=messages.WARNING)
                 return HttpResponseRedirect(obj.admin_url)
-            if obj.submittable and obj.status not in [Status.DRAFT, Status.SUBMITTED]:
+            if obj.submittable and obj.status == Status.ACCEPTED:
                 payment_order = PaymentOrder(
                     nature_of_doc_being_secured='Wildlife',
                     client=obj.client,
@@ -271,7 +271,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 self.message_user(
                     request, 'Inspection has started already.', level=messages.WARNING)
                 return HttpResponseRedirect(obj.inspection.admin_url)
-            if obj.submittable and obj.status != Status.DRAFT \
+            if obj.submittable and obj.status == Status.ACCEPTED \
                     and hasattr(obj, 'paymentorder') and obj.paymentorder.paid:
                 inspection = Inspection(
                     permit_application=obj,
