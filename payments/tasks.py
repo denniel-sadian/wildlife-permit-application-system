@@ -14,7 +14,8 @@ from .models import (
 from .emails import (
     PreparedPaymentOrderEmailView,
     SignedPaymentOrderEmailView,
-    ReleasedPaymentOrderEmailView
+    ReleasedPaymentOrderEmailView,
+    PaidPaymentOrderEmailView
 )
 
 
@@ -45,4 +46,11 @@ def notify_admins_about_signed_payment_order(payment_order_id):
 def notify_client_about_released_payment_order(payment_order_id):
     payment_order = PaymentOrder.objects.get(id=payment_order_id)
     ReleasedPaymentOrderEmailView(
+        payment_order.permit_application.client, payment_order).send()
+
+
+@shared_task
+def notify_client_about_paid_payment_order(payment_order_id):
+    payment_order = PaymentOrder.objects.get(id=payment_order_id)
+    PaidPaymentOrderEmailView(
         payment_order.permit_application.client, payment_order).send()
