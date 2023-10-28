@@ -18,6 +18,11 @@ class EmailContextMixin:
 
         return context
 
+    def render_to_message(self, *args, **kwargs):
+        assert 'to' not in kwargs  # this should only be sent to the user
+        kwargs['to'] = (self.user.email, )
+        return super().render_to_message(*args, **kwargs)
+
 
 class RegistrationEmailView(EmailContextMixin, TemplatedHTMLEmailMessageView):
     subject_template_name = 'users/emails/registration/subject.txt'
@@ -32,8 +37,3 @@ class RegistrationEmailView(EmailContextMixin, TemplatedHTMLEmailMessageView):
         context = super().get_context_data(**kwargs)
         context['temporary_password'] = self.temporary_password
         return context
-
-    def render_to_message(self, *args, **kwargs):
-        assert 'to' not in kwargs  # this should only be sent to the user
-        kwargs['to'] = (self.user.email, )
-        return super().render_to_message(*args, **kwargs)
