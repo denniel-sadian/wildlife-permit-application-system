@@ -5,7 +5,7 @@ import json
 
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
-from django.db import models, transaction
+from django.db import transaction
 from django.http import HttpResponse
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
@@ -38,6 +38,9 @@ from .forms import (
 from .filters import (
     PermitApplicationFilter,
     PermitFilter
+)
+from .signals import (
+    application_submitted
 )
 
 
@@ -214,6 +217,10 @@ class SubmitRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, RedirectVi
 
         permit_application.status = Status.SUBMITTED
         permit_application.save()
+
+        application_submitted.send(
+            sender=self.__class__, application=permit_application)
+
         messages.success(
             self.request,
             f'Your permit application {permit_application.no} has been submitted. '
