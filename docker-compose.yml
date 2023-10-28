@@ -12,6 +12,7 @@ services:
       SECRET_KEY: ${SECRET_KEY:-queenladygaga}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-["*"]}
       DEBUG: ${DEBUG:-true}
+      DEBUG_PROPAGATE_EXCEPTIONS: ${DEBUG_PROPAGATE_EXCEPTIONS:-false}
       PORT: ${PORT:-8000}
       DB_ENGINE: ${DB_ENGINE:-django.db.backends.postgresql}
       DB_HOST: ${DB_HOST:-db}
