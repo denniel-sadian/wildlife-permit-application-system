@@ -5,13 +5,13 @@
 </head>
 <body>
 
-    <h1>Accepted Permit Application {{ application.no }}</h1>
+    <h1>Returned Permit Application {{ application.no }}</h1>
 
     <p>Good day, {{ user.name }}.</p>
 
     <p>
         Your permit application with no. <a href="{{ DOMAIN }}{% url 'update_application' pk=application.id %}">{{ application.no }}</a>
-        has been accepted.
+        was returned. Please see the admin's remarks regarding your application.
     </p>
 
 </body>
