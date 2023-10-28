@@ -62,8 +62,8 @@ class ClientRegistrationView(FormView):
 
         messages.info(
             self.request,
-            "Your account registration is almost complete. "
-            "An email is sent to your email containing your temporary password.")
+            'Your account registration is almost complete. '
+            f'An email is sent to {user.email} containing your temporary password.')
 
         return super().form_valid(form)
 
