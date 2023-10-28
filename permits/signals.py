@@ -9,7 +9,8 @@ from .models import (
 from .tasks import (
     notify_admins_about_submitted_application,
     notify_admins_about_unsubmitted_application,
-    notify_client_about_accepted_application
+    notify_client_about_accepted_application,
+    notify_client_about_returned_application
 )
 
 
@@ -19,6 +20,7 @@ logger = logging.getLogger(__name__)
 application_submitted = Signal()
 application_unsubmitted = Signal()
 application_accepted = Signal()
+application_returned = Signal()
 
 
 @receiver(application_submitted)
@@ -39,4 +41,11 @@ def receive_application_unsubmitted(sender, application: PermitApplication, **kw
 def receive_application_accepted(sender, application: PermitApplication, **kwargs):
     logger.info('Permit application %s is accepted.', application.no)
     notify_client_about_accepted_application.delay(
+        application_id=application.id)
+
+
+@receiver(application_returned)
+def receive_application_returned(sender, application: PermitApplication, **kwargs):
+    logger.info('Permit application %s is returned.', application.no)
+    notify_client_about_returned_application.delay(
         application_id=application.id)
