@@ -9,12 +9,14 @@ from django.http.request import HttpRequest
 
 from users.mixins import AdminMixin
 
-
 from .models import (
     PaymentOrder,
     PaymentOrderItem,
     Payment,
     PaymentType
+)
+from .signals import (
+    payment_order_prepared
 )
 
 
@@ -73,7 +75,15 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                     level=messages.ERROR)
             return HttpResponseRedirect('.')
 
-        return super().response_change(request, obj)
+        response_change = super().response_change(request, obj)
+
+        # Check if it's been signed by the one who prepared it
+        if 'add_sign' in request.POST and obj.prepared_by_signature \
+                and obj.prepared_by_signature.person == request.user:
+            payment_order_prepared.send(
+                sender=self.__class__, payment_order=obj)
+
+        return response_change
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         if not change:
