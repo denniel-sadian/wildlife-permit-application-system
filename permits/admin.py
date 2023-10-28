@@ -5,17 +5,11 @@ from django.contrib import admin
 from django.contrib import messages
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
-from django import forms
-from django.db.models import Q
 
 from users.mixins import AdminMixin
 
 from payments.models import (
     PaymentOrder
-)
-
-from animals.models import (
-    SubSpecies
 )
 
 from .models import (
@@ -38,6 +32,9 @@ from .models import (
     Status,
     Inspection,
     Signature
+)
+from .signals import (
+    application_accepted
 )
 
 
@@ -229,6 +226,10 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 obj.save()
                 self.message_user(
                     request, 'The application has been accepted.', level=messages.SUCCESS)
+
+                application_accepted.send(
+                    sender=self.__class__, application=obj)
+
             else:
                 self.message_user(
                     request, 'Cannot be accepted.',
@@ -240,7 +241,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 self.message_user(
                     request, 'Order of Payment has been created already.', level=messages.WARNING)
                 return HttpResponseRedirect(obj.admin_url)
-            if obj.submittable and obj.status != Status.DRAFT:
+            if obj.submittable and obj.status not in [Status.DRAFT, Status.SUBMITTED]:
                 payment_order = PaymentOrder(
                     nature_of_doc_being_secured='Wildlife',
                     client=obj.client,
