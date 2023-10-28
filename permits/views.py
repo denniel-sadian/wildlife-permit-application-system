@@ -40,7 +40,8 @@ from .filters import (
     PermitFilter
 )
 from .signals import (
-    application_submitted
+    application_submitted,
+    application_unsubmitted
 )
 
 
@@ -240,6 +241,9 @@ class UnsubmitRedirectView(SingleObjectMixin, RedirectView):
         if permit_application.status == Status.SUBMITTED:
             permit_application.status = Status.DRAFT
             permit_application.save()
+
+            application_unsubmitted.send(
+                sender=self.__class__, application=permit_application)
 
         return same_url
 
