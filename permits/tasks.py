@@ -14,7 +14,8 @@ from .models import (
 )
 from .emails import (
     SubmittedApplicationEmailView,
-    UnsubmittedApplicationEmailView
+    UnsubmittedApplicationEmailView,
+    AcceptedApplicationEmailView
 )
 
 
@@ -43,6 +44,13 @@ def notify_admins_about_unsubmitted_application(application_id):
     admins = get_admins_who_can_receive_emails()
     for admin in admins:
         UnsubmittedApplicationEmailView(admin, application).send()
+
+
+@shared_task
+def notify_client_about_accepted_application(application_id):
+    application: PermitApplication = PermitApplication.objects.get(
+        id=application_id)
+    AcceptedApplicationEmailView(application.client, application).send()
 
 
 @shared_task
