@@ -7,7 +7,8 @@ from .models import (
     PermitApplication
 )
 from .tasks import (
-    notify_admins_about_submitted_application
+    notify_admins_about_submitted_application,
+    notify_admins_about_unsubmitted_application
 )
 
 
@@ -22,4 +23,11 @@ application_unsubmitted = Signal()
 def receive_application_submitted(sender, application: PermitApplication, **kwargs):
     logger.info('Permit application %s has been submitted.', application.no)
     notify_admins_about_submitted_application.delay(
+        application_id=application.id)
+
+
+@receiver(application_unsubmitted)
+def receive_application_unsubmitted(sender, application: PermitApplication, **kwargs):
+    logger.info('Permit application %s is unsubmitted.', application.no)
+    notify_admins_about_unsubmitted_application.delay(
         application_id=application.id)
