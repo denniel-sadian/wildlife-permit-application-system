@@ -1,0 +1,1 @@
+Successfully Paid: {{ payment_order.no }}
