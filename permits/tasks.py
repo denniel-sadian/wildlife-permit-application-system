@@ -15,7 +15,8 @@ from .models import (
 from .emails import (
     SubmittedApplicationEmailView,
     UnsubmittedApplicationEmailView,
-    AcceptedApplicationEmailView
+    AcceptedApplicationEmailView,
+    ReturnedApplicationEmailView
 )
 
 
@@ -51,6 +52,13 @@ def notify_client_about_accepted_application(application_id):
     application: PermitApplication = PermitApplication.objects.get(
         id=application_id)
     AcceptedApplicationEmailView(application.client, application).send()
+
+
+@shared_task
+def notify_client_about_returned_application(application_id):
+    application: PermitApplication = PermitApplication.objects.get(
+        id=application_id)
+    ReturnedApplicationEmailView(application.client, application).send()
 
 
 @shared_task
