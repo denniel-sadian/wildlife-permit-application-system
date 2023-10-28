@@ -61,6 +61,11 @@ class User(ModelMixin, AbstractUser):
         salutation = 'Mr.' if self.gender == Gender.MALE else 'Ms.'
         return salutation + ' ' + str(self)
 
+    @property
+    def pronoun(self):
+        pronoun = 'he' if self.gender == Gender.MALE else 'she'
+        return pronoun
+
     def __str__(self):
         return self.first_name + ' ' + self.last_name
 
