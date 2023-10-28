@@ -1,0 +1,18 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+    <h1>Waiting for Payment: {{ payment_order.permit_application.no }}</h1>
+
+    <p>Good day, {{ user.name }}.</p>
+
+    <p>
+        Your permit application with no. <a href="{{ DOMAIN }}{% url 'update_application' pk=payment_order.permit_application.id %}">{{ payment_order.permit_application.no }}</a>
+        is now waiting for your payment.
+    </p>
+
+</body>
+</html>
