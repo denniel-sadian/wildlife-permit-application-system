@@ -31,3 +31,9 @@ class ReleasedPaymentOrderEmailView(BasePaymentOrderEmailView):
     subject_template_name = 'payments/emails/paymentorder_released/subject.txt'
     body_template_name = 'payments/emails/paymentorder_released/body.txt'
     html_body_template_name = 'payments/emails/paymentorder_released/body.html'
+
+
+class PaidPaymentOrderEmailView(BasePaymentOrderEmailView):
+    subject_template_name = 'payments/emails/paymentorder_paid/subject.txt'
+    body_template_name = 'payments/emails/paymentorder_paid/body.txt'
+    html_body_template_name = 'payments/emails/paymentorder_paid/body.html'
