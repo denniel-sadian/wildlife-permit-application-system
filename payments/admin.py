@@ -17,7 +17,8 @@ from .models import (
 )
 from .signals import (
     payment_order_prepared,
-    payment_order_signed
+    payment_order_signed,
+    payment_order_released
 )
 
 
@@ -69,6 +70,10 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                 obj.save()
                 self.message_user(
                     request, 'Payment record has been released, and the client has been notified already.', level=messages.SUCCESS)
+
+                payment_order_released.send(
+                    sender=self.__class__, payment_order=obj)
+
             else:
                 self.message_user(
                     request,
