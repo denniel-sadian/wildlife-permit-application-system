@@ -25,3 +25,9 @@ class UnsubmittedApplicationEmailView(BaseApplicationEmailView):
     subject_template_name = 'permits/emails/application_unsubmitted/subject.txt'
     body_template_name = 'permits/emails/application_unsubmitted/body.txt'
     html_body_template_name = 'permits/emails/application_unsubmitted/body.html'
+
+
+class AcceptedApplicationEmailView(BaseApplicationEmailView):
+    subject_template_name = 'permits/emails/application_accepted/subject.txt'
+    body_template_name = 'permits/emails/application_accepted/body.txt'
+    html_body_template_name = 'permits/emails/application_accepted/body.html'
