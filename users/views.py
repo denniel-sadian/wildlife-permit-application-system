@@ -58,7 +58,7 @@ class ClientRegistrationView(FormView):
         user = form.instance
         user.save()
         user = User.objects.get(id=user.id)
-        user_created.send_robust(sender=self.__class__, user=user)
+        user_created.send(sender=self.__class__, user=user)
 
         messages.info(
             self.request,
