@@ -3,10 +3,7 @@ from django_yubin.message_views import TemplatedHTMLEmailMessageView
 from users.emails import EmailContextMixin
 
 
-class SubmittedApplicationEmailView(EmailContextMixin, TemplatedHTMLEmailMessageView):
-    subject_template_name = 'permits/emails/application_submitted/subject.txt'
-    body_template_name = 'permits/emails/application_submitted/body.txt'
-    html_body_template_name = 'permits/emails/application_submitted/body.html'
+class BaseApplicationEmailView(EmailContextMixin, TemplatedHTMLEmailMessageView):
 
     def __init__(self, user, application, *args, **kwargs):
         super().__init__(user, *args, **kwargs)
@@ -17,7 +14,14 @@ class SubmittedApplicationEmailView(EmailContextMixin, TemplatedHTMLEmailMessage
         context['application'] = self.application
         return context
 
-    def render_to_message(self, *args, **kwargs):
-        assert 'to' not in kwargs  # this should only be sent to the user
-        kwargs['to'] = (self.user.email, )
-        return super().render_to_message(*args, **kwargs)
+
+class SubmittedApplicationEmailView(BaseApplicationEmailView):
+    subject_template_name = 'permits/emails/application_submitted/subject.txt'
+    body_template_name = 'permits/emails/application_submitted/body.txt'
+    html_body_template_name = 'permits/emails/application_submitted/body.html'
+
+
+class UnsubmittedApplicationEmailView(BaseApplicationEmailView):
+    subject_template_name = 'permits/emails/application_unsubmitted/subject.txt'
+    body_template_name = 'permits/emails/application_unsubmitted/body.txt'
+    html_body_template_name = 'permits/emails/application_unsubmitted/body.html'
