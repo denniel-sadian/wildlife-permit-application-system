@@ -16,7 +16,8 @@ from .models import (
     PaymentType
 )
 from .signals import (
-    payment_order_prepared
+    payment_order_prepared,
+    payment_order_signed
 )
 
 
@@ -81,6 +82,12 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
         if 'add_sign' in request.POST and obj.prepared_by_signature \
                 and obj.prepared_by_signature.person == request.user:
             payment_order_prepared.send(
+                sender=self.__class__, payment_order=obj)
+
+        # Check if it's been signed by a signatory
+        if 'add_sign' in request.POST and obj.approved_by_signature \
+                and obj.approved_by_signature.person == request.user:
+            payment_order_signed.send(
                 sender=self.__class__, payment_order=obj)
 
         return response_change
