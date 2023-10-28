@@ -34,7 +34,8 @@ from .models import (
     Signature
 )
 from .signals import (
-    application_accepted
+    application_accepted,
+    application_returned
 )
 
 
@@ -215,6 +216,9 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 # Admin has added some remarks, so we return the application
                 form.instance.status = Status.RETURNED
                 form.save()
+
+                application_returned.send(
+                    self.__class__, application=form.instance)
 
             instance.save()
         formset.save_m2m()
