@@ -3,12 +3,10 @@ from decimal import Decimal
 from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from django.contrib.contenttypes.models import ContentType
 
 from users.mixins import ModelMixin, validate_file_extension, validate_amount
 from permits.models import (
-    PermitApplication,
-    Signature
+    PermitApplication
 )
 
 
@@ -70,6 +68,9 @@ class PaymentType(models.TextChoices):
 
 
 class Payment(ModelMixin, models.Model):
+    created_by = models.ForeignKey(
+        'users.User', on_delete=models.CASCADE, related_name='created_payments')
+    created_at = models.DateTimeField(auto_now_add=True)
     receipt_no = models.CharField(max_length=255)
     payment_order = models.OneToOneField(
         PaymentOrder, on_delete=models.CASCADE)
