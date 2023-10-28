@@ -91,9 +91,8 @@ class PaymentAdmin(admin.ModelAdmin):
         if not change:
             obj.prepared_by = request.user.subclass
 
-        if obj.uploaded_receipt:
-            obj.payment_order.paid = True
-            obj.payment_order.save()
+        obj.payment_order.paid = bool(obj.uploaded_receipt)
+        obj.payment_order.save()
 
         obj.save()
         return super().save_model(request, obj, form, change)
