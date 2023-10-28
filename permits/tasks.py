@@ -3,13 +3,31 @@ from datetime import datetime
 
 from celery import shared_task
 
+from users.models import (
+    Admin
+)
+
 from .models import (
+    PermitApplication,
     Status,
     Permit
+)
+from .emails import (
+    SubmittedApplicationEmailView
 )
 
 
 logger = logging.getLogger(__name__)
+
+
+@shared_task
+def notify_admins_about_submitted_application(application_id):
+    application: PermitApplication = PermitApplication.objects.get(
+        id=application_id)
+    admins = Admin.objects.filter(
+        is_active=True, is_initial_password_changed=True)
+    for admin in admins:
+        SubmittedApplicationEmailView(admin, application).send()
 
 
 @shared_task
