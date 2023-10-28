@@ -1,0 +1,1 @@
+Prepared Payment Order {{ payment_order.no }}
