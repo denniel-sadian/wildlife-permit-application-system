@@ -1,0 +1,17 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+    <h1>Permit Created: {{ permit.permit_no }}</h1>
+
+    <p>Good day, {{ user.name }}.</p>
+
+    <p>
+        The permit with no. <a href="{{ DOMAIN }}{{ permit.admin_url }}">{{ permit.permit_no }}</a> has been created and now needs your signature.
+    </p>
+
+</body>
+</html>
