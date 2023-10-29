@@ -85,3 +85,9 @@ class PermitValidatedEmailView(BasePermitEmailView):
     subject_template_name = 'permits/emails/permit_validated/subject.txt'
     body_template_name = 'permits/emails/permit_validated/body.txt'
     html_body_template_name = 'permits/emails/permit_validated/body.html'
+
+
+class PermitExpiredEmailView(BasePermitEmailView):
+    subject_template_name = 'permits/emails/permit_expired/subject.txt'
+    body_template_name = 'permits/emails/permit_expired/body.txt'
+    html_body_template_name = 'permits/emails/permit_expired/body.html'
