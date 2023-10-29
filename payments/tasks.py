@@ -52,7 +52,7 @@ def notify_client_about_released_payment_order(payment_order_id):
 @shared_task
 def notify_client_about_paid_payment_order(payment_order_id):
     payment_order = PaymentOrder.objects.get(id=payment_order_id)
-    users = get_admins_who_can_receive_emails()
+    users = list(get_admins_who_can_receive_emails())
     users.append(payment_order.permit_application.client)
     for user in users:
         PaidPaymentOrderEmailView(user, payment_order).send()
