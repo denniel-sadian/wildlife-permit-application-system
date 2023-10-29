@@ -36,7 +36,8 @@ from .models import (
 from .signals import (
     application_accepted,
     application_returned,
-    inspection_scheduled
+    inspection_scheduled,
+    inspection_signed
 )
 
 
@@ -434,6 +435,16 @@ class InspectionAdmin(AdminMixin, admin.ModelAdmin):
     search_fields = ('no',)
     autocomplete_fields = ('permit_application', 'inspecting_officer')
     change_form_template = 'permits/admin/inspection_changeform.html'
+
+    def response_change(self, request, obj):
+        response_change = super().response_change(request, obj)
+
+        # Check signature has been attached already
+        if 'add_sign' in request.POST and obj.signatures.first() is not None:
+            inspection_signed.send(
+                sender=self.__class__, application=obj.permit_application)
+
+        return response_change
 
     def save_model(self, request, obj, form, change):
         if change:
