@@ -30,6 +30,7 @@ services:
       AWS_SECRET_ACCESS_KEY:
       AWS_STORAGE_BUCKET_NAME:
       CELERY_BROKER_URL:
+      PAYMONGO_SECRET_KEY:
     depends_on:
       - db
       - mail
