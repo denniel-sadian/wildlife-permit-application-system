@@ -35,7 +35,8 @@ from .models import (
 )
 from .signals import (
     application_accepted,
-    application_returned
+    application_returned,
+    inspection_scheduled
 )
 
 
@@ -433,3 +434,22 @@ class InspectionAdmin(AdminMixin, admin.ModelAdmin):
     search_fields = ('no',)
     autocomplete_fields = ('permit_application', 'inspecting_officer')
     change_form_template = 'permits/admin/inspection_changeform.html'
+
+    def save_model(self, request, obj, form, change):
+        if change:
+            # Check if the object is being updated
+            original_obj = Inspection.objects.get(pk=obj.pk)
+            changed_fields = set()
+
+            # Compare each field to determine which ones have changed
+            for field in Inspection._meta.fields:
+                if getattr(obj, field.name) != getattr(original_obj, field.name):
+                    changed_fields.add(field.name)
+
+            # Now, 'changed_fields' contains the names of the fields that have been updated
+            if {'inspecting_officer', 'scheduled_date'}.issubset(changed_fields) \
+                    and obj.inspecting_officer is not None and obj.scheduled_date is not None:
+                inspection_scheduled.send(
+                    sender=self.__class__, application=obj.permit_application)
+
+        obj.save()
