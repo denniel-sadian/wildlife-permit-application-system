@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.dispatch import Signal
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.auth.models import Group
+from django.db import transaction
 
 from .models import User, Client
 from .tasks import send_account_created_email
@@ -15,12 +16,15 @@ user_created = Signal()
 @receiver(user_created)
 def handle_user_created(sender, user: User, **kwargs):
     # Set temporary password, and then send the registration email too
-    temporary_password = str(uuid.uuid4())
-    user.set_password(temporary_password)
-    user.save()
+    with transaction.atomic():
+        temporary_password = str(uuid.uuid4())
+        user.set_password(temporary_password)
+        user.save()
 
-    # Send mail
-    send_account_created_email.delay(user.id, temporary_password)
+        # Send the email
+        transaction.on_commit(
+            lambda: send_account_created_email.delay(
+                user.id, temporary_password))
 
     # Assign the user to the right group
     try:
