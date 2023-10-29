@@ -14,7 +14,8 @@ from .tasks import (
     notify_client_about_returned_application,
     notify_client_and_officer_about_scheduled_inspection,
     notify_admins_about_signed_inspection,
-    notify_signatories_about_created_permit
+    notify_signatories_about_created_permit,
+    notify_client_and_admins_about_released_permit
 )
 
 
@@ -28,6 +29,7 @@ application_returned = Signal()
 inspection_scheduled = Signal()
 inspection_signed = Signal()
 permit_created = Signal()
+permit_released = Signal()
 
 
 @receiver(application_submitted)
@@ -76,4 +78,11 @@ def receive_inspection_signed(sender, application: PermitApplication, **kwargs):
 def receive_permit_created(sender, permit: Permit, **kwargs):
     logger.info('Permit %s has been created.', permit.permit_no)
     notify_signatories_about_created_permit.delay(
+        permit_id=permit.id)
+
+
+@receiver(permit_released)
+def receive_permit_released(sender, permit: Permit, **kwargs):
+    logger.info('Permit %s has been released.', permit.permit_no)
+    notify_client_and_admins_about_released_permit.delay(
         permit_id=permit.id)
