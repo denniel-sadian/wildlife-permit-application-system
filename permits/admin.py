@@ -39,7 +39,8 @@ from .signals import (
     application_returned,
     inspection_scheduled,
     inspection_signed,
-    permit_created
+    permit_created,
+    permit_released
 )
 
 
@@ -91,6 +92,9 @@ class PermitBaseAdmin(AdminMixin, admin.ModelAdmin):
                 obj.save()
                 self.message_user(
                     request, 'The permit has been released.', level=messages.SUCCESS)
+
+                permit_released.send(sender=self.__class__, permit=obj)
+
             else:
                 self.message_user(
                     request, 'The permit cannot be released because of the current status.', level=messages.ERROR)
