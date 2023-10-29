@@ -80,6 +80,13 @@ class PermitBaseAdmin(AdminMixin, admin.ModelAdmin):
     def response_change(self, request, obj):
         if 'release' in request.POST:
             if obj.status not in [Status.RELEASED, Status.USED, Status.EXPIRED]:
+
+                if isinstance(obj.subclass, LocalTransportPermit) and obj.signatures.first() is None:
+                    self.message_user(
+                        request, 'You cannot release this unsigned permit yet.',
+                        level=messages.ERROR)
+                    return HttpResponseRedirect('.')
+
                 obj.status = Status.RELEASED
                 obj.save()
                 self.message_user(
