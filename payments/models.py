@@ -23,6 +23,7 @@ class PaymentOrder(ModelMixin, models.Model):
     prepared_by = models.ForeignKey(
         'users.Admin', on_delete=models.CASCADE, related_name='prepared_payment_orders')
     paid = models.BooleanField(default=False)
+    extra_data = models.JSONField(default=dict)
 
     @property
     def total(self):
@@ -69,7 +70,8 @@ class PaymentType(models.TextChoices):
 
 class Payment(ModelMixin, models.Model):
     created_by = models.ForeignKey(
-        'users.User', on_delete=models.CASCADE, related_name='created_payments')
+        'users.User', on_delete=models.CASCADE, null=True,
+        related_name='created_payments')
     created_at = models.DateTimeField(auto_now_add=True)
     receipt_no = models.CharField(max_length=255)
     payment_order = models.OneToOneField(

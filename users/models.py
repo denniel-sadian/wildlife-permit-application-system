@@ -55,6 +55,7 @@ class User(ModelMixin, AbstractUser):
     is_initial_password_changed = models.BooleanField(default=False)
     signature_image = ResizedImageField(
         upload_to='signs/', null=True, blank=True)
+    extra_data = models.JSONField(default=dict)
 
     @property
     def name(self):
