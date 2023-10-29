@@ -1,16 +1,20 @@
 import logging
 from datetime import datetime
 
+from django.contrib.auth.models import Group
+
 from celery import shared_task
 
 from users.models import (
+    User,
     Admin
 )
 
 from .models import (
     PermitApplication,
     Status,
-    Permit
+    Permit,
+    LocalTransportPermit
 )
 from .emails import (
     SubmittedApplicationEmailView,
@@ -19,7 +23,8 @@ from .emails import (
     ReturnedApplicationEmailView,
     ScheduledInspectionEmailView,
     AssignedScheduledInspectionEmailView,
-    SignedInspectionEmailView
+    SignedInspectionEmailView,
+    PermitCreatedEmailView
 )
 
 
@@ -30,6 +35,13 @@ def get_admins_who_can_receive_emails():
     admins = Admin.objects.filter(
         is_active=True, is_initial_password_changed=True)
     return admins
+
+
+def get_permit_signatories_who_can_receive_emails():
+    group = Group.objects.get(name='Permit Signatory')
+    signatories = User.objects.filter(
+        groups=group, is_active=True, is_initial_password_changed=True)
+    return signatories
 
 
 @shared_task
@@ -83,6 +95,19 @@ def notify_admins_about_signed_inspection(application_id):
         if admin.id != application.inspection.signatures.first().person.id:
             SignedInspectionEmailView(
                 admin, application).send()
+
+
+@shared_task
+def notify_signatories_about_created_permit(permit_id):
+    permit: Permit = Permit.objects.get(id=permit_id).subclass
+
+    notifiable_permits = [LocalTransportPermit.__name__]
+    if permit.type not in notifiable_permits:
+        return
+
+    signatories = get_permit_signatories_who_can_receive_emails()
+    for signatory in signatories:
+        PermitCreatedEmailView(signatory, permit).send()
 
 
 @shared_task
