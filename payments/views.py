@@ -16,7 +16,7 @@ from users.views import CustomLoginRequiredMixin
 from users.models import Client
 
 from .models import PaymentOrder
-from .signals import online_payment_successful
+from .signals import online_payment_successful, online_payment_failed
 
 
 logger = logging.getLogger(__name__)
@@ -109,4 +109,22 @@ class AuthorizationCompleteDetailView(CustomLoginRequiredMixin, DetailView):
 @api_view(['POST'])
 def webhook(request):
     logger.info('PayMongo webhook data: %s', str(request.data))
+
+    or_no = request.data['data']['attributes']['data']['attributes']['metadata']['or_no']
+    event_type = request.data['data']['attributes']['type']
+    payment_order = PaymentOrder.objects.get(no=or_no)
+
+    if event_type == 'payment.failed':
+        online_payment_failed.send(sender=None, payment_order=payment_order)
+
+    elif event_type == 'payment.paid':
+        if not payment_order.paid:
+            payment_intent = paymongo.PaymentIntent.retrieve(
+                payment_order.extra_data['payment_intent_id'])
+            online_payment_successful.send(
+                sender=None,
+                payment_order=payment_order,
+                payment_intent=payment_intent
+            )
+
     return Response({'message': 'Thanks.'})

@@ -13,7 +13,8 @@ from .tasks import (
     notify_signatories_about_prepared_payment_order,
     notify_admins_about_signed_payment_order,
     notify_client_about_released_payment_order,
-    notify_client_about_paid_payment_order
+    notify_client_about_paid_payment_order,
+    notify_client_about_failed_payment
 )
 
 
@@ -76,6 +77,7 @@ def receive_online_payment_successful(sender, payment_order: PaymentOrder, payme
 
 
 @receiver(online_payment_failed)
-def receive_online_payment_failed(sender, payment_order: PaymentOrder, payment_intent, **kwargs):
+def receive_online_payment_failed(sender, payment_order: PaymentOrder, **kwargs):
     logger.info(
         'Payment order %s has been was not paid successfully online.', payment_order.no)
+    notify_client_about_failed_payment.delay(payment_order_id=payment_order.id)
