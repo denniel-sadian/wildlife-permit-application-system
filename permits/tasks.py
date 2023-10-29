@@ -2,7 +2,6 @@ import copy
 import logging
 from datetime import datetime
 
-
 from django.contrib.auth.models import Group
 
 from celery import shared_task
