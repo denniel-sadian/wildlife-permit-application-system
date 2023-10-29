@@ -1,0 +1,1 @@
+Signed Payment Order {{ payment_order.no }}

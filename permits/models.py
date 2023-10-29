@@ -358,12 +358,12 @@ class Remarks(models.Model):
 
 
 class Inspection(ModelMixin, models.Model):
-    no = models.CharField(max_length=255, null=False, blank=True, unique=True)
+    no = models.CharField(max_length=255, unique=True)
     permit_application = models.OneToOneField(
-        PermitApplication, on_delete=models.CASCADE, null=True, blank=True)
-    scheduled_date = models.DateField(blank=True, null=True)
+        PermitApplication, on_delete=models.CASCADE)
+    scheduled_date = models.DateField(null=True)
     inspecting_officer = models.ForeignKey(
-        'users.Admin', on_delete=models.CASCADE, blank=True, null=True)
+        'users.Admin', on_delete=models.CASCADE, null=True)
 
     @property
     def day(self):

@@ -5,17 +5,12 @@ from django.contrib import admin
 from django.contrib import messages
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
-from django import forms
-from django.db.models import Q
+from django.db import transaction
 
 from users.mixins import AdminMixin
 
 from payments.models import (
     PaymentOrder
-)
-
-from animals.models import (
-    SubSpecies
 )
 
 from .models import (
@@ -38,6 +33,14 @@ from .models import (
     Status,
     Inspection,
     Signature
+)
+from .signals import (
+    application_accepted,
+    application_returned,
+    inspection_scheduled,
+    inspection_signed,
+    permit_created,
+    permit_released
 )
 
 
@@ -78,10 +81,20 @@ class PermitBaseAdmin(AdminMixin, admin.ModelAdmin):
     def response_change(self, request, obj):
         if 'release' in request.POST:
             if obj.status not in [Status.RELEASED, Status.USED, Status.EXPIRED]:
+
+                if isinstance(obj.subclass, LocalTransportPermit) and obj.signatures.first() is None:
+                    self.message_user(
+                        request, 'You cannot release this unsigned permit yet.',
+                        level=messages.ERROR)
+                    return HttpResponseRedirect('.')
+
                 obj.status = Status.RELEASED
                 obj.save()
                 self.message_user(
                     request, 'The permit has been released.', level=messages.SUCCESS)
+
+                permit_released.send(sender=self.__class__, permit=obj)
+
             else:
                 self.message_user(
                     request, 'The permit cannot be released because of the current status.', level=messages.ERROR)
@@ -219,6 +232,9 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 form.instance.status = Status.RETURNED
                 form.save()
 
+                application_returned.send(
+                    self.__class__, application=form.instance)
+
             instance.save()
         formset.save_m2m()
 
@@ -229,6 +245,10 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 obj.save()
                 self.message_user(
                     request, 'The application has been accepted.', level=messages.SUCCESS)
+
+                application_accepted.send(
+                    sender=self.__class__, application=obj)
+
             else:
                 self.message_user(
                     request, 'Cannot be accepted.',
@@ -240,7 +260,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 self.message_user(
                     request, 'Order of Payment has been created already.', level=messages.WARNING)
                 return HttpResponseRedirect(obj.admin_url)
-            if obj.submittable and obj.status != Status.DRAFT:
+            if obj.submittable and obj.status == Status.ACCEPTED:
                 payment_order = PaymentOrder(
                     nature_of_doc_being_secured='Wildlife',
                     client=obj.client,
@@ -270,7 +290,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 self.message_user(
                     request, 'Inspection has started already.', level=messages.WARNING)
                 return HttpResponseRedirect(obj.inspection.admin_url)
-            if obj.submittable and obj.status != Status.DRAFT \
+            if obj.submittable and obj.status == Status.ACCEPTED \
                     and hasattr(obj, 'paymentorder') and obj.paymentorder.paid:
                 inspection = Inspection(
                     permit_application=obj,
@@ -304,27 +324,32 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                             'Cannot generate the permit because there is no inspection report.', level=messages.ERROR)
                         return HttpResponseRedirect('.')
 
-                    ltp = LocalTransportPermit(
-                        status=Status.DRAFT,
-                        client=obj.client,
-                        wfp=obj.client.current_wfp,
-                        wcp=obj.client.current_wcp,
-                        transport_location=obj.transport_location,
-                        transport_date=obj.transport_date,
-                        payment_order=obj.paymentorder,
-                        or_no=obj.paymentorder.no,
-                        inspection=obj.inspection,
-                        issued_date=datetime.now())
-                    ltp.save()
-                    formatted_date = datetime.now().strftime("%Y-%m")
-                    day_part = datetime.now().day
-                    ltp.permit_no = f'MIMAROPA-{obj.permit_type}-{formatted_date}-{day_part}-{ltp.id}'
-                    ltp.save()
-                    for i in obj.requested_species_to_transport.all():
-                        i.ltp = ltp
-                        i.save()
-                    obj.permit = Permit.objects.select_subclasses().get(id=ltp.id)
-                    obj.save()
+                    with transaction.atomic():
+                        ltp = LocalTransportPermit(
+                            status=Status.DRAFT,
+                            client=obj.client,
+                            wfp=obj.client.current_wfp,
+                            wcp=obj.client.current_wcp,
+                            transport_location=obj.transport_location,
+                            transport_date=obj.transport_date,
+                            payment_order=obj.paymentorder,
+                            or_no=obj.paymentorder.no,
+                            inspection=obj.inspection,
+                            issued_date=datetime.now())
+                        ltp.save()
+                        formatted_date = datetime.now().strftime("%Y-%m")
+                        day_part = datetime.now().day
+                        ltp.permit_no = f'MIMAROPA-{obj.permit_type}-{formatted_date}-{day_part}-{ltp.id}'
+                        ltp.save()
+                        for i in obj.requested_species_to_transport.all():
+                            i.ltp = ltp
+                            i.save()
+                        obj.permit = Permit.objects.select_subclasses().get(id=ltp.id)
+                        obj.save()
+
+                        transaction.on_commit(
+                            lambda: permit_created.send(
+                                sender=self.__class__, permit=ltp))
 
                     return HttpResponseRedirect(ltp.admin_url)
 
@@ -428,3 +453,32 @@ class InspectionAdmin(AdminMixin, admin.ModelAdmin):
     search_fields = ('no',)
     autocomplete_fields = ('permit_application', 'inspecting_officer')
     change_form_template = 'permits/admin/inspection_changeform.html'
+
+    def response_change(self, request, obj):
+        response_change = super().response_change(request, obj)
+
+        # Check signature has been attached already
+        if 'add_sign' in request.POST and obj.signatures.first() is not None:
+            inspection_signed.send(
+                sender=self.__class__, application=obj.permit_application)
+
+        return response_change
+
+    def save_model(self, request, obj, form, change):
+        if change:
+            # Check if the object is being updated
+            original_obj = Inspection.objects.get(pk=obj.pk)
+            changed_fields = set()
+
+            # Compare each field to determine which ones have changed
+            for field in Inspection._meta.fields:
+                if getattr(obj, field.name) != getattr(original_obj, field.name):
+                    changed_fields.add(field.name)
+
+            # Now, 'changed_fields' contains the names of the fields that have been updated
+            if {'inspecting_officer', 'scheduled_date'}.issubset(changed_fields) \
+                    and obj.inspecting_officer is not None and obj.scheduled_date is not None:
+                inspection_scheduled.send(
+                    sender=self.__class__, application=obj.permit_application)
+
+        obj.save()

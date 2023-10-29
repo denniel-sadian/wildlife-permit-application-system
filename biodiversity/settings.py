@@ -33,7 +33,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'hello')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = json.loads(os.getenv('DEBUG', 'false'))
-DEBUG_PROPAGATE_EXCEPTIONS = True
+DEBUG_PROPAGATE_EXCEPTIONS = json.loads(
+    os.getenv('DEBUG_PROPAGATE_EXCEPTIONS', 'true'))
 
 USE_HTTPS = json.loads(os.getenv('USE_HTTPS', 'false'))
 

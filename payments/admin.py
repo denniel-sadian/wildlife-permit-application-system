@@ -5,15 +5,21 @@ from typing import Any
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+from django.http.request import HttpRequest
 
 from users.mixins import AdminMixin
-
 
 from .models import (
     PaymentOrder,
     PaymentOrderItem,
     Payment,
     PaymentType
+)
+from .signals import (
+    payment_order_prepared,
+    payment_order_signed,
+    payment_order_released,
+    payment_order_paid
 )
 
 
@@ -52,7 +58,8 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                 payment = Payment(receipt_no=obj.no,
                                   payment_order=obj,
                                   amount=obj.total,
-                                  payment_type=PaymentType.OTC)
+                                  payment_type=PaymentType.OTC,
+                                  created_by=request.user)
                 payment.save()
                 self.message_user(
                     request, 'Payment record has been made.', level=messages.SUCCESS)
@@ -64,6 +71,10 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                 obj.save()
                 self.message_user(
                     request, 'Payment record has been released, and the client has been notified already.', level=messages.SUCCESS)
+
+                payment_order_released.send(
+                    sender=self.__class__, payment_order=obj)
+
             else:
                 self.message_user(
                     request,
@@ -71,7 +82,21 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                     level=messages.ERROR)
             return HttpResponseRedirect('.')
 
-        return super().response_change(request, obj)
+        response_change = super().response_change(request, obj)
+
+        # Check if it's been signed by the one who prepared it
+        if 'add_sign' in request.POST and obj.prepared_by_signature \
+                and obj.prepared_by_signature.person == request.user:
+            payment_order_prepared.send(
+                sender=self.__class__, payment_order=obj)
+
+        # Check if it's been signed by a signatory
+        if 'add_sign' in request.POST and obj.approved_by_signature \
+                and obj.approved_by_signature.person == request.user:
+            payment_order_signed.send(
+                sender=self.__class__, payment_order=obj)
+
+        return response_change
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         if not change:
@@ -87,12 +112,20 @@ class PaymentAdmin(admin.ModelAdmin):
     autocomplete_fields = ('payment_order',)
     change_form_template = 'payments/admin/payment_changeform.html'
 
+    def delete_model(self, request: HttpRequest, obj: Any) -> None:
+        obj.payment_order.paid = False
+        obj.payment_order.save()
+        return super().delete_model(request, obj)
+
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         if not change:
-            obj.prepared_by = request.user.subclass
+            obj.created_by = request.user.subclass
 
         obj.payment_order.paid = bool(obj.uploaded_receipt)
         obj.payment_order.save()
+        if obj.payment_order.paid:
+            payment_order_paid.send(
+                sender=self.__class__, payment_order=obj.payment_order)
 
         obj.save()
         return super().save_model(request, obj, form, change)

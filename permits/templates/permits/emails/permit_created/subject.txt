@@ -1,0 +1,1 @@
+Permit Created: {{ permit.permit_no }}

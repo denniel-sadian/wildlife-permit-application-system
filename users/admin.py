@@ -55,7 +55,7 @@ class BaseUserAdmin(UserAdmin):
         super().save_model(request, obj, form, change)
         if not change:
             user = User.objects.get(id=obj.id)
-            user_created.send_robust(sender=self.__class__, user=user)
+            user_created.send(sender=self.__class__, user=user)
 
 
 @admin.register(Admin)

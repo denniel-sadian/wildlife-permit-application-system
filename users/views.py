@@ -58,12 +58,12 @@ class ClientRegistrationView(FormView):
         user = form.instance
         user.save()
         user = User.objects.get(id=user.id)
-        user_created.send_robust(sender=self.__class__, user=user)
+        user_created.send(sender=self.__class__, user=user)
 
         messages.info(
             self.request,
-            "Your account registration is almost complete. "
-            "An email is sent to your email containing your temporary password.")
+            'Your account registration is almost complete. '
+            f'An email is sent to {user.email} containing your temporary password.')
 
         return super().form_valid(form)
 
