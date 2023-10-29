@@ -15,6 +15,18 @@ class BaseApplicationEmailView(EmailContextMixin, TemplatedHTMLEmailMessageView)
         return context
 
 
+class BasePermitEmailView(EmailContextMixin, TemplatedHTMLEmailMessageView):
+
+    def __init__(self, user, permit, *args, **kwargs):
+        super().__init__(user, *args, **kwargs)
+        self.permit = permit
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['permit'] = self.permit
+        return context
+
+
 class SubmittedApplicationEmailView(BaseApplicationEmailView):
     subject_template_name = 'permits/emails/application_submitted/subject.txt'
     body_template_name = 'permits/emails/application_submitted/body.txt'
@@ -55,3 +67,9 @@ class SignedInspectionEmailView(BaseApplicationEmailView):
     subject_template_name = 'permits/emails/inspection_signed/subject.txt'
     body_template_name = 'permits/emails/inspection_signed/body.txt'
     html_body_template_name = 'permits/emails/inspection_signed/body.html'
+
+
+class PermitCreatedEmailView(BasePermitEmailView):
+    subject_template_name = 'permits/emails/permit_created/subject.txt'
+    body_template_name = 'permits/emails/permit_created/body.txt'
+    html_body_template_name = 'permits/emails/permit_created/body.html'
