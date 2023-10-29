@@ -5,6 +5,7 @@ from django.views.generic.detail import SingleObjectMixin, DetailView
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 
 import paymongo
 
@@ -107,3 +108,4 @@ class AuthorizationCompleteDetailView(CustomLoginRequiredMixin, DetailView):
 def webhook(request):
     if request.method == 'POST':
         logger.info('PayMongo webhook data: %s', str(request.POST))
+    return HttpResponse('Thank you.', content_type='text/plain')
