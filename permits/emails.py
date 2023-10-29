@@ -49,3 +49,9 @@ class AssignedScheduledInspectionEmailView(BaseApplicationEmailView):
     subject_template_name = 'permits/emails/inspection_assigned/subject.txt'
     body_template_name = 'permits/emails/inspection_assigned/body.txt'
     html_body_template_name = 'permits/emails/inspection_assigned/body.html'
+
+
+class SignedInspectionEmailView(BaseApplicationEmailView):
+    subject_template_name = 'permits/emails/inspection_signed/subject.txt'
+    body_template_name = 'permits/emails/inspection_signed/body.txt'
+    html_body_template_name = 'permits/emails/inspection_signed/body.html'
