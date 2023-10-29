@@ -37,3 +37,15 @@ class ReturnedApplicationEmailView(BaseApplicationEmailView):
     subject_template_name = 'permits/emails/application_returned/subject.txt'
     body_template_name = 'permits/emails/application_returned/body.txt'
     html_body_template_name = 'permits/emails/application_returned/body.html'
+
+
+class ScheduledInspectionEmailView(BaseApplicationEmailView):
+    subject_template_name = 'permits/emails/inspection_scheduled/subject.txt'
+    body_template_name = 'permits/emails/inspection_scheduled/body.txt'
+    html_body_template_name = 'permits/emails/inspection_scheduled/body.html'
+
+
+class AssignedScheduledInspectionEmailView(BaseApplicationEmailView):
+    subject_template_name = 'permits/emails/inspection_assigned/subject.txt'
+    body_template_name = 'permits/emails/inspection_assigned/body.txt'
+    html_body_template_name = 'permits/emails/inspection_assigned/body.html'
