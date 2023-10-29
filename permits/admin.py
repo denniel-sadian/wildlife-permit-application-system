@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.contrib import messages
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
+from django.db import transaction
 
 from users.mixins import AdminMixin
 
@@ -37,7 +38,8 @@ from .signals import (
     application_accepted,
     application_returned,
     inspection_scheduled,
-    inspection_signed
+    inspection_signed,
+    permit_created
 )
 
 
@@ -311,27 +313,32 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                             'Cannot generate the permit because there is no inspection report.', level=messages.ERROR)
                         return HttpResponseRedirect('.')
 
-                    ltp = LocalTransportPermit(
-                        status=Status.DRAFT,
-                        client=obj.client,
-                        wfp=obj.client.current_wfp,
-                        wcp=obj.client.current_wcp,
-                        transport_location=obj.transport_location,
-                        transport_date=obj.transport_date,
-                        payment_order=obj.paymentorder,
-                        or_no=obj.paymentorder.no,
-                        inspection=obj.inspection,
-                        issued_date=datetime.now())
-                    ltp.save()
-                    formatted_date = datetime.now().strftime("%Y-%m")
-                    day_part = datetime.now().day
-                    ltp.permit_no = f'MIMAROPA-{obj.permit_type}-{formatted_date}-{day_part}-{ltp.id}'
-                    ltp.save()
-                    for i in obj.requested_species_to_transport.all():
-                        i.ltp = ltp
-                        i.save()
-                    obj.permit = Permit.objects.select_subclasses().get(id=ltp.id)
-                    obj.save()
+                    with transaction.atomic():
+                        ltp = LocalTransportPermit(
+                            status=Status.DRAFT,
+                            client=obj.client,
+                            wfp=obj.client.current_wfp,
+                            wcp=obj.client.current_wcp,
+                            transport_location=obj.transport_location,
+                            transport_date=obj.transport_date,
+                            payment_order=obj.paymentorder,
+                            or_no=obj.paymentorder.no,
+                            inspection=obj.inspection,
+                            issued_date=datetime.now())
+                        ltp.save()
+                        formatted_date = datetime.now().strftime("%Y-%m")
+                        day_part = datetime.now().day
+                        ltp.permit_no = f'MIMAROPA-{obj.permit_type}-{formatted_date}-{day_part}-{ltp.id}'
+                        ltp.save()
+                        for i in obj.requested_species_to_transport.all():
+                            i.ltp = ltp
+                            i.save()
+                        obj.permit = Permit.objects.select_subclasses().get(id=ltp.id)
+                        obj.save()
+
+                        transaction.on_commit(
+                            lambda: permit_created.send(
+                                sender=self.__class__, permit=ltp))
 
                     return HttpResponseRedirect(ltp.admin_url)
 
