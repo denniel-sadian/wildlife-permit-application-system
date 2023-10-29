@@ -11,7 +11,8 @@ from .tasks import (
     notify_admins_about_unsubmitted_application,
     notify_client_about_accepted_application,
     notify_client_about_returned_application,
-    notify_client_and_officer_about_scheduled_inspection
+    notify_client_and_officer_about_scheduled_inspection,
+    notify_admins_about_signed_inspection
 )
 
 
@@ -23,6 +24,7 @@ application_unsubmitted = Signal()
 application_accepted = Signal()
 application_returned = Signal()
 inspection_scheduled = Signal()
+inspection_signed = Signal()
 
 
 @receiver(application_submitted)
@@ -57,4 +59,11 @@ def receive_application_returned(sender, application: PermitApplication, **kwarg
 def receive_inspection_scheduled(sender, application: PermitApplication, **kwargs):
     logger.info('Inspection for %s has been scheduled.', application.no)
     notify_client_and_officer_about_scheduled_inspection.delay(
+        application_id=application.id)
+
+
+@receiver(inspection_signed)
+def receive_inspection_signed(sender, application: PermitApplication, **kwargs):
+    logger.info('Inspection for %s has been signed.', application.no)
+    notify_admins_about_signed_inspection.delay(
         application_id=application.id)
