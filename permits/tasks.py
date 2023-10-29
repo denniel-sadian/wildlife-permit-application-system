@@ -18,7 +18,8 @@ from .emails import (
     AcceptedApplicationEmailView,
     ReturnedApplicationEmailView,
     ScheduledInspectionEmailView,
-    AssignedScheduledInspectionEmailView
+    AssignedScheduledInspectionEmailView,
+    SignedInspectionEmailView
 )
 
 
@@ -71,6 +72,17 @@ def notify_client_and_officer_about_scheduled_inspection(application_id):
         application.client, application).send()
     AssignedScheduledInspectionEmailView(
         application.inspection.inspecting_officer, application).send()
+
+
+@shared_task
+def notify_admins_about_signed_inspection(application_id):
+    application: PermitApplication = PermitApplication.objects.get(
+        id=application_id)
+    admins = get_admins_who_can_receive_emails()
+    for admin in admins:
+        if admin.id != application.inspection.signatures.first().person.id:
+            SignedInspectionEmailView(
+                admin, application).send()
 
 
 @shared_task
