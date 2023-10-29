@@ -41,7 +41,8 @@ from .filters import (
 )
 from .signals import (
     application_submitted,
-    application_unsubmitted
+    application_unsubmitted,
+    permit_validated
 )
 
 
@@ -358,6 +359,8 @@ class ValidateRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, Redirect
             permit.status = Status.USED
             permit.save()
             params = '?'+urlencode({'validated': True})
+
+            permit_validated.send(sender=self.__class__, permit=permit)
 
         return reverse_lazy(
             'permit_detail',
