@@ -215,6 +215,11 @@
         <hr>
         <h3 style="text-align:center;">Payment Order</h3>
         {% include 'ui/paymentorder.html' with paymentorder=object.paymentorder %}
+        {% if not object.paymentorder.paid %}
+        <div style="text-align:center;">
+            <a href="{% url 'pay_via_gcash_redirect' pk=object.paymentorder.id %}" class="w3-btn w3-blue w3-round-xxlarge">Pay via GCash</a>
+        </div>
+        {% endif %}
         {% endif %}
 
         {% if object.remarks.count != 0 %}

@@ -308,3 +308,11 @@ VALIDITY = {
     'CertificateOfWildlifeRegistration': int(os.getenv('VALIDITY_DAYS_CWR', '30')),
     'GratuitousPermit': int(os.getenv('VALIDITY_DAYS_GP', '30'))
 }
+
+
+# PAYMONGO
+
+PAYMONGO = {
+    'SECRET_KEY': os.getenv('PAYMONGO_SECRET_KEY'),
+    'STATEMENT_DESCRIPTOR': os.getenv('PAYMONGO_STATEMENT_DESCRIPTOR', 'DENR-PENRO')
+}
