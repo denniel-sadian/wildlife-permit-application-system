@@ -16,7 +16,9 @@ from .emails import (
     SubmittedApplicationEmailView,
     UnsubmittedApplicationEmailView,
     AcceptedApplicationEmailView,
-    ReturnedApplicationEmailView
+    ReturnedApplicationEmailView,
+    ScheduledInspectionEmailView,
+    AssignedScheduledInspectionEmailView
 )
 
 
@@ -59,6 +61,16 @@ def notify_client_about_returned_application(application_id):
     application: PermitApplication = PermitApplication.objects.get(
         id=application_id)
     ReturnedApplicationEmailView(application.client, application).send()
+
+
+@shared_task
+def notify_client_and_officer_about_scheduled_inspection(application_id):
+    application: PermitApplication = PermitApplication.objects.get(
+        id=application_id)
+    ScheduledInspectionEmailView(
+        application.client, application).send()
+    AssignedScheduledInspectionEmailView(
+        application.inspection.inspecting_officer, application).send()
 
 
 @shared_task
