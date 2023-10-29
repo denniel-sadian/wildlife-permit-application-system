@@ -1,5 +1,7 @@
+import copy
 import logging
 from datetime import datetime
+
 
 from django.contrib.auth.models import Group
 
@@ -26,7 +28,8 @@ from .emails import (
     SignedInspectionEmailView,
     PermitCreatedEmailView,
     PermitReleasedEmailView,
-    PermitValidatedEmailView
+    PermitValidatedEmailView,
+    PermitExpiredEmailView
 )
 
 
@@ -137,9 +140,17 @@ def check_permit_validity():
     permits_to_expire = Permit.objects.filter(
         status__in=[Status.RELEASED],
         valid_until__lt=datetime.now().date())
+    admins = list(get_admins_who_can_receive_emails())
+
     for permit in permits_to_expire:
         permit.status = Status.EXPIRED
         permit.save()
         logger.info('Permit %s has expired already.', permit.permit_no)
+
+        # Notify the users
+        users = copy.deepcopy(admins)
+        users.append(permit.client)
+        for user in users:
+            PermitExpiredEmailView(user, permit.subclass).send()
 
     logger.info('Done expiring permits.')
