@@ -294,7 +294,7 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULE = {
     'check_permit_validity': {
         'task': 'permits.tasks.check_permit_validity',
-        'schedule': crontab()
+        'schedule': crontab(minute=0, hour=0)
     }
 }
 
