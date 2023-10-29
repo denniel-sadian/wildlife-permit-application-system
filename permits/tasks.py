@@ -25,7 +25,8 @@ from .emails import (
     AssignedScheduledInspectionEmailView,
     SignedInspectionEmailView,
     PermitCreatedEmailView,
-    PermitReleasedEmailView
+    PermitReleasedEmailView,
+    PermitValidatedEmailView
 )
 
 
@@ -118,6 +119,15 @@ def notify_client_and_admins_about_released_permit(permit_id):
     users.append(permit.client)
     for user in users:
         PermitReleasedEmailView(user, permit).send()
+
+
+@shared_task
+def notify_client_and_admins_about_validated_permit(permit_id):
+    permit: Permit = Permit.objects.get(id=permit_id).subclass
+    users = list(get_admins_who_can_receive_emails())
+    users.append(permit.client)
+    for user in users:
+        PermitValidatedEmailView(user, permit).send()
 
 
 @shared_task
