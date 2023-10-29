@@ -32,6 +32,7 @@ inspection_signed = Signal()
 permit_created = Signal()
 permit_released = Signal()
 permit_validated = Signal()
+permit_expired = Signal()
 
 
 @receiver(application_submitted)
