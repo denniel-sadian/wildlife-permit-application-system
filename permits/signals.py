@@ -4,7 +4,8 @@ from django.dispatch import receiver
 from django.dispatch import Signal
 
 from .models import (
-    PermitApplication
+    PermitApplication,
+    Permit
 )
 from .tasks import (
     notify_admins_about_submitted_application,
@@ -12,7 +13,8 @@ from .tasks import (
     notify_client_about_accepted_application,
     notify_client_about_returned_application,
     notify_client_and_officer_about_scheduled_inspection,
-    notify_admins_about_signed_inspection
+    notify_admins_about_signed_inspection,
+    notify_signatories_about_created_permit
 )
 
 
@@ -25,6 +27,7 @@ application_accepted = Signal()
 application_returned = Signal()
 inspection_scheduled = Signal()
 inspection_signed = Signal()
+permit_created = Signal()
 
 
 @receiver(application_submitted)
@@ -67,3 +70,10 @@ def receive_inspection_signed(sender, application: PermitApplication, **kwargs):
     logger.info('Inspection for %s has been signed.', application.no)
     notify_admins_about_signed_inspection.delay(
         application_id=application.id)
+
+
+@receiver(permit_created)
+def receive_permit_created(sender, permit: Permit, **kwargs):
+    logger.info('Permit %s has been created.', permit.permit_no)
+    notify_signatories_about_created_permit.delay(
+        permit_id=permit.id)
