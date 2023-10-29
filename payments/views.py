@@ -1,7 +1,10 @@
+import logging
+
 from django.views.generic import RedirectView
 from django.views.generic.detail import SingleObjectMixin, DetailView
 from django.conf import settings
 from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
 
 import paymongo
 
@@ -12,6 +15,9 @@ from users.models import Client
 
 from .models import PaymentOrder
 from .signals import online_payment_successful
+
+
+logger = logging.getLogger(__name__)
 
 
 class PayViaGcashRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, RedirectView):
@@ -95,3 +101,9 @@ class AuthorizationCompleteDetailView(CustomLoginRequiredMixin, DetailView):
             )
 
         return context
+
+
+@csrf_exempt
+def webhook(request):
+    if request.method == 'POST':
+        logger.info('PayMongo webhook data: %s', str(request.POST))
