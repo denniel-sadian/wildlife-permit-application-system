@@ -15,7 +15,8 @@ from .emails import (
     PreparedPaymentOrderEmailView,
     SignedPaymentOrderEmailView,
     ReleasedPaymentOrderEmailView,
-    PaidPaymentOrderEmailView
+    PaidPaymentOrderEmailView,
+    FailedPaymentOrderEmailView
 )
 
 
@@ -56,3 +57,9 @@ def notify_client_about_paid_payment_order(payment_order_id):
     users.append(payment_order.permit_application.client)
     for user in users:
         PaidPaymentOrderEmailView(user, payment_order).send()
+
+
+@shared_task
+def notify_client_about_failed_payment(payment_order_id):
+    payment_order = PaymentOrder.objects.get(id=payment_order_id)
+    FailedPaymentOrderEmailView(payment_order.client, payment_order).send()
