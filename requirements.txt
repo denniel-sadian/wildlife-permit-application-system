@@ -18,3 +18,4 @@ django-storages==1.14.2
 boto3==1.28.69
 celery==5.2.7
 redis==5.0.1
+paymongo-python==0.1.0
