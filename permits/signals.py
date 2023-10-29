@@ -10,7 +10,8 @@ from .tasks import (
     notify_admins_about_submitted_application,
     notify_admins_about_unsubmitted_application,
     notify_client_about_accepted_application,
-    notify_client_about_returned_application
+    notify_client_about_returned_application,
+    notify_client_and_officer_about_scheduled_inspection
 )
 
 
@@ -21,6 +22,7 @@ application_submitted = Signal()
 application_unsubmitted = Signal()
 application_accepted = Signal()
 application_returned = Signal()
+inspection_scheduled = Signal()
 
 
 @receiver(application_submitted)
@@ -48,4 +50,11 @@ def receive_application_accepted(sender, application: PermitApplication, **kwarg
 def receive_application_returned(sender, application: PermitApplication, **kwargs):
     logger.info('Permit application %s is returned.', application.no)
     notify_client_about_returned_application.delay(
+        application_id=application.id)
+
+
+@receiver(inspection_scheduled)
+def receive_inspection_scheduled(sender, application: PermitApplication, **kwargs):
+    logger.info('Inspection for %s has been scheduled.', application.no)
+    notify_client_and_officer_about_scheduled_inspection.delay(
         application_id=application.id)
