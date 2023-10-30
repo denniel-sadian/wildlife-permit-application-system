@@ -4,6 +4,7 @@ import base64
 import json
 
 from django.db.models.query import QuerySet
+from django.db.models import Q
 from django.forms.models import BaseModelForm
 from django.db import transaction
 from django.http import HttpResponse
@@ -15,6 +16,8 @@ from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.utils.http import urlencode
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 
 from users.views import CustomLoginRequiredMixin
 from users.models import Client, Validator
@@ -132,6 +135,14 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
                 prefix='requirement')
 
         context['needed_requirements'] = self.object.needed_requirements
+
+        content_type = ContentType.objects.get_for_model(PermitApplication)
+        context['logs'] = LogEntry.objects \
+            .filter(
+                content_type=content_type,
+                object_id=self.object.id) \
+            .exclude(Q(change_message='[]') | Q(change_message='')) \
+            .order_by('-action_time')
 
         return context
 
