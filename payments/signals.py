@@ -14,7 +14,8 @@ from .tasks import (
     notify_admins_about_signed_payment_order,
     notify_client_about_released_payment_order,
     notify_client_about_paid_payment_order,
-    notify_client_about_failed_payment
+    notify_client_about_failed_payment,
+    notify_client_about_refunded_payment
 )
 
 
@@ -27,6 +28,7 @@ payment_order_released = Signal()
 payment_order_paid = Signal()
 online_payment_successful = Signal()
 online_payment_failed = Signal()
+online_payment_refunded = Signal()
 
 
 @receiver(payment_order_prepared)
@@ -81,3 +83,17 @@ def receive_online_payment_failed(sender, payment_order: PaymentOrder, **kwargs)
     logger.info(
         'Payment order %s has been was not paid successfully online.', payment_order.no)
     notify_client_about_failed_payment.delay(payment_order_id=payment_order.id)
+
+
+@receiver(online_payment_refunded)
+def receive_online_payment_refunded(sender, payment_order: PaymentOrder, **kwargs):
+    logger.info('Payment order %s has been refunded.', payment_order.no)
+    with transaction.atomic():
+        payment_order.paid = False
+        payment_order.save()
+        if hasattr(payment_order, 'payment'):
+            payment_order.payment.delete()
+
+        transaction.on_commit(
+            lambda: notify_client_about_refunded_payment.delay(
+                payment_order_id=payment_order.id))
