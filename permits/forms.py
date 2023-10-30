@@ -19,7 +19,11 @@ from .models import (
     TransportEntry,
     CollectionEntry,
     WildlifeCollectorPermit,
-    PermittedToCollectAnimal
+    PermittedToCollectAnimal,
+    LocalTransportPermit,
+    WildlifeFarmPermit,
+    CertificateOfWildlifeRegistration,
+    GratuitousPermit
 )
 
 
@@ -110,6 +114,19 @@ class PermitApplicationForm(forms.ModelForm):
             if not has_needed_permits:
                 return forms.ValidationError(
                     "You currently don't have the needed permits WFP or WCP.")
+
+        subclasses = {
+            PermitType.LTP: LocalTransportPermit,
+            PermitType.WFP: WildlifeFarmPermit,
+            PermitType.WCP: WildlifeCollectorPermit,
+            PermitType.CWR: CertificateOfWildlifeRegistration,
+            PermitType.GP: GratuitousPermit
+        }
+        current_permit = subclasses[permit_type].objects.filter(
+            status=Status.RELEASED).last()
+        if current_permit:
+            return forms.ValidationError(
+                'You currently have a valid permit of this type.')
 
         in_progress_application = PermitApplication.objects.filter(
             client=client, permit_type=permit_type).exclude(
