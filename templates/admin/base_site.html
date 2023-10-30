@@ -1,6 +1,12 @@
 {% extends "admin/base.html" %}
 
+{% load static %}
+
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+<link rel="icon" type="image/png" href="{% static 'img/favicon.ico' %}">
+{% endblock %}
 
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Biodiversity Administration') }}</a></h1>
