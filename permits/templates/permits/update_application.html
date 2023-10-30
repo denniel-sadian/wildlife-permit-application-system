@@ -229,12 +229,35 @@
             {% for i in object.remarks.all %}
             <div class="w3-panel w3-pale-blue w3-round-large w3-border w3-border-blue">
                 <p>
+                    <span class="w3-small w3-text-gray">#{{ i.id }}</span>
+                    <br>
                     <strong class="w3-small w3-text-gray">{{ i.created_at }}</strong>
                     <br>
                     <span class="w3-large"><span class="w3-text-gray">{{ i.user }}:</span> {{ i.content }}</span>
                 </p>
             </div>
             {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if logs.count != 0 %}
+        <hr>
+        <h4>Activity Logs:</h4>
+        <div style="overflow-x:auto;">
+            <table class="w3-table w3-table-all w3-margin-bottom">
+                <tr>
+                    <th>Time</th>
+                    <th>Person</th>
+                    <th>Activity</th>
+                </tr>
+                {% for i in logs %}
+                <tr>
+                    <td>{{ i.action_time }}</td>
+                    <td>{% if i.user != user %}{{ i.user.name }}{% else %}Me{% endif %}</td>
+                    <td>{{ i.get_change_message }}</td>
+                </tr>
+                {% endfor %}
+            </table>
         </div>
         {% endif %}
 

@@ -75,6 +75,12 @@ class PermitCreatedEmailView(BasePermitEmailView):
     html_body_template_name = 'permits/emails/permit_created/body.html'
 
 
+class PermitSignedEmailView(BasePermitEmailView):
+    subject_template_name = 'permits/emails/permit_signed/subject.txt'
+    body_template_name = 'permits/emails/permit_signed/body.txt'
+    html_body_template_name = 'permits/emails/permit_signed/body.html'
+
+
 class PermitReleasedEmailView(BasePermitEmailView):
     subject_template_name = 'permits/emails/permit_released/subject.txt'
     body_template_name = 'permits/emails/permit_released/body.txt'

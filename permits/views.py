@@ -4,6 +4,7 @@ import base64
 import json
 
 from django.db.models.query import QuerySet
+from django.db.models import Q
 from django.forms.models import BaseModelForm
 from django.db import transaction
 from django.http import HttpResponse
@@ -15,6 +16,8 @@ from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.utils.http import urlencode
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 
 from users.views import CustomLoginRequiredMixin
 from users.models import Client, Validator
@@ -133,6 +136,14 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
 
         context['needed_requirements'] = self.object.needed_requirements
 
+        content_type = ContentType.objects.get_for_model(PermitApplication)
+        context['logs'] = LogEntry.objects \
+            .filter(
+                content_type=content_type,
+                object_id=self.object.id) \
+            .exclude(Q(change_message='[]') | Q(change_message='')) \
+            .order_by('-action_time')
+
         return context
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
@@ -221,7 +232,7 @@ class SubmitRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, RedirectVi
         permit_application.save()
 
         application_submitted.send(
-            sender=self.__class__, application=permit_application)
+            sender=self.request.user, application=permit_application)
 
         messages.success(
             self.request,
@@ -244,7 +255,7 @@ class UnsubmitRedirectView(SingleObjectMixin, RedirectView):
             permit_application.save()
 
             application_unsubmitted.send(
-                sender=self.__class__, application=permit_application)
+                sender=self.request.user, application=permit_application)
 
         return same_url
 
@@ -360,7 +371,7 @@ class ValidateRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, Redirect
             permit.save()
             params = '?'+urlencode({'validated': True})
 
-            permit_validated.send(sender=self.__class__, permit=permit)
+            permit_validated.send(sender=self.request.user, permit=permit)
 
         return reverse_lazy(
             'permit_detail',
