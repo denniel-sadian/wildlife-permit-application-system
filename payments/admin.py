@@ -73,7 +73,7 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                     request, 'Payment record has been released, and the client has been notified already.', level=messages.SUCCESS)
 
                 payment_order_released.send(
-                    sender=self.__class__, payment_order=obj)
+                    sender=request.user, payment_order=obj)
 
             else:
                 self.message_user(
@@ -88,13 +88,13 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
         if 'add_sign' in request.POST and obj.prepared_by_signature \
                 and obj.prepared_by_signature.person == request.user:
             payment_order_prepared.send(
-                sender=self.__class__, payment_order=obj)
+                sender=request.user, payment_order=obj)
 
         # Check if it's been signed by a signatory
         if 'add_sign' in request.POST and obj.approved_by_signature \
                 and obj.approved_by_signature.person == request.user:
             payment_order_signed.send(
-                sender=self.__class__, payment_order=obj)
+                sender=request.user, payment_order=obj)
 
         return response_change
 
@@ -125,7 +125,7 @@ class PaymentAdmin(admin.ModelAdmin):
         obj.payment_order.save()
         if obj.payment_order.paid:
             payment_order_paid.send(
-                sender=self.__class__, payment_order=obj.payment_order)
+                sender=request.user, payment_order=obj.payment_order)
 
         obj.save()
         return super().save_model(request, obj, form, change)
