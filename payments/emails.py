@@ -43,3 +43,9 @@ class FailedPaymentOrderEmailView(BasePaymentOrderEmailView):
     subject_template_name = 'payments/emails/paymentorder_failed/subject.txt'
     body_template_name = 'payments/emails/paymentorder_failed/body.txt'
     html_body_template_name = 'payments/emails/paymentorder_failed/body.html'
+
+
+class RefundedPaymentOrderEmailView(BasePaymentOrderEmailView):
+    subject_template_name = 'payments/emails/paymentorder_refunded/subject.txt'
+    body_template_name = 'payments/emails/paymentorder_refunded/body.txt'
+    html_body_template_name = 'payments/emails/paymentorder_refunded/body.html'
