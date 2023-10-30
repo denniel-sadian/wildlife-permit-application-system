@@ -221,7 +221,7 @@ class SubmitRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, RedirectVi
         permit_application.save()
 
         application_submitted.send(
-            sender=self.__class__, application=permit_application)
+            sender=self.request.user, application=permit_application)
 
         messages.success(
             self.request,
@@ -244,7 +244,7 @@ class UnsubmitRedirectView(SingleObjectMixin, RedirectView):
             permit_application.save()
 
             application_unsubmitted.send(
-                sender=self.__class__, application=permit_application)
+                sender=self.request.user, application=permit_application)
 
         return same_url
 
@@ -360,7 +360,7 @@ class ValidateRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, Redirect
             permit.save()
             params = '?'+urlencode({'validated': True})
 
-            permit_validated.send(sender=self.__class__, permit=permit)
+            permit_validated.send(sender=self.request.user, permit=permit)
 
         return reverse_lazy(
             'permit_detail',
