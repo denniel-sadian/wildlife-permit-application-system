@@ -16,7 +16,8 @@ from .emails import (
     SignedPaymentOrderEmailView,
     ReleasedPaymentOrderEmailView,
     PaidPaymentOrderEmailView,
-    FailedPaymentOrderEmailView
+    FailedPaymentOrderEmailView,
+    RefundedPaymentOrderEmailView
 )
 
 
@@ -63,3 +64,9 @@ def notify_client_about_paid_payment_order(payment_order_id):
 def notify_client_about_failed_payment(payment_order_id):
     payment_order = PaymentOrder.objects.get(id=payment_order_id)
     FailedPaymentOrderEmailView(payment_order.client, payment_order).send()
+
+
+@shared_task
+def notify_client_about_refunded_payment(payment_order_id):
+    payment_order = PaymentOrder.objects.get(id=payment_order_id)
+    RefundedPaymentOrderEmailView(payment_order.client, payment_order).send()
