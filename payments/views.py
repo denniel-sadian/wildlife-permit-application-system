@@ -16,7 +16,11 @@ from users.views import CustomLoginRequiredMixin
 from users.models import Client
 
 from .models import PaymentOrder
-from .signals import online_payment_successful, online_payment_failed
+from .signals import (
+    online_payment_successful,
+    online_payment_failed,
+    online_payment_refunded
+)
 
 
 logger = logging.getLogger(__name__)
@@ -130,5 +134,10 @@ def webhook(request):
                 payment_order=payment_order,
                 payment_intent=payment_intent
             )
+
+    elif event_type == 'payment.refunded':
+        if payment_order.paid:
+            online_payment_refunded.send(
+                sender=None, payment_order=payment_order)
 
     return Response({'message': 'Thanks.'})
