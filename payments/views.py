@@ -102,7 +102,7 @@ class AuthorizationCompleteDetailView(CustomLoginRequiredMixin, DetailView):
         if payment_intent.status == 'succeeded':
             online_payment_successful.send(
                 sender=self.request.user,
-                payment_order=self.object,
+                payment_order=self.get_object(self.get_queryset()),
                 payment_intent=payment_intent
             )
 
