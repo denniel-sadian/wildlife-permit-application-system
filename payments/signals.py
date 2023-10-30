@@ -142,7 +142,7 @@ def receive_online_payment_successful(sender, payment_order: PaymentOrder, payme
 
 @receiver(online_payment_failed)
 def receive_online_payment_failed(sender, payment_order: PaymentOrder, **kwargs):
-    message = f'Payment order {payment_order.no} has been was not paid successfully online.'
+    message = f'Payment order {payment_order.no} was not paid successfully online.'
     logger.info(message)
     notify_client_about_failed_payment.delay(payment_order_id=payment_order.id)
 
