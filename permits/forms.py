@@ -123,7 +123,7 @@ class PermitApplicationForm(forms.ModelForm):
             PermitType.GP: GratuitousPermit
         }
         current_permit = subclasses[permit_type].objects.filter(
-            status=Status.RELEASED).last()
+            client=client, status=Status.RELEASED).last()
         if current_permit:
             return forms.ValidationError(
                 'You currently have a valid permit of this type.')
