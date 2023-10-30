@@ -111,7 +111,7 @@ def webhook(request):
     logger.info('PayMongo webhook data: %s', str(request.data))
 
     extra_data = {
-        'payment_intent_id': request.data['data']['attributes']['data']['payment_intent_id']
+        'payment_intent_id': request.data['data']['attributes']['data']['attributes']['payment_intent_id']
     }
     event_type = request.data['data']['attributes']['type']
     payment_order = PaymentOrder.objects.filter(
