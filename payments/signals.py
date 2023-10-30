@@ -115,7 +115,7 @@ def receive_online_payment_successful(sender, payment_order: PaymentOrder, payme
     message = f'Payment order {payment_order.no} has been paid online.'
     logger.info(message)
     with transaction.atomic():
-        payment = Payment.objects.create(
+        Payment.objects.create(
             receipt_no=payment_order.no,
             payment_order=payment_order,
             json_response=vars(payment_intent),
