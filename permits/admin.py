@@ -93,7 +93,7 @@ class PermitBaseAdmin(AdminMixin, admin.ModelAdmin):
                 self.message_user(
                     request, 'The permit has been released.', level=messages.SUCCESS)
 
-                permit_released.send(sender=self.__class__, permit=obj)
+                permit_released.send(sender=request.user, permit=obj)
 
             else:
                 self.message_user(
@@ -233,7 +233,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                 form.save()
 
                 application_returned.send(
-                    self.__class__, application=form.instance)
+                    request.user, application=form.instance)
 
             instance.save()
         formset.save_m2m()
@@ -247,7 +247,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                     request, 'The application has been accepted.', level=messages.SUCCESS)
 
                 application_accepted.send(
-                    sender=self.__class__, application=obj)
+                    sender=request.user, application=obj)
 
             else:
                 self.message_user(
@@ -349,7 +349,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
 
                         transaction.on_commit(
                             lambda: permit_created.send(
-                                sender=self.__class__, permit=ltp))
+                                sender=request.user, permit=ltp))
 
                     return HttpResponseRedirect(ltp.admin_url)
 
@@ -460,7 +460,7 @@ class InspectionAdmin(AdminMixin, admin.ModelAdmin):
         # Check signature has been attached already
         if 'add_sign' in request.POST and obj.signatures.first() is not None:
             inspection_signed.send(
-                sender=self.__class__, application=obj.permit_application)
+                sender=request.user, application=obj.permit_application)
 
         return response_change
 
@@ -479,6 +479,6 @@ class InspectionAdmin(AdminMixin, admin.ModelAdmin):
             if {'inspecting_officer', 'scheduled_date'}.issubset(changed_fields) \
                     and obj.inspecting_officer is not None and obj.scheduled_date is not None:
                 inspection_scheduled.send(
-                    sender=self.__class__, application=obj.permit_application)
+                    sender=request.user, application=obj.permit_application)
 
         obj.save()
