@@ -42,7 +42,8 @@ permit_expired = Signal()
 
 @receiver(application_submitted)
 def receive_application_submitted(sender, application: PermitApplication, **kwargs):
-    logger.info('Permit application %s has been submitted.', application.no)
+    message = f'Permit application {application.no} has been submitted.'
+    logger.info(message)
     notify_admins_about_submitted_application.delay(
         application_id=application.id)
     if isinstance(sender, User):
@@ -53,13 +54,14 @@ def receive_application_submitted(sender, application: PermitApplication, **kwar
             object_id=application.id,
             object_repr=_(str(application)),
             action_flag=CHANGE,
-            change_message=_('Permit application was submitted.')
+            change_message=_(message)
         )
 
 
 @receiver(application_unsubmitted)
 def receive_application_unsubmitted(sender, application: PermitApplication, **kwargs):
-    logger.info('Permit application %s is unsubmitted.', application.no)
+    message = f'Permit application {application.no} is unsubmitted.'
+    logger.info(message)
     notify_admins_about_unsubmitted_application.delay(
         application_id=application.id)
     if isinstance(sender, User):
@@ -70,13 +72,14 @@ def receive_application_unsubmitted(sender, application: PermitApplication, **kw
             object_id=application.id,
             object_repr=_(str(application)),
             action_flag=CHANGE,
-            change_message=_('Permit application was unsubmitted.')
+            change_message=_(message)
         )
 
 
 @receiver(application_accepted)
 def receive_application_accepted(sender, application: PermitApplication, **kwargs):
-    logger.info('Permit application %s is accepted.', application.no)
+    message = f'Permit application {application.no} is accepted.'
+    logger.info(message)
     notify_client_about_accepted_application.delay(
         application_id=application.id)
     if isinstance(sender, User):
@@ -87,13 +90,14 @@ def receive_application_accepted(sender, application: PermitApplication, **kwarg
             object_id=application.id,
             object_repr=_(str(application)),
             action_flag=CHANGE,
-            change_message=_('Permit application was accepted.')
+            change_message=_(message)
         )
 
 
 @receiver(application_returned)
 def receive_application_returned(sender, application: PermitApplication, **kwargs):
-    logger.info('Permit application %s is returned.', application.no)
+    message = f'Permit application {application.no} is returned.'
+    logger.info(message)
     notify_client_about_returned_application.delay(
         application_id=application.id)
     if isinstance(sender, User):
@@ -104,13 +108,14 @@ def receive_application_returned(sender, application: PermitApplication, **kwarg
             object_id=application.id,
             object_repr=_(str(application)),
             action_flag=CHANGE,
-            change_message=_('Permit application was returned.')
+            change_message=_(message)
         )
 
 
 @receiver(inspection_scheduled)
 def receive_inspection_scheduled(sender, application: PermitApplication, **kwargs):
-    logger.info('Inspection for %s has been scheduled.', application.no)
+    message = f'Inspection for {application.no} has been scheduled on {application.inspection.scheduled_date}'
+    logger.info(message)
     notify_client_and_officer_about_scheduled_inspection.delay(
         application_id=application.id)
     if isinstance(sender, User):
@@ -121,14 +126,14 @@ def receive_inspection_scheduled(sender, application: PermitApplication, **kwarg
             object_id=application.id,
             object_repr=_(str(application)),
             action_flag=CHANGE,
-            change_message=_(
-                f'Inspection was scheduled to be on {application.inspection.scheduled_date}')
+            change_message=_(message)
         )
 
 
 @receiver(inspection_signed)
 def receive_inspection_signed(sender, application: PermitApplication, **kwargs):
-    logger.info('Inspection for %s has been signed.', application.no)
+    message = f'Inspection for {application.no} has been signed by {application.inspection.inspecting_officer.name}.'
+    logger.info(message)
     notify_admins_about_signed_inspection.delay(
         application_id=application.id)
     if isinstance(sender, User):
@@ -139,14 +144,14 @@ def receive_inspection_signed(sender, application: PermitApplication, **kwargs):
             object_id=application.id,
             object_repr=_(str(application)),
             action_flag=CHANGE,
-            change_message=_(
-                f'Inspection was signed by {application.inspection.inspecting_officer.name}')
+            change_message=_(message)
         )
 
 
 @receiver(permit_created)
 def receive_permit_created(sender, permit: Permit, **kwargs):
-    logger.info('Permit %s has been created.', permit.permit_no)
+    message = f'Permit {permit.permit_no} has been initially created.'
+    logger.info(message)
     notify_signatories_about_created_permit.delay(
         permit_id=permit.id)
     if isinstance(sender, User):
@@ -158,13 +163,14 @@ def receive_permit_created(sender, permit: Permit, **kwargs):
             object_id=application.id,
             object_repr=_(str(application)),
             action_flag=CHANGE,
-            change_message=_('Permit was initially created.')
+            change_message=_(message)
         )
 
 
 @receiver(permit_released)
 def receive_permit_released(sender, permit: Permit, **kwargs):
-    logger.info('Permit %s has been released.', permit.permit_no)
+    message = f'Permit {permit.permit_no} has been released.'
+    logger.info(message)
     notify_client_and_admins_about_released_permit.delay(
         permit_id=permit.id)
     if isinstance(sender, User):
@@ -176,13 +182,14 @@ def receive_permit_released(sender, permit: Permit, **kwargs):
             object_id=application.id,
             object_repr=_(str(application)),
             action_flag=CHANGE,
-            change_message=_('Permit was released.')
+            change_message=_(message)
         )
 
 
 @receiver(permit_validated)
 def receive_permit_validated(sender, permit: Permit, **kwargs):
-    logger.info('Permit %s has been validated.', permit.permit_no)
+    message = f'Permit {permit.permit_no} has been validated.'
+    logger.info(message)
     notify_client_and_admins_about_validated_permit.delay(
         permit_id=permit.id)
     if isinstance(sender, User):
@@ -194,5 +201,5 @@ def receive_permit_validated(sender, permit: Permit, **kwargs):
             object_id=application.id,
             object_repr=_(str(application)),
             action_flag=CHANGE,
-            change_message=_('Permit was released.')
+            change_message=_(message)
         )
