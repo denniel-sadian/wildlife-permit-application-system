@@ -26,6 +26,7 @@ from .emails import (
     AssignedScheduledInspectionEmailView,
     SignedInspectionEmailView,
     PermitCreatedEmailView,
+    PermitSignedEmailView,
     PermitReleasedEmailView,
     PermitValidatedEmailView,
     PermitExpiredEmailView
@@ -112,6 +113,14 @@ def notify_signatories_about_created_permit(permit_id):
     signatories = get_permit_signatories_who_can_receive_emails()
     for signatory in signatories:
         PermitCreatedEmailView(signatory, permit).send()
+
+
+@shared_task
+def notify_admins_about_signed_permit(permit_id):
+    permit: Permit = Permit.objects.get(id=permit_id).subclass
+    admins = get_admins_who_can_receive_emails()
+    for user in admins:
+        PermitSignedEmailView(user, permit).send()
 
 
 @shared_task
