@@ -40,6 +40,7 @@ from .signals import (
     inspection_scheduled,
     inspection_signed,
     permit_created,
+    permit_signed,
     permit_released
 )
 
@@ -100,7 +101,14 @@ class PermitBaseAdmin(AdminMixin, admin.ModelAdmin):
                     request, 'The permit cannot be released because of the current status.', level=messages.ERROR)
             return HttpResponseRedirect('.')
 
-        return super().response_change(request, obj)
+        response_change = super().response_change(request, obj)
+
+        # Check signature has been attached already
+        if 'add_sign' in request.POST and obj.signatures.first() is not None:
+            print('gaga')
+            permit_signed.send(sender=request.user, permit=obj)
+
+        return response_change
 
     def save_model(self, request: Any, obj: Permit, form: Any, change: Any) -> None:
         super().save_model(request, obj, form, change)

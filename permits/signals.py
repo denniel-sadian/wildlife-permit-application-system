@@ -20,6 +20,7 @@ from .tasks import (
     notify_client_and_officer_about_scheduled_inspection,
     notify_admins_about_signed_inspection,
     notify_signatories_about_created_permit,
+    notify_admins_about_signed_permit,
     notify_client_and_admins_about_released_permit,
     notify_client_and_admins_about_validated_permit
 )
@@ -35,6 +36,7 @@ application_returned = Signal()
 inspection_scheduled = Signal()
 inspection_signed = Signal()
 permit_created = Signal()
+permit_signed = Signal()
 permit_released = Signal()
 permit_validated = Signal()
 permit_expired = Signal()
@@ -153,6 +155,25 @@ def receive_permit_created(sender, permit: Permit, **kwargs):
     message = f'Permit {permit.permit_no} has been initially created.'
     logger.info(message)
     notify_signatories_about_created_permit.delay(
+        permit_id=permit.id)
+    if isinstance(sender, User):
+        content_type = ContentType.objects.get_for_model(PermitApplication)
+        application = PermitApplication.objects.filter(permit=permit).first()
+        LogEntry.objects.log_action(
+            user_id=sender.id,
+            content_type_id=content_type.id,
+            object_id=application.id,
+            object_repr=_(str(application)),
+            action_flag=CHANGE,
+            change_message=_(message)
+        )
+
+
+@receiver(permit_signed)
+def receive_permit_signed(sender, permit: Permit, **kwargs):
+    message = f'Permit {permit.permit_no} has been signed by {permit.signatures.first().person.name}.'
+    logger.info(message)
+    notify_admins_about_signed_permit.delay(
         permit_id=permit.id)
     if isinstance(sender, User):
         content_type = ContentType.objects.get_for_model(PermitApplication)
