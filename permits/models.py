@@ -73,7 +73,7 @@ class Permit(ModelMixin, models.Model):
     client = models.ForeignKey(
         'users.Client', on_delete=models.CASCADE, null=True, related_name='permits')
     uploaded_file = models.FileField(
-        upload_to='uploads/', null=True, blank=True, validators=[validate_file_extension])
+        upload_to='uploads/', null=True, validators=[validate_file_extension])
     valid_until = models.DateField(null=True, blank=True)
     or_no = models.CharField('Order No.', max_length=100, null=True)
     or_no_amount = models.DecimalField(
