@@ -18,6 +18,7 @@ from django.contrib import messages
 from django.utils.http import urlencode
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 
 from users.views import CustomLoginRequiredMixin
 from users.models import Client, Validator
@@ -358,7 +359,7 @@ class ValidateRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, Redirect
             data = json.loads(base64.urlsafe_b64decode(
                 self.request.GET['data']).decode('utf-8'))
             return Permit.objects.get(permit_no=data['permit_no'], or_no=data['or_no'])
-        raise Permit.DoesNotExist('You are not a validator.')
+        raise PermissionDenied('You are not a validator.')
 
     def get_redirect_url(self, *args: Any, **kwargs: Any):
         permit: Permit = self.get_object()
