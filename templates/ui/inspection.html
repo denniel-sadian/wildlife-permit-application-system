@@ -15,7 +15,7 @@
 
     <p style="text-indent:50px;">
         This is to ceritfy that on this date, the undersigned has undertaken the inspection of wildlife
-        in the <span class="underlined">DENR-PENRO Marinduque</span> of <span class="underlined">{{ inspection.permit_application.client.name }}</span>
+        in the <span class="underlined">DENR-PENRO Marinduque</span> of <span class="underlined">{{ inspection.client.name }}</span>
         and has found the following wildlife.
     </p>
 
@@ -24,7 +24,7 @@
             <th>Kind of Species</th>
             <th>Quantity</th>
         </tr>
-        {% for i in inspection.permit_application.requested_species_to_transport.all %}
+        {% for i in inspection.transports.all %}
         <tr>
             <td>{{ i.sub_species }}</td>
             <td>{{ i.quantity }}</td>
@@ -32,19 +32,19 @@
         {% endfor %}
         <tr>
             <th>Total</th>
-            <td>{{ inspection.permit_application.total_transport_quantity }}</td>
+            <td>{{ inspection.total_transport_quantity }}</td>
         </tr>
     </table>
 
     <p style="text-indent:50px;">
-        The inspection was made in the presence of <span class="underlined">{{ inspection.permit_application.client.name }}</span>
+        The inspection was made in the presence of <span class="underlined">{{ inspection.client.name }}</span>
         at the above address.
     </p>
 
     <h2 style="font-weight:bold; text-align:center;">CERTIFICATE OF CONCURRENCE</h2>
 
     <p style="text-indent:50px;">
-        This is to certify that the inspection report of <span class="underlined">{{ inspection.permit_application.client.name }}</span>
+        This is to certify that the inspection report of <span class="underlined">{{ inspection.client.name }}</span>
         the PAWD, Region <span class="underlined">IV-MIMAROPA</span> is/are true and correct and has been done this
         <span class="underlined">{{ inspection.day }}</span> day of <span class="underlined">{{ inspection.month_and_year }}</span>.
     </p>

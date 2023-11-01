@@ -51,8 +51,14 @@
     existing wildlife laws, rules and regulations.
 </p>
 <p style="text-indent: 50px;">
-    Local transport fee in the amount of <span class="underlined">₱ {{ permit.payment_order.payment.amount }}</span> was paid under the DENR PENRO Official Receipt No.
-    <span class="underlined">{{ permit.payment_order.payment.receipt_no }}</span> dated <span class="underlined">{{ permit.payment_order.released_at.date }}</span>.
+    Local transport fee in the amount of <span class="underlined">₱ {{ permit.amount }}</span> was paid under the DENR PENRO Official Receipt No.
+    <span class="underlined">{{ permit.receipt_no }}</span> dated
+    {% if permit.payment_order %}
+    <span class="underlined">{{ permit.payment_order.released_at.date }}</span>
+    {% else %}
+    <span class="underlined">{{ permit.created_at }}</span>
+    {% endif %}
+    .
 </p>
 <p style="text-indent: 50px;">This is to certifyfurther that this statement wasgiven me voluntarily and with
     neither coercion nor promise of reward from the personnelofthe Department of Environment and Natural
@@ -62,7 +68,7 @@
 
 <hr>
 
-{% include 'ui/inspection.html' with inspection=permit.application.inspection %}
+{% include 'ui/inspection.html' with inspection=permit.inspection %}
 
 {% if permit.wfp.uploaded_file %}
 <embed src="{{ permit.wfp.uploaded_file.url }}" class="added-file"/>
