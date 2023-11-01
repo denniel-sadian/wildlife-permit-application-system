@@ -134,6 +134,8 @@ def receive_inspection_scheduled(sender, application: PermitApplication, **kwarg
 
 @receiver(inspection_signed)
 def receive_inspection_signed(sender, application: PermitApplication, **kwargs):
+    if application is None:
+        return
     message = f'Inspection for {application.no} has been signed by {application.inspection.inspecting_officer.name}.'
     logger.info(message)
     notify_admins_about_signed_inspection.delay(
@@ -159,14 +161,15 @@ def receive_permit_created(sender, permit: Permit, **kwargs):
     if isinstance(sender, User):
         content_type = ContentType.objects.get_for_model(PermitApplication)
         application = PermitApplication.objects.filter(permit=permit).first()
-        LogEntry.objects.log_action(
-            user_id=sender.id,
-            content_type_id=content_type.id,
-            object_id=application.id,
-            object_repr=_(str(application)),
-            action_flag=CHANGE,
-            change_message=_(message)
-        )
+        if application:
+            LogEntry.objects.log_action(
+                user_id=sender.id,
+                content_type_id=content_type.id,
+                object_id=application.id,
+                object_repr=_(str(application)),
+                action_flag=CHANGE,
+                change_message=_(message)
+            )
 
 
 @receiver(permit_signed)
@@ -178,14 +181,15 @@ def receive_permit_signed(sender, permit: Permit, **kwargs):
     if isinstance(sender, User):
         content_type = ContentType.objects.get_for_model(PermitApplication)
         application = PermitApplication.objects.filter(permit=permit).first()
-        LogEntry.objects.log_action(
-            user_id=sender.id,
-            content_type_id=content_type.id,
-            object_id=application.id,
-            object_repr=_(str(application)),
-            action_flag=CHANGE,
-            change_message=_(message)
-        )
+        if application:
+            LogEntry.objects.log_action(
+                user_id=sender.id,
+                content_type_id=content_type.id,
+                object_id=application.id,
+                object_repr=_(str(application)),
+                action_flag=CHANGE,
+                change_message=_(message)
+            )
 
 
 @receiver(permit_released)
@@ -197,14 +201,15 @@ def receive_permit_released(sender, permit: Permit, **kwargs):
     if isinstance(sender, User):
         content_type = ContentType.objects.get_for_model(PermitApplication)
         application = PermitApplication.objects.filter(permit=permit).first()
-        LogEntry.objects.log_action(
-            user_id=sender.id,
-            content_type_id=content_type.id,
-            object_id=application.id,
-            object_repr=_(str(application)),
-            action_flag=CHANGE,
-            change_message=_(message)
-        )
+        if application:
+            LogEntry.objects.log_action(
+                user_id=sender.id,
+                content_type_id=content_type.id,
+                object_id=application.id,
+                object_repr=_(str(application)),
+                action_flag=CHANGE,
+                change_message=_(message)
+            )
 
 
 @receiver(permit_validated)
@@ -216,11 +221,12 @@ def receive_permit_validated(sender, permit: Permit, **kwargs):
     if isinstance(sender, User):
         content_type = ContentType.objects.get_for_model(PermitApplication)
         application = PermitApplication.objects.filter(permit=permit).first()
-        LogEntry.objects.log_action(
-            user_id=sender.id,
-            content_type_id=content_type.id,
-            object_id=application.id,
-            object_repr=_(str(application)),
-            action_flag=CHANGE,
-            change_message=_(message)
-        )
+        if application:
+            LogEntry.objects.log_action(
+                user_id=sender.id,
+                content_type_id=content_type.id,
+                object_id=application.id,
+                object_repr=_(str(application)),
+                action_flag=CHANGE,
+                change_message=_(message)
+            )
