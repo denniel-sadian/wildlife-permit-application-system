@@ -115,13 +115,17 @@ def receive_online_payment_successful(sender, payment_order: PaymentOrder, payme
     message = f'Payment order {payment_order.no} has been paid online.'
     logger.info(message)
     with transaction.atomic():
-        Payment.objects.create(
-            receipt_no=payment_order.no,
-            payment_order=payment_order,
-            json_response=vars(payment_intent),
-            amount=payment_order.total,
-            payment_type=PaymentType.ONLINE
-        )
+        if not hasattr(payment_order, 'payment'):
+            Payment.objects.create(
+                receipt_no=payment_order.no,
+                payment_order=payment_order,
+                json_response=vars(payment_intent),
+                amount=payment_order.total,
+                payment_type=PaymentType.ONLINE
+            )
+        else:
+            payment_order.payment.payment_type = PaymentType.ONLINE
+            payment_order.payment.save()
         payment_order.paid = True
         payment_order.save()
 
