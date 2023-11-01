@@ -121,12 +121,26 @@ class PermitBaseAdmin(AdminMixin, admin.ModelAdmin):
 
 @admin.register(LocalTransportPermit)
 class LocalTransportPermitAdmin(PermitBaseAdmin):
-    fields = ('permit_no', 'status', 'client', 'wfp', 'wcp',
-              'transport_date', 'transport_location', 'payment_order',
-              'inspection', 'issued_date', 'valid_until', 'uploaded_file')
     autocomplete_fields = ('client', 'wfp', 'wcp', 'payment_order',
                            'inspection')
     inlines = (TransportEntryInline,)
+
+    def get_fieldsets(self, request: HttpRequest, obj: Any | None = ...):
+        fields = ['permit_no', 'status', 'client', 'wfp', 'wcp',
+                  'transport_date', 'transport_location',
+                  'inspection', 'issued_date', 'valid_until']
+
+        if obj is not None and obj.payment_order is not None:
+            fields += ['payment_order']
+        else:
+            fields += ['or_no', 'or_no_amount']
+
+        fieldsets = [
+            ('Permit Data', {
+                'fields': fields,
+            })
+        ]
+        return fieldsets
 
 
 @admin.register(WildlifeFarmPermit)
@@ -457,6 +471,7 @@ class RequirementAdmin(admin.ModelAdmin):
 
 @admin.register(Inspection)
 class InspectionAdmin(AdminMixin, admin.ModelAdmin):
+    fields = ('no', 'scheduled_date', 'inspecting_officer')
     list_display = ('no', 'scheduled_date')
     search_fields = ('no',)
     autocomplete_fields = ('permit_application', 'inspecting_officer')
