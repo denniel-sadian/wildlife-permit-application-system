@@ -26,7 +26,8 @@ class BaseUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'first_name', 'last_name', 'title', 'gender'),
+            'fields': ('username', 'email', 'first_name', 'last_name', 'title', 'gender',
+                       'phone_number'),
         }),
     )
     add_form = CustomUserCreationForm
@@ -78,7 +79,8 @@ class ClientAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'first_name', 'last_name', 'gender'),
+            'fields': ('username', 'email', 'first_name', 'last_name', 'gender'
+                       'phone_number'),
         }),
     )
     list_display = ('username', 'email', 'first_name',
