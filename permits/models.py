@@ -15,7 +15,7 @@ from django.core.validators import MinValueValidator
 from model_utils.managers import InheritanceManager
 
 from users.mixins import ModelMixin
-from users.mixins import validate_file_extension
+from users.mixins import validate_file_extension, validate_amount
 from animals.models import SubSpecies
 
 
@@ -76,6 +76,9 @@ class Permit(ModelMixin, models.Model):
         upload_to='uploads/', null=True, blank=True, validators=[validate_file_extension])
     valid_until = models.DateField(null=True, blank=True)
     or_no = models.CharField('Order No.', max_length=100, null=True)
+    or_no_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, validators=[validate_amount],
+        null=True)
     created_at = models.DateField(auto_now_add=True)
     issued_date = models.DateField(null=True)
     payment_order = models.ForeignKey(
@@ -206,6 +209,20 @@ class LocalTransportPermit(Permit):
     def total_transport_quantity(self):
         return self.species_to_transport.aggregate(
             total=Coalesce(Sum(F('quantity')), Value(0, models.IntegerField())))['total']
+
+    @property
+    def amount(self):
+        if self.payment_order:
+            return self.payment_order.payment.amount
+        else:
+            return self.or_no_amount
+
+    @property
+    def receipt_no(self):
+        if self.payment_order:
+            return self.payment_order.payment.receipt_no
+        else:
+            return self.or_no
 
 
 class PermitApplication(ModelMixin, models.Model):
@@ -360,7 +377,8 @@ class Remarks(models.Model):
 class Inspection(ModelMixin, models.Model):
     no = models.CharField(max_length=255, unique=True)
     permit_application = models.OneToOneField(
-        PermitApplication, on_delete=models.CASCADE)
+        PermitApplication, on_delete=models.CASCADE,
+        null=True)
     scheduled_date = models.DateField(null=True)
     inspecting_officer = models.ForeignKey(
         'users.Admin', on_delete=models.CASCADE, null=True)
@@ -380,6 +398,35 @@ class Inspection(ModelMixin, models.Model):
         if self.scheduled_date:
             month = self.scheduled_date.strftime('%B')
             return f'{month} {self.scheduled_date.year}'
+
+    @property
+    def client(self):
+        if self.permit_application is not None:
+            return self.permit_application.client
+        else:
+            permit = Permit.objects.filter(inspection=self).first()
+            if permit:
+                return permit.client
+
+    @property
+    def transports(self):
+        if self.permit_application is not None:
+            return self.permit_application.requested_species_to_transport
+        else:
+            permit = Permit.objects.filter(inspection=self).first()
+            if permit:
+                return permit.subclass.species_to_transport
+
+    @property
+    def total_transport_quantity(self):
+        if self.permit_application is not None:
+            return self.requested_species_to_transport.aggregate(
+                total=Coalesce(Sum(F('quantity')), Value(0, models.IntegerField())))['total']
+        else:
+            permit = Permit.objects.filter(inspection=self).first()
+            if permit:
+                return permit.subclass.species_to_transport.aggregate(
+                    total=Coalesce(Sum(F('quantity')), Value(0, models.IntegerField())))['total']
 
     def __str__(self):
         return str(self.no)
