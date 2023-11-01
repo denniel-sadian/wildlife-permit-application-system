@@ -114,30 +114,34 @@ class AuthorizationCompleteDetailView(CustomLoginRequiredMixin, DetailView):
 def webhook(request):
     logger.info('PayMongo webhook data: %s', str(request.data))
 
-    extra_data = {
-        'payment_intent_id': request.data['data']['attributes']['data']['attributes']['payment_intent_id']
-    }
-    event_type = request.data['data']['attributes']['type']
-    payment_order = PaymentOrder.objects.filter(
-        extra_data__contains=extra_data).first()
+    try:
+        extra_data = {
+            'payment_intent_id': request.data['data']['attributes']['data']['attributes']['payment_intent_id']
+        }
+        event_type = request.data['data']['attributes']['type']
+        payment_order = PaymentOrder.objects.filter(
+            extra_data__contains=extra_data).first()
 
-    if event_type == 'payment.failed':
-        online_payment_failed.send(
-            sender=None, payment_order=payment_order)
-
-    elif event_type == 'payment.paid':
-        if not payment_order.paid:
-            payment_intent = paymongo.PaymentIntent.retrieve(
-                payment_order.extra_data['payment_intent_id'])
-            online_payment_successful.send(
-                sender=None,
-                payment_order=payment_order,
-                payment_intent=payment_intent
-            )
-
-    elif event_type == 'payment.refunded':
-        if payment_order.paid:
-            online_payment_refunded.send(
+        if event_type == 'payment.failed':
+            online_payment_failed.send(
                 sender=None, payment_order=payment_order)
+
+        elif event_type == 'payment.paid':
+            if not payment_order.paid:
+                payment_intent = paymongo.PaymentIntent.retrieve(
+                    payment_order.extra_data['payment_intent_id'])
+                online_payment_successful.send(
+                    sender=None,
+                    payment_order=payment_order,
+                    payment_intent=payment_intent
+                )
+
+        elif event_type == 'payment.refunded':
+            if payment_order.paid:
+                online_payment_refunded.send(
+                    sender=None, payment_order=payment_order)
+
+    except (AttributeError, KeyError) as e:
+        logger.error(e.message)
 
     return Response({'message': 'Thanks.'})
