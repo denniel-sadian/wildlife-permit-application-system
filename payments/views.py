@@ -142,6 +142,6 @@ def webhook(request):
                     sender=None, payment_order=payment_order)
 
     except (AttributeError, KeyError) as e:
-        logger.error(e.message)
+        logging.error(f'Caught an exception: {e}')
 
     return Response({'message': 'Thanks.'})
