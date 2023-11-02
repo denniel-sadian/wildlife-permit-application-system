@@ -420,7 +420,7 @@ class Inspection(ModelMixin, models.Model):
     @property
     def total_transport_quantity(self):
         if self.permit_application is not None:
-            return self.requested_species_to_transport.aggregate(
+            return self.permit_application.requested_species_to_transport.aggregate(
                 total=Coalesce(Sum(F('quantity')), Value(0, models.IntegerField())))['total']
         else:
             permit = Permit.objects.filter(inspection=self).first()
