@@ -64,7 +64,7 @@
                     {% endif %}
 
                     {% if user.is_authenticated %}
-                    <a href="{% url 'transport_stats' %}" class="{% if tab == 'transport_stats' %}current-tab{% endif %}"><i class="fa fa-user-circle-o"></i>&nbsp;Transport Chart</a>
+                    <a href="{% url 'transport_stats' %}" class="{% if tab == 'transport_stats' %}current-tab{% endif %}"><i class="fa fa-bar-chart"></i>&nbsp;Transport Chart</a>
                     <a href="{% url 'profile' %}" class="{% if tab == 'profile' %}current-tab{% endif %}"><b><i class="fa fa-user-circle-o"></i>&nbsp;{{ user.name }}</b></a>
                     {% endif %}
                 </div>
