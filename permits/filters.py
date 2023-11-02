@@ -28,7 +28,9 @@ class PermitApplicationFilter(django_filters.FilterSet):
     def qs(self):
         qs = super().qs
         user = getattr(self.request, 'user', None)
-        return qs.filter(client=user.subclass)
+        if user and isinstance(user.subclass, Client):
+            return qs.filter(client=user.subclass)
+        return qs.none()
 
     def search_filter(self, queryset, name, value):
         return queryset.filter(**{
@@ -63,7 +65,7 @@ class PermitFilter(django_filters.FilterSet):
     def qs(self):
         qs = super().qs
         user = getattr(self.request, 'user', None)
-        if isinstance(user.subclass, Client):
+        if user and isinstance(user.subclass, Client):
             return qs.filter(client=user.subclass)
         return qs
 
