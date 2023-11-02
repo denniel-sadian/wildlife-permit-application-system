@@ -5,6 +5,6 @@ from . import views
 
 urlpatterns = [
     # Autocomplete
-    path('subspecies-autocomplete/', views.SubSpeciesAutocompleteView.as_view(),
-         name='subspecies-autocomplete'),
+    path('species/transport_stats/', views.TransportStatsView.as_view(),
+         name='transport_stats'),
 ]

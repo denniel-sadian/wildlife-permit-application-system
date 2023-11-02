@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Transport Chart{% endblock %}
+
+{% block links %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block styles %}
+<style>
+    main .cont {
+        margin: 100px auto;
+        padding: 0px 20px;
+        width: 100%;
+        max-width: 1100px;
+    }
+
+    #transport-chart {
+        width: 100%;
+        height: auto;
+    }
+
+    form {
+        width: 100%;
+        max-width: 100px;
+        margin: 0px auto;
+    }
+
+    form input {
+        width: 100%;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="cont">
+        <h2 style="text-align:center;">Transport Chart</h2>
+        <form action="" method="GET">
+            <input type="number" id="yearFilter" value="{{year}}" name="year" min="1900" max="2099" step="1">
+        </form>
+
+        <div>
+          <canvas id="transport-chart"></canvas>
+        </div>
+
+        <script>
+            $(function() {
+              const ctx = document.getElementById('transport-chart');
+
+              stats = JSON.parse(atob('{{ data }}'));
+
+              datasets = [];
+              for (const key in stats) {
+                datasets.push({
+                    label: key,
+                    data: stats[key],
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                });
+              }
+
+              new Chart(ctx, {
+                type: 'line',
+                data: {
+                  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                  datasets: datasets
+                },
+                options: {
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    }
+                  }
+                }
+              });
+            });
+        </script>
+    </div>
+</main>
+{% endblock %}
