@@ -15,7 +15,11 @@ from django.core.validators import MinValueValidator
 from model_utils.managers import InheritanceManager
 
 from users.mixins import ModelMixin
-from users.mixins import validate_file_extension, validate_amount
+from users.mixins import (
+    validate_file_extension,
+    validate_amount,
+    validate_file_size
+)
 from animals.models import SubSpecies
 
 
@@ -73,7 +77,8 @@ class Permit(ModelMixin, models.Model):
     client = models.ForeignKey(
         'users.Client', on_delete=models.CASCADE, null=True, related_name='permits')
     uploaded_file = models.FileField(
-        upload_to='uploads/', null=True, validators=[validate_file_extension])
+        upload_to='uploads/', null=True,
+        validators=[validate_file_extension, validate_file_size])
     valid_until = models.DateField(null=True, blank=True)
     or_no = models.CharField('Order No.', max_length=100, null=True)
     or_no_amount = models.DecimalField(
@@ -356,7 +361,8 @@ class UploadedRequirement(models.Model):
     requirement = models.ForeignKey(
         Requirement, on_delete=models.CASCADE)
     uploaded_file = models.FileField(
-        upload_to='requirements/', null=False, blank=False)
+        upload_to='requirements/', null=False, blank=False,
+        validators=[validate_file_size])
 
     class Meta:
         unique_together = ('permit_application', 'requirement')
