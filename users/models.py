@@ -23,7 +23,7 @@ class Gender(models.TextChoices):
 class ObjectManager(UserManager, InheritanceManager):
     """Manager for User model."""
 
-    def create_superuser(self, username, password, **extra_fields):
+    def create_superuser(self, username, email, password, **extra_fields):
         """Create superuser; called by `createsuperuser` management command."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
