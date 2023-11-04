@@ -4,7 +4,10 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
-from users.mixins import ModelMixin, validate_file_extension, validate_amount
+from users.mixins import (
+    ModelMixin, validate_file_extension, validate_amount,
+    validate_file_size
+)
 from permits.models import (
     PermitApplication
 )
@@ -78,7 +81,7 @@ class Payment(ModelMixin, models.Model):
         PaymentOrder, on_delete=models.CASCADE)
     uploaded_receipt = models.FileField(
         upload_to='receipts/', null=True, blank=True,
-        validators=[validate_file_extension])
+        validators=[validate_file_extension, validate_file_size])
     json_response = models.JSONField(null=True, blank=True)
     amount = models.DecimalField(
         max_digits=10, decimal_places=2, validators=[validate_amount])
