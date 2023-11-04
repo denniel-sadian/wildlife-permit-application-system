@@ -179,17 +179,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = '/static/'
-
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Media files
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-MEDIA_URL = '/media/'
-
-
 USE_S3 = json.loads(os.getenv('USE_S3', 'false'))
 if USE_S3:
     # aws settings
@@ -215,6 +204,8 @@ else:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MAX_UPLOADED_FILE_SIZE_MB = int(os.getenv('MAX_UPLOADED_FILE_SIZE_MB', '5'))
 
 
 # EMAILS
