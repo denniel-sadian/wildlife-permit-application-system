@@ -12,7 +12,7 @@ from permits.models import (
     WildlifeFarmPermit
 )
 
-from .mixins import ModelMixin
+from .mixins import ModelMixin, validate_file_size, validate_file_extension
 
 
 class Gender(models.TextChoices):
@@ -54,7 +54,8 @@ class User(ModelMixin, AbstractUser):
     phone_number = PhoneNumberField(max_length=14)
     is_initial_password_changed = models.BooleanField(default=False)
     signature_image = ResizedImageField(
-        upload_to='signs/', null=True, blank=True)
+        upload_to='signs/', null=True, blank=True,
+        validators=[validate_file_size, validate_file_extension])
     extra_data = models.JSONField(default=dict)
 
     @property
