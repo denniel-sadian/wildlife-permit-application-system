@@ -11,6 +11,10 @@ class Species(models.Model):
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=5, choices=Type.choices)
 
+    class Meta:
+        verbose_name = 'Species'
+        verbose_name_plural = 'Species'
+
     def __str__(self):
         return str(self.name)
 
@@ -21,6 +25,10 @@ class SubSpecies(models.Model):
     input_code = models.CharField(max_length=10, unique=True)
     common_name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = 'Sub Species'
+        verbose_name_plural = 'Sub Species'
 
     def __str__(self):
         return str(self.main_species.name + ' - ' + self.common_name)
