@@ -38,7 +38,7 @@ DEBUG_PROPAGATE_EXCEPTIONS = json.loads(
 
 USE_HTTPS = json.loads(os.getenv('USE_HTTPS', 'false'))
 
-SITE_ID = os.getenv('SITE_ID', 1)
+SITE_ID = int(os.getenv('SITE_ID', '1'))
 
 ALLOWED_HOSTS = json.loads(os.getenv('ALLOWED_HOSTS', '["*"]'))
 CSRF_TRUSTED_ORIGINS = json.loads(os.getenv(
