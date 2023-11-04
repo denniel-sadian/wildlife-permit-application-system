@@ -19,7 +19,6 @@ from django.utils.http import urlencode
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseNotFound
 
 from users.views import CustomLoginRequiredMixin
 from users.models import Client, Validator
