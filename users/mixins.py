@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
+from django.conf import settings
 
 
 class AdminMixin:
@@ -95,6 +96,13 @@ def validate_file_extension(value):
             return
     raise ValidationError(
         'File types that are only allowed: ' + (', ').join(accepted_types))
+
+
+def validate_file_size(value):
+    limit = settings.MAX_UPLOADED_FILE_SIZE_MB * 1024 * 1024
+    if value.size > limit:
+        raise ValidationError(
+            f'File size cannot exceed {settings.MAX_UPLOADED_FILE_SIZE_MB} MB.')
 
 
 def validate_amount(value):
