@@ -1,4 +1,5 @@
 from django_yubin.message_views import TemplatedHTMLEmailMessageView
+from django_yubin.message_views import TemplatedAttachmentEmailMessageView
 
 from users.emails import EmailContextMixin
 
@@ -25,6 +26,12 @@ class BasePermitEmailView(EmailContextMixin, TemplatedHTMLEmailMessageView):
         context = super().get_context_data(**kwargs)
         context['permit'] = self.permit
         return context
+
+
+class ReportsEmailView(EmailContextMixin, TemplatedAttachmentEmailMessageView):
+    subject_template_name = 'permits/emails/reports_generated/subject.txt'
+    body_template_name = 'permits/emails/reports_generated/body.txt'
+    html_body_template_name = 'permits/emails/reports_generated/body.html'
 
 
 class SubmittedApplicationEmailView(BaseApplicationEmailView):
