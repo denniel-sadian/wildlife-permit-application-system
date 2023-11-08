@@ -3,8 +3,12 @@ import calendar
 import datetime
 import json
 from typing import Any
+from urllib.parse import urlencode
 
 from django.views.generic import TemplateView
+from django.views.generic import RedirectView
+from django.urls import reverse_lazy
+from django.contrib import messages
 from django.db.models import Sum, F
 
 from users.views import CustomLoginRequiredMixin
@@ -14,8 +18,21 @@ from permits.models import (
     TransportEntry,
     Status
 )
+from permits.tasks import generate_reports
 
 from .models import Species
+
+
+def get_current_quarter():
+    current_month = datetime.datetime.now().month
+    if 1 <= current_month <= 3:
+        return 1
+    elif 4 <= current_month <= 6:
+        return 2
+    elif 7 <= current_month <= 9:
+        return 3
+    else:
+        return 4
 
 
 class TransportStatsView(CustomLoginRequiredMixin, TemplateView):
@@ -27,7 +44,10 @@ class TransportStatsView(CustomLoginRequiredMixin, TemplateView):
 
         selected_year = int(self.request.GET.get(
             'year', datetime.datetime.now().year))
+        selected_quarter = int(self.request.GET.get(
+            'quarter', get_current_quarter()))
         context['year'] = selected_year
+        context['quarter'] = selected_quarter
         data = {}
         for month in range(1, 13):
             from_date = f'{selected_year}-{month:02d}-01'
@@ -55,3 +75,22 @@ class TransportStatsView(CustomLoginRequiredMixin, TemplateView):
             json.dumps(data).encode('utf-8')).decode('utf-8')
 
         return context
+
+
+class GenerateReportsRedirectView(CustomLoginRequiredMixin, RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        self.generate_reports()
+        messages.info(
+            self.request,
+            'Your reports are being generated and will be sent to your email. Please wait.')
+        return reverse_lazy('transport_stats')+'?'+urlencode(self.request.GET)
+
+    def generate_reports(self):
+        generate_reports.delay(
+            year=int(self.request.GET.get(
+                'year', datetime.datetime.now().year)),
+            quarter=int(self.request.GET.get(
+                'quarter', get_current_quarter())),
+            user_id=self.request.user.id
+        )
