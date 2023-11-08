@@ -516,13 +516,13 @@ def build_ltp_reports(ws, data, from_date, to_date):
                 cell = ws.cell(row=species_row, column=10,
                                value=transport.sub_species.scientific_name)
                 cell = ws.cell(row=species_row, column=11,
-                               value='Pupae')
+                               value=transport.description)
                 cell = ws.cell(row=species_row, column=12,
                                value=transport.quantity)
                 cell = ws.cell(row=species_row, column=13,
                                value='Pieces')
                 cell = ws.cell(row=species_row, column=14,
-                               value='Pupae')
+                               value=transport.description)
                 cell = ws.cell(row=species_row, column=15,
                                value='Marinduque')
                 cell = ws.cell(row=species_row, column=16,
