@@ -85,7 +85,7 @@ class Client(User):
         try:
             wcp = WildlifeCollectorPermit.objects \
                 .filter(client=self, status=Status.RELEASED) \
-                .latest('created_at')
+                .latest('-created_at')
         except WildlifeCollectorPermit.DoesNotExist:
             wcp = None
         return wcp
@@ -95,10 +95,16 @@ class Client(User):
         try:
             wfp = WildlifeFarmPermit.objects \
                 .filter(client=self, status=Status.RELEASED) \
-                .latest('created_at')
+                .latest('-created_at')
         except WildlifeFarmPermit.DoesNotExist:
             wfp = None
         return wfp
+
+    @property
+    def current_farm_name(self):
+        return WildlifeFarmPermit.objects \
+            .filter(client=self) \
+            .latest('-created_at').farm_name
 
 
 class Admin(User):
