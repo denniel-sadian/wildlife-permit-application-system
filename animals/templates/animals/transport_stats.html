@@ -14,7 +14,7 @@
         margin: 100px auto;
         padding: 0px 20px;
         width: 100%;
-        max-width: 1100px;
+        max-width: 1000px;
     }
 
     #transport-chart {
@@ -22,16 +22,44 @@
         height: auto;
     }
 
-    form {
+    #year-form {
         width: 100%;
         max-width: 100px;
         margin: 0px auto;
     }
 
-    form input {
+    #year-form input {
         width: 100%;
         text-align: center;
     }
+
+    hr {
+        margin: 100px 0px;
+    }
+
+    #gen-report-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .inpt-cont {
+        display: flex;
+        flex-wrap: nowrap;
+    }
+
+    .inpt {
+        display: grid;
+        grid-template-rows: 1fr auto;
+    }
+
+    .inpt input {
+        height: 40px;
+        text-align: center;
+        border-radius: 0px;
+        border: 1px solid black;
+    }
+
 </style>
 {% endblock %}
 
@@ -39,13 +67,34 @@
 <main>
     <div class="cont">
         <h2 style="text-align:center;">Transport Chart</h2>
-        <form action="" method="GET">
+        <form action="" method="GET" id="year-form">
             <input type="number" id="yearFilter" value="{{year}}" name="year" min="1900" max="2099" step="1">
         </form>
 
         <div>
           <canvas id="transport-chart"></canvas>
         </div>
+
+        {% if user.is_staff %}
+        <hr>
+        <form action="{% url 'generate_reports' %}" method="GET" id="gen-report-form">
+            <h2>Generate Reports</h2>
+            <div class="inpt-cont">
+                <div class="inpt">
+                    <span>Year:</span>
+                    <input type="number" style="width:80px" id="yearFilter" value="{{year}}" name="year" min="1900" max="2099" step="1">
+                </div>
+                <div class="inpt">
+                    <span>Quarter:</span>
+                    <input type="number" style="width:70px; border-left:none;" id="yearFilter" value="{{quarter}}" name="quarter" min="1" max="4" step="1">
+                </div>
+                <div class="inpt">
+                    <span></span>
+                    <input type="submit" value="Generate" style="border-left:none;" class="w3-btn w3-green">
+                </div>
+            </div>
+        </form>
+        {% endif %}
 
         <script>
             $(function() {
