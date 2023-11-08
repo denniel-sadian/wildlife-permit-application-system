@@ -545,7 +545,7 @@ def build_ltp_reports(ws, data, from_date, to_date):
         ws.merge_cells(start_row=client_row, start_column=2,
                        end_row=row_span, end_column=2)
 
-        client_row += 1
+        client_row += total_transport
 
     for col in range(1, 19):
         for row in range(1, last_row):
