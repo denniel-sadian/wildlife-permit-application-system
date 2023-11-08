@@ -105,7 +105,6 @@ class PermitBaseAdmin(AdminMixin, admin.ModelAdmin):
 
         # Check signature has been attached already
         if 'add_sign' in request.POST and obj.signatures.first() is not None:
-            print('gaga')
             permit_signed.send(sender=request.user, permit=obj)
 
         return response_change
