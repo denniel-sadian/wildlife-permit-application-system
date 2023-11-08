@@ -86,6 +86,14 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                     level=messages.ERROR)
             return HttpResponseRedirect('.')
 
+        # Before signing, make sure the payment order has a total
+        if 'add_sign' in request.POST:
+            if obj.total == 0:
+                self.message_user(
+                    request, 'Cannot sign an incomplete payment order.',
+                    level=messages.ERROR)
+                return HttpResponseRedirect('.')
+
         response_change = super().response_change(request, obj)
 
         # Check if it's been signed by the one who prepared it
