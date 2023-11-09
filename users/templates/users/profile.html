@@ -28,6 +28,10 @@
 
         <form action="" method="POST" enctype="multipart/form-data" class="w3-margin-bottom">
             {% csrf_token %}
+            <p>
+                <span class="w3-text-gray">Username:</span> {{ user.username }}<br>
+                <span class="w3-text-gray">Email:</span> {{ user.email }}<br>
+            </p>
             {% include 'ui/inputbox.html' with field=form.first_name %}
             {% include 'ui/inputbox.html' with field=form.last_name %}
             {% include 'ui/inputbox.html' with field=form.phone_number %}
