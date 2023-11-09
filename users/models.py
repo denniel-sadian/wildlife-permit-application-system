@@ -48,7 +48,7 @@ class User(ModelMixin, AbstractUser):
 
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    title = models.CharField('Position', max_length=100, null=True)
+    title = models.CharField('Position', max_length=100, null=True, blank=True)
     gender = models.CharField(choices=Gender.choices, max_length=10)
     email = models.EmailField(unique=True)
     phone_number = PhoneNumberField(max_length=14)
