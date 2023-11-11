@@ -54,7 +54,7 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
 
     def response_change(self, request, obj):
         if 'create_payment' in request.POST:
-            if not hasattr(obj, 'payment') and obj.total != 0:
+            if (not hasattr(obj, 'payment') and obj.total != 0) or obj.released_at is None:
                 payment = Payment(receipt_no=obj.no,
                                   payment_order=obj,
                                   amount=obj.total,
@@ -65,7 +65,7 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                     request, 'Payment record has been made.', level=messages.SUCCESS)
                 return HttpResponseRedirect(payment.admin_url)
             else:
-                self.message_user(request, 'Incomplete payment order.',
+                self.message_user(request, 'Incomplete or unreleased payment order.',
                                   level=messages.ERROR)
                 return HttpResponseRedirect('.')
 
