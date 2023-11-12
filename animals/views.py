@@ -10,6 +10,7 @@ from django.views.generic import RedirectView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Sum, F
+from django.core.exceptions import PermissionDenied
 
 from users.views import CustomLoginRequiredMixin
 from users.models import Client
@@ -80,11 +81,14 @@ class TransportStatsView(CustomLoginRequiredMixin, TemplateView):
 class GenerateReportsRedirectView(CustomLoginRequiredMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
-        self.generate_reports()
-        messages.info(
-            self.request,
-            'Your reports are being generated and will be sent to your email. Please wait.')
-        return reverse_lazy('transport_stats')+'?'+urlencode(self.request.GET)
+        if self.request.user.is_staff:
+            self.generate_reports()
+            messages.info(
+                self.request,
+                'Your reports are being generated and will be sent to your email. Please wait.')
+            return reverse_lazy('transport_stats')+'?'+urlencode(self.request.GET)
+
+        raise PermissionDenied('You are not a staff to generate reports.')
 
     def generate_reports(self):
         generate_reports.delay(
