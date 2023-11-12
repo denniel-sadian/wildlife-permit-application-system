@@ -54,7 +54,7 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
 
     def response_change(self, request, obj):
         if 'create_payment' in request.POST:
-            if (not hasattr(obj, 'payment') and obj.total != 0) or obj.released_at is None:
+            if not hasattr(obj, 'payment') and obj.total != 0 and obj.released_at:
                 payment = Payment(receipt_no=obj.no,
                                   payment_order=obj,
                                   amount=obj.total,
