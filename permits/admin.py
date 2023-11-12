@@ -340,10 +340,10 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                     return HttpResponseRedirect('.')
 
                 if obj.permit_type == PermitType.LTP:
-                    if not hasattr(obj, 'inspection'):
+                    if not hasattr(obj, 'inspection') or (hasattr(obj, 'inspection') and obj.inspection.signatures.count() == 0):
                         self.message_user(
                             request,
-                            'Cannot generate the permit because there is no inspection report.', level=messages.ERROR)
+                            'Cannot generate the permit because the inspection is not done yet.', level=messages.ERROR)
                         return HttpResponseRedirect('.')
 
                     with transaction.atomic():
