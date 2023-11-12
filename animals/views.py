@@ -85,7 +85,8 @@ class GenerateReportsRedirectView(CustomLoginRequiredMixin, RedirectView):
             self.generate_reports()
             messages.info(
                 self.request,
-                'Your reports are being generated and will be sent to your email. Please wait.')
+                'Your reports are being generated and will be sent to your '
+                f'email ({self.request.user.email}). Please wait.')
             return reverse_lazy('transport_stats')+'?'+urlencode(self.request.GET)
 
         raise PermissionDenied('You are not a staff to generate reports.')
