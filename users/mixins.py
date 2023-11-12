@@ -106,5 +106,5 @@ def validate_file_size(value):
 
 
 def validate_amount(value):
-    if value < 0:
-        raise ValidationError(f'Really, {str(value)}?')
+    if value < 20:
+        raise ValidationError('The minimum amount should be 20.')
