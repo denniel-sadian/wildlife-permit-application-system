@@ -194,10 +194,6 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
         if selected_errors:
             for error in selected_errors:
                 messages.warning(self.request, error)
-        else:
-            messages.success(
-                self.request,
-                'Permit application has been saved')
 
         return super().form_valid(form)
 
