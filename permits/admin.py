@@ -261,7 +261,8 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
 
     def response_change(self, request, obj: PermitApplication):
         if 'accept' in request.POST:
-            if obj.status in [Status.DRAFT, Status.RETURNED, Status.SUBMITTED]:
+            if obj.status in [Status.DRAFT, Status.RETURNED, Status.SUBMITTED] \
+                    and obj.submittable:
                 obj.status = Status.ACCEPTED
                 obj.save()
                 self.message_user(
@@ -272,7 +273,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
 
             else:
                 self.message_user(
-                    request, 'Cannot be accepted.',
+                    request, 'Cannot be accepted – yet.',
                     level=messages.ERROR)
             return HttpResponseRedirect('.')
 
