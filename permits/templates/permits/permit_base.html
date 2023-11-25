@@ -70,9 +70,11 @@
 <body>
     <main>
         <div class="permit-info {{ status }}">
+            {% if permit.permit_type == 'Local Transport Permit' %}
             <div class="qrcode-cont">
                 <div id="qrcode"></div>
             </div>
+            {% endif %}
 
             {% if status == 'validated' %}
             <h3><i class="fa fa-check-circle w3-text-green"></i> Successfully Validated</h3>
