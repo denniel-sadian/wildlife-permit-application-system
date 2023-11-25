@@ -318,6 +318,31 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 4px;
 }
 
+.selected-species {
+    display: flex;
+    flex-direction: row;
+}
+.selected-species > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 150px;
+  background-color: #fff;
+  border: 1px solid #000;
+}
+.selected-species > div img {
+    max-width: 150px;
+    width: 100%;
+    height: auto;
+}
+.selected-species > div span {
+    text-align: center;
+    background-color: #fff;
+    padding: 1px;
+    font-weight: normal;
+    border-top: 1px solid #000;
+}
+
 /*  MOBILE */
 
 @media only screen and (max-width: 1000px) {
