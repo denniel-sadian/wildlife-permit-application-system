@@ -131,6 +131,10 @@ class Permit(ModelMixin, models.Model):
         path = reverse_lazy('validate_permit')
         return f'{path}?data={url_safe_base64}'
 
+    @property
+    def validation(self):
+        return Validation.objects.filter(permit__id=self.id).first()
+
     def calculate_validity_date(self):
         if self.issued_date:
             days_valid = settings.VALIDITY[self.type]
