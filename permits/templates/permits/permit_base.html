@@ -98,6 +98,12 @@
                 and waiting to get validated. It was issued on {{ permit.issued_date }} and is valid until {{ permit.valid_until }}.
             </p>
             {% endif %}
+
+            {% if permit.validation %}
+            <div>
+                <p>This permit has been validated by {{ permit.validation.validator.name }} on {{ permit.validation.validated_at }}</p>
+            </div>
+            {% endif %}
         </div>
 
         <hr>
