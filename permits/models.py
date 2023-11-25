@@ -44,6 +44,9 @@ class PermitType(models.TextChoices):
 class Requirement(models.Model):
     code = models.CharField(max_length=100, unique=True)
     label = models.CharField(max_length=255)
+    example_file = models.FileField(
+        upload_to='example-requirements/', null=True, blank=True,
+        validators=[validate_file_size])
 
     def __str__(self):
         return str(self.label)
