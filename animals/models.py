@@ -1,5 +1,9 @@
 from django.db import models
 
+from django_resized import ResizedImageField
+
+from users.mixins import validate_image_only
+
 
 class Type(models.TextChoices):
     FAUNA = 'FAUNA', 'Fauna'
@@ -25,6 +29,9 @@ class SubSpecies(models.Model):
     input_code = models.CharField(max_length=10, unique=True)
     common_name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255)
+    image = ResizedImageField(
+        upload_to='subspecies/', null=True, blank=True,
+        validators=[validate_image_only])
 
     class Meta:
         verbose_name = 'Sub Species'
