@@ -63,7 +63,7 @@
 
             {% if wcp %}
             <p>
-                Your latest <strong>Wildlife Farm Permit ({{ wcp.permit_no }})</strong> was <strong>created on {{ wcp.created_at }}</strong> and is <strong>valid until {{ wcp.valid_until }}</strong>.
+                Your latest <strong>Wildlife Collector's Permit ({{ wcp.permit_no }})</strong> was <strong>created on {{ wcp.created_at }}</strong> and is <strong>valid until {{ wcp.valid_until }}</strong>.
                 Your permit's status is currently <strong>"{{ wcp.current_status }}"</strong>.
                 {% if wcp.uploaded_file %}You can download this permit using <a href="{% url 'permit_detail' pk=wcp.id %}" target="_blank">this link</a>.{% endif %}
             </p>
