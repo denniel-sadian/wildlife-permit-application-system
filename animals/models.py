@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.html import mark_safe
 
 from django_resized import ResizedImageField
 
@@ -39,3 +40,15 @@ class SubSpecies(models.Model):
 
     def __str__(self):
         return str(self.main_species.name + ' - ' + self.common_name)
+
+    def image_preview(self):
+        if self.image:
+            return mark_safe(
+                f'''
+                <img src = "{self.image.url}" style="max-width: 200px;
+                                              width: 100%;
+                                              height:auto;"/>
+                '''
+            )
+        else:
+            return mark_safe('<span>no image</span>')
