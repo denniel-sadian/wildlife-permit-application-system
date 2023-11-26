@@ -18,6 +18,7 @@ from .models import (
     PermitType,
     TransportEntry,
     CollectionEntry,
+    CollectorOrTrapper,
     WildlifeCollectorPermit,
     PermittedToCollectAnimal,
     LocalTransportPermit,
@@ -143,8 +144,7 @@ class PermitApplicationUpdateForm(forms.ModelForm):
     class Meta:
         model = PermitApplication
         fields = ('transport_date', 'transport_location',
-                  'farm_name', 'farm_address',
-                  'names_and_addresses_of_authorized_collectors_or_trappers')
+                  'farm_name', 'farm_address')
         widgets = {
             'transport_date': forms.DateInput(attrs={'type': 'date'})
         }
@@ -174,3 +174,10 @@ class CollectionEntryForm(forms.ModelForm):
             raise forms.ValidationError(
                 f'{sub_species} has been chosen already.')
         return sub_species
+
+
+class CollectorOrTrapperForm(forms.ModelForm):
+
+    class Meta:
+        model = CollectorOrTrapper
+        fields = ('name', 'address')
