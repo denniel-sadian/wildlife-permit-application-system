@@ -362,6 +362,13 @@ class CollectionEntry(models.Model):
         return str(self.sub_species)
 
 
+class CollectorOrTrapper(models.Model):
+    permit_application = models.ForeignKey(
+        PermitApplication, on_delete=models.CASCADE, related_name='collectors_or_trappers')
+    name = models.CharField(max_length=50)
+    address = models.CharField(max_length=100)
+
+
 class UploadedRequirement(models.Model):
     permit_application = models.ForeignKey(
         PermitApplication, on_delete=models.CASCADE, related_name='requirements')
