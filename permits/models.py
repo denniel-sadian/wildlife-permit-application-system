@@ -254,8 +254,6 @@ class PermitApplication(ModelMixin, models.Model):
         max_length=255, null=True, blank=True)
 
     # WCP
-    names_and_addresses_of_authorized_collectors_or_trappers = models.TextField(
-        null=True, blank=True)
 
     # The permit created
     permit = models.ForeignKey(
@@ -307,13 +305,13 @@ class PermitApplication(ModelMixin, models.Model):
 
         # For WCP
         if self.permit_type == PermitType.WCP:
-            needed_fields = [
-                'names_and_addresses_of_authorized_collectors_or_trappers',
-                'farm_name', 'farm_address']
+            needed_fields = ['farm_name', 'farm_address']
             for field in needed_fields:
                 if not hasattr(self, field) or (hasattr(self, field) and not getattr(self, field)):
                     return False
             if self.requested_species.count() == 0:
+                return False
+            if self.collectors_or_trappers.count() == 0:
                 return False
 
         # For WFP
