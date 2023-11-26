@@ -61,7 +61,6 @@
             {% endif %}
 
             {% if object.permit_type == 'WCP' %}
-            {% include 'ui/inputbox.html' with field=form.names_and_addresses_of_authorized_collectors_or_trappers %}
             {% endif %}
 
             {% if object.permit_type in 'WCP WFP' %}
@@ -173,6 +172,41 @@
             </div>
             {% endif %}
         </form>
+
+        <form class="extra-form" action="" method="POST" enctype="multipart/form-data">
+            <div style="display:none;">{{ form }}</div>
+            {% csrf_token %}
+            <h3 id="{{ collectors_or_trappers.prefix }}">Names and Addresses of Authorized Collectors or Trappers:</h3>
+            <div style="overflow-x:auto;">
+                <table class="w3-table w3-table-all w3-margin-bottom">
+                    <tr>
+                        <th>Name</th>
+                        <th>Address</th>
+                        {% if object.editable %}
+                        <th>Action</th>
+                        {% endif %}
+                    </tr>
+                    {% for i in object.collectors_or_trappers.all %}
+                    <tr>
+                        <td>{{ i.name }}</td>
+                        <td>{{ i.address }}</td>
+                        {% if object.editable %}
+                        <td><a href="{% url 'delete_collector_or_trapper' pk=i.id %}" class="w3-text-red"><i class="fa fa-trash-o"></i> Delete</a></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% if object.editable %}
+            <div class="mini-form">
+                {% include 'ui/inputbox.html' with field=collectors_or_trappers.name %}
+                {% include 'ui/inputbox.html' with field=collectors_or_trappers.address %}
+            </div>
+            <div class="buttons">
+                <button type="submit" class="w3-btn w3-text-blue w3-round-large w3-border w3-border-blue">Add Person</button>
+            </div>
+            {% endif %}
+        </form>
         {% endif %}
 
         <form class="extra-form" action="" method="POST" enctype="multipart/form-data">
@@ -184,7 +218,12 @@
                 <h3>Needed Requirements:</h3>
                 <ul>
                     {% for i in needed_requirements %}
-                    <li><i class="fa {% if i.submitted %}fa-check w3-text-green{% else %}fa-times w3-text-red{% endif %}"></i> {% if i.optional %}(Optional) {% endif %}{{ i.requirement.requirement.label }}</li>
+                    <li>
+                        <i class="fa {% if i.submitted %}fa-check w3-text-green{% else %}fa-times w3-text-red{% endif %}"></i> {% if i.optional %}(Optional) {% endif %}{{ i.requirement.requirement.label }}
+                        {% if i.requirement.requirement.example_file %}
+                        (<a href="{{ i.requirement.requirement.example_file.url }}" target="_blank" class="w3-text-blue">See example</a>)
+                        {% endif %}
+                    </li>
                     {% endfor %}
                 </ul>
             </div>

@@ -44,6 +44,9 @@ class PermitType(models.TextChoices):
 class Requirement(models.Model):
     code = models.CharField(max_length=100, unique=True)
     label = models.CharField(max_length=255)
+    example_file = models.FileField(
+        upload_to='example-requirements/', null=True, blank=True,
+        validators=[validate_file_size])
 
     def __str__(self):
         return str(self.label)
@@ -127,6 +130,10 @@ class Permit(ModelMixin, models.Model):
             data.encode('utf-8')).decode('utf-8')
         path = reverse_lazy('validate_permit')
         return f'{path}?data={url_safe_base64}'
+
+    @property
+    def validation(self):
+        return Validation.objects.filter(permit__id=self.id).first()
 
     def calculate_validity_date(self):
         if self.issued_date:
@@ -247,8 +254,6 @@ class PermitApplication(ModelMixin, models.Model):
         max_length=255, null=True, blank=True)
 
     # WCP
-    names_and_addresses_of_authorized_collectors_or_trappers = models.TextField(
-        null=True, blank=True)
 
     # The permit created
     permit = models.ForeignKey(
@@ -300,13 +305,13 @@ class PermitApplication(ModelMixin, models.Model):
 
         # For WCP
         if self.permit_type == PermitType.WCP:
-            needed_fields = [
-                'names_and_addresses_of_authorized_collectors_or_trappers',
-                'farm_name', 'farm_address']
+            needed_fields = ['farm_name', 'farm_address']
             for field in needed_fields:
                 if not hasattr(self, field) or (hasattr(self, field) and not getattr(self, field)):
                     return False
             if self.requested_species.count() == 0:
+                return False
+            if self.collectors_or_trappers.count() == 0:
                 return False
 
         # For WFP
@@ -353,6 +358,13 @@ class CollectionEntry(models.Model):
 
     def __str__(self):
         return str(self.sub_species)
+
+
+class CollectorOrTrapper(models.Model):
+    permit_application = models.ForeignKey(
+        PermitApplication, on_delete=models.CASCADE, related_name='collectors_or_trappers')
+    name = models.CharField(max_length=50)
+    address = models.CharField(max_length=100)
 
 
 class UploadedRequirement(models.Model):

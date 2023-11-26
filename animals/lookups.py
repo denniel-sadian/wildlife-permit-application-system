@@ -6,8 +6,23 @@ from django.db.models import Q
 from .models import SubSpecies
 
 
+class SubSpeciesLookupMixin:
+
+    def format_item_display(self, item):
+        img_url = item.image.url if item.image else '/static/img/butterfly4.gif'
+        return (
+            f'''
+            <div class="selected-species">
+              <div>
+                <img src={img_url}>
+                <span>{item.main_species.name + ' / ' + item.scientific_name + ' / ' + item.common_name}</span>
+              </div>
+            </div>
+            ''')
+
+
 @register('subspecies')
-class SubSpeciesLookup(LookupChannel):
+class SubSpeciesLookup(SubSpeciesLookupMixin, LookupChannel):
     model = SubSpecies
 
     def get_query(self, q, request):
@@ -24,7 +39,7 @@ class SubSpeciesLookup(LookupChannel):
 
 
 @register('permitted-subspecies')
-class PermittedSubSpeciesLookup(LookupChannel):
+class PermittedSubSpeciesLookup(SubSpeciesLookupMixin, LookupChannel):
     model = SubSpecies
 
     def get_query(self, q, request):

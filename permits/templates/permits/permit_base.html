@@ -70,9 +70,11 @@
 <body>
     <main>
         <div class="permit-info {{ status }}">
+            {% if permit.permit_type == 'Local Transport Permit' %}
             <div class="qrcode-cont">
                 <div id="qrcode"></div>
             </div>
+            {% endif %}
 
             {% if status == 'validated' %}
             <h3><i class="fa fa-check-circle w3-text-green"></i> Successfully Validated</h3>
@@ -95,6 +97,12 @@
                 This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" currently has the status "{{ permit.current_status }}"
                 and waiting to get validated. It was issued on {{ permit.issued_date }} and is valid until {{ permit.valid_until }}.
             </p>
+            {% endif %}
+
+            {% if permit.validation %}
+            <div>
+                <p>This permit has been validated by {{ permit.validation.validator.name }} on {{ permit.validation.validated_at }}</p>
+            </div>
             {% endif %}
         </div>
 

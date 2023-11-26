@@ -29,6 +29,7 @@ from .models import (
     UploadedRequirement,
     TransportEntry,
     CollectionEntry,
+    CollectorOrTrapper,
     Permit,
     Validation
 )
@@ -37,7 +38,8 @@ from .forms import (
     PermitApplicationUpdateForm,
     UploadedRequirementForm,
     TransportEntryForm,
-    CollectionEntryForm
+    CollectionEntryForm,
+    CollectorOrTrapperForm
 )
 from .filters import (
     PermitApplicationFilter,
@@ -125,6 +127,9 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
             context['requested_species'] = CollectionEntryForm(
                 self.request.POST, self.request.FILES,
                 prefix='requested_species')
+            context['collectors_or_trappers'] = CollectorOrTrapperForm(
+                self.request.POST, self.request.FILES,
+                prefix='collectors_or_trappers')
             context['requirement'] = UploadedRequirementForm(
                 self.request.POST, self.request.FILES, prefix='requirement')
         else:
@@ -132,6 +137,8 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
                 prefix='transport_entry')
             context['requested_species'] = CollectionEntryForm(
                 prefix='requested_species')
+            context['collectors_or_trappers'] = CollectorOrTrapperForm(
+                prefix='collectors_or_trappers')
             context['requirement'] = UploadedRequirementForm(
                 prefix='requirement')
 
@@ -152,6 +159,7 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
 
         transport_entry = context['transport_entry']
         requested_species = context['requested_species']
+        collectors_or_trappers = context['collectors_or_trappers']
         requirement = context['requirement']
 
         with transaction.atomic():
@@ -176,6 +184,15 @@ class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
                 self.last_edited_list = requested_species.prefix
             else:
                 for field, error_list in requested_species.errors.items():
+                    for error in error_list:
+                        errors.append(error)
+
+            collectors_or_trappers.instance.permit_application = self.object
+            if collectors_or_trappers.is_valid():
+                collectors_or_trappers.save()
+                self.last_edited_list = collectors_or_trappers.prefix
+            else:
+                for field, error_list in collectors_or_trappers.errors.items():
                     for error in error_list:
                         errors.append(error)
 
@@ -345,6 +362,11 @@ class TransportEntryDeleteView(PermitApplicationItemDeleteView):
 class CollectionEntryDeleteView(PermitApplicationItemDeleteView):
     model = CollectionEntry
     item_list = 'requested_species'
+
+
+class CollectorOrTrapperDeleteView(PermitApplicationItemDeleteView):
+    model = CollectorOrTrapper
+    item_list = 'collectors_or_trappers'
 
 
 class ValidateRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, RedirectView):

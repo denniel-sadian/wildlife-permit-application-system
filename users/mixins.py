@@ -98,6 +98,15 @@ def validate_file_extension(value):
         'File types that are only allowed: ' + (', ').join(accepted_types))
 
 
+def validate_image_only(value):
+    accepted_types = ['jpg', 'jpeg', 'png']
+    for i in accepted_types:
+        if value.name.lower().endswith('.'+i):
+            return
+    raise ValidationError(
+        'File types that are only allowed: ' + (', ').join(accepted_types))
+
+
 def validate_file_size(value):
     limit = settings.MAX_UPLOADED_FILE_SIZE_MB * 1024 * 1024
     if value.size > limit:

@@ -23,6 +23,8 @@ urlpatterns = [
          name='delete_transport_entry'),
     path('requested_species/<int:pk>/', views.CollectionEntryDeleteView.as_view(),
          name='delete_requested_species'),
+    path('collectors_or_trappers/<int:pk>/', views.CollectorOrTrapperDeleteView.as_view(),
+         name='delete_collector_or_trapper'),
 
     # Permits
     path('permits/validate/', views.ValidateRedirectView.as_view(),
