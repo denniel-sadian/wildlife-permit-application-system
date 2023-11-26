@@ -29,6 +29,7 @@ from .models import (
     RequirementList,
     RequirementItem,
     CollectionEntry,
+    CollectorOrTrapper,
     Remarks,
     Status,
     Inspection,
@@ -179,6 +180,12 @@ class CollectionEntryInline(admin.TabularInline):
     verbose_name_plural = 'Collection Entries'
 
 
+class CollectorOrTrapperInline(admin.TabularInline):
+    fields = ('name', 'address')
+    model = CollectorOrTrapper
+    extra = 1
+
+
 class RemarksInline(admin.TabularInline):
     fields = ('content',)
     model = Remarks
@@ -215,8 +222,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
             fields.append('transport_date')
             fields.append('transport_location')
         if obj and obj.permit_type == PermitType.WCP:
-            fields.append(
-                'names_and_addresses_of_authorized_collectors_or_trappers')
+            pass
 
         fieldsets = [
             ('Permit Application Data', {
@@ -237,6 +243,8 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
 
         if obj and obj.permit_type == PermitType.WCP:
             inlines.insert(0, CollectionEntryInline(
+                self.model, self.admin_site))
+            inlines.insert(0, CollectorOrTrapperInline(
                 self.model, self.admin_site))
 
         return inlines
