@@ -3,13 +3,15 @@ from ajax_select import register, LookupChannel
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 
+from permits.models import Status
+
 from .models import SubSpecies
 
 
 class SubSpeciesLookupMixin:
 
     def format_item_display(self, item):
-        img_url = item.image.url if item.image else '/static/img/butterfly4.gif'
+        img_url = item.image.url if item.image else '/static/img/no-img.jpg'
         return (
             f'''
             <div class="selected-species">
@@ -44,11 +46,12 @@ class PermittedSubSpeciesLookup(SubSpeciesLookupMixin, LookupChannel):
 
     def get_query(self, q, request):
         client = request.user.subclass
-        query = \
-            (Q(common_name__icontains=q) |
-             Q(scientific_name__icontains=q) |
-             Q(main_species__name__icontains=q)) & \
-            (Q(species_permitted__wcp__client=client))
+        query =  \
+            (Q(common_name__icontains=q)
+             | Q(scientific_name__icontains=q)
+             | Q(main_species__name__icontains=q))  \
+            & (Q(species_permitted__wcp__client=client)
+               & Q(species_permitted__wcp__status=Status.RELEASED))
         qs = self.model.objects.filter(query).order_by('common_name')
         return qs
 
