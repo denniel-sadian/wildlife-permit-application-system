@@ -45,8 +45,9 @@ class TransportEntryBaseForm(forms.ModelForm):
                 'This species has been chosen for transport already.')
 
         # Make sure only collected species are chosen for transport
-        allowed = SubSpecies.objects.filter(Q(species_permitted__wcp__client=application.client) &
-                                            Q(common_name__exact=sub_species.common_name)).first()
+        allowed = SubSpecies.objects.filter(Q(species_permitted__wcp__client=application.client)
+                                            & Q(species_permitted__wcp__status=Status.RELEASED)
+                                            & Q(common_name__exact=sub_species.common_name)).first()
         if not allowed:
             raise forms.ValidationError(
                 'The client is not allowed to transport this species.')
