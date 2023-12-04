@@ -4,11 +4,13 @@ from datetime import datetime
 from django.contrib import admin
 from django.contrib import messages
 from django.db.models.query import QuerySet
+from django.db.models import Q
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
 from django.db import transaction
 
 from users.mixins import AdminMixin
+from users.models import Admin
 
 from payments.models import (
     PaymentOrder
@@ -210,6 +212,11 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
         # Do not include on draft applications
         qs = qs.exclude(status=Status.DRAFT)
 
+        # For admins, exclude those that they didn't accept
+        if isinstance(request.user.subclass, Admin):
+            qs = qs.exclude(~Q(accepted_by=request.user.subclass)
+                            & Q(accepted_by__isnull=False))
+
         return qs
 
     def acceptable(self, obj):
@@ -222,10 +229,10 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
         if obj is None:
             return ()
         # Otherwise, when updating an existing record
-        return ('client', 'permit_type')
+        return ('client', 'permit_type', 'accepted_by')
 
     def get_fieldsets(self, request: HttpRequest, obj: Any | None = ...):
-        fields = ['no', 'status', 'permit_type', 'client']
+        fields = ['no', 'status', 'permit_type', 'client', 'accepted_by']
 
         if obj and obj.permit_type == PermitType.LTP:
             fields.append('transport_date')
@@ -281,6 +288,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
             if obj.status in [Status.DRAFT, Status.RETURNED, Status.SUBMITTED] \
                     and obj.submittable:
                 obj.status = Status.ACCEPTED
+                obj.accepted_by = request.user.subclass
                 obj.save()
                 self.message_user(
                     request, 'The application has been accepted.', level=messages.SUCCESS)
