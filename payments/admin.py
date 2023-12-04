@@ -3,11 +3,14 @@ from datetime import datetime
 from typing import Any
 
 from django.contrib import admin
+from django.db.models.query import QuerySet
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.http.request import HttpRequest
 
 from users.mixins import AdminMixin
+from users.models import Signatory
 
 from .models import (
     PaymentOrder,
@@ -31,11 +34,8 @@ class PaymentOrderItemInline(admin.TabularInline):
 @admin.register(PaymentOrder)
 class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
     list_display = ('no', 'permit_application',
-                    'paid', 'prepared_by', 'created_at', 'released_at')
-    fields = ('no', 'nature_of_doc_being_secured',
-              'client', 'permit_application', 'prepared_by',
-              'paid', 'released_at')
-    autocomplete_fields = ('permit_application', 'client', 'prepared_by')
+                    'paid', 'created_by', 'prepared_by', 'approved_by', 'created_at', 'released_at')
+    autocomplete_fields = ('permit_application', 'client', 'created_by')
     search_fields = ('no', 'permit_application__no')
     inlines = (PaymentOrderItemInline,)
     change_form_template = 'payments/admin/paymentorder_changeform.html'
@@ -45,12 +45,39 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
 
     paid.boolean = True
 
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
+        qs = super().get_queryset(request)
+
+        if isinstance(request.user.subclass, Signatory):
+            qs = qs.filter(Q(prepared_by=request.user.subclass)
+                           | Q(approved_by=request.user.subclass))
+
+        return qs
+
+    def get_fieldsets(self, request: HttpRequest, obj: Any | None = ...):
+        fields = ['no', 'nature_of_doc_being_secured',
+                  'client', 'permit_application', 'created_by', 'prepared_by',
+                  'paid', 'released_at']
+
+        if obj and obj.prepared_by and obj.prepared_by_signature:
+            fields.append('approved_by')
+
+        fieldsets = [
+            ('Permit Application Data', {
+                'fields': fields,
+            })
+        ]
+        return fieldsets
+
     def get_readonly_fields(self, request, obj=None):
+        fields = ['client', 'permit_application', 'created_by', 'released_at']
         # If obj is None, it means we are adding a new record
         if obj is None:
             return ()
+        if isinstance(request.user.subclass, Signatory) == False:
+            fields.append('approved_by')
         # Otherwise, when updating an existing record
-        return ('client', 'permit_application', 'prepared_by', 'released_at')
+        return fields
 
     def response_change(self, request, obj):
         if 'create_payment' in request.POST:
@@ -96,13 +123,13 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
 
         response_change = super().response_change(request, obj)
 
-        # Check if it's been signed by the one who prepared it
+        # Check if it's been signed by the prepared_by
         if 'add_sign' in request.POST and obj.prepared_by_signature \
                 and obj.prepared_by_signature.person == request.user:
             payment_order_prepared.send(
                 sender=request.user, payment_order=obj)
 
-        # Check if it's been signed by a signatory
+        # Check if it's been signed by the approved_by
         if 'add_sign' in request.POST and obj.approved_by_signature \
                 and obj.approved_by_signature.person == request.user:
             payment_order_signed.send(
@@ -112,7 +139,7 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         if not change:
-            obj.prepared_by = request.user.subclass
+            obj.created_by = request.user.subclass
 
         obj.save()
         return super().save_model(request, obj, form, change)
