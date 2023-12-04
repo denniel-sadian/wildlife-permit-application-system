@@ -312,7 +312,7 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                     nature_of_doc_being_secured='Wildlife',
                     client=obj.client,
                     permit_application=obj,
-                    prepared_by=request.user.subclass
+                    created_by=request.user.subclass
                 )
                 payment_order.save()
                 current_date = datetime.now()
