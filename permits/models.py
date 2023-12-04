@@ -248,6 +248,10 @@ class PermitApplication(ModelMixin, models.Model):
     farm_name = models.CharField(max_length=255, null=True, blank=True)
     farm_address = models.CharField(max_length=255, null=True, blank=True)
 
+    accepted_by = models.ForeignKey(
+        'users.Admin', on_delete=models.SET_NULL, related_name='accepted_applications',
+        blank=True, null=True)
+
     # LTP
     transport_date = models.DateField(null=True, blank=True)
     transport_location = models.CharField(
