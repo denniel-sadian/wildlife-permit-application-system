@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.contrib import admin
 from django.contrib import messages
+from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from django.http import HttpResponseRedirect
 from django.db import transaction
@@ -202,6 +203,14 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                      'client__last_name', 'status')
     autocomplete_fields = ('client',)
     change_form_template = 'permits/admin/application_changeform.html'
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
+        qs = super().get_queryset(request)
+
+        # Do not include on draft applications
+        qs = qs.exclude(status=Status.DRAFT)
+
+        return qs
 
     def acceptable(self, obj):
         return obj.submittable
