@@ -14,7 +14,7 @@
         {% if original.application %}<a href="{{ original.application.admin_url }}">View Permit Application</a>{% endif %}
         {% if original.type == 'LocalTransportPermit' %}<a href="{{ original.preview_url }}" target="_blank">View Preview</a>{% endif %}
 
-        {% if original.type == 'LocalTransportPermit' and user_has_edit_perm %}
+        {% if original.type == 'LocalTransportPermit' and user_has_edit_perm and user.type == 'Signatory' %}
             {% if current_user_has_signed %}
             <input type="submit" value="Remove Your Signature" name="remove_sign">
             {% else %}
