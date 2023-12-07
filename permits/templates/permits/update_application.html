@@ -5,7 +5,7 @@
 {% block title %}{{ object.no }}{% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=41" />
+<link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=42" />
 {% endblock %}
 
 {% block styles %}
@@ -261,6 +261,11 @@
             <a href="{% url 'pay_via_gcash_redirect' pk=object.paymentorder.id %}" class="w3-btn w3-blue w3-round-xxlarge">Pay via GCash</a>
         </div>
         {% endif %}
+
+        {% if object.paymentorder.paid %}
+            {% include 'ui/receipt.html' with payment=object.paymentorder.payment %}
+        {% endif %}
+
         {% endif %}
 
         {% if object.remarks.count != 0 %}
