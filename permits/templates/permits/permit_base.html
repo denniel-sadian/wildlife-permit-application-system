@@ -9,6 +9,8 @@
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="https://kit.fontawesome.com/209b41c676.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto+Slab:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=37" />
     {% block styles %}
     <style>
         body {
@@ -109,6 +111,8 @@
         <hr>
 
         {% block content %}{% endblock content %}
+
+        {% include 'ui/receipt.html' with payment=permit.payment_order.payment %}
     </main>
 
     <script>
