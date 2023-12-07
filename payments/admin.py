@@ -86,7 +86,7 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
                                   payment_order=obj,
                                   amount=obj.total,
                                   payment_type=PaymentType.OTC,
-                                  created_by=request.user)
+                                  created_by=request.user.subclass)
                 payment.save()
                 self.message_user(
                     request, 'Payment record has been made.', level=messages.SUCCESS)
