@@ -263,6 +263,10 @@ class PermitApplication(ModelMixin, models.Model):
     permit = models.ForeignKey(
         Permit, on_delete=models.SET_NULL, null=True, blank=True)
 
+    inspection_report = models.FileField(
+        upload_to='uploaded_inspections/', null=True, blank=True,
+        validators=[validate_file_size])
+
     @property
     def total_transport_quantity(self):
         return self.requested_species_to_transport.aggregate(
