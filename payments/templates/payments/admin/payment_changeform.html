@@ -5,6 +5,7 @@
 {% block extrastyle %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=36" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto+Slab:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 {% endblock %}
 
 {% block submit_buttons_bottom %}
@@ -13,5 +14,7 @@
     <div class="submit-row custom-row">
         {% if original.payment_order %}<a href="{{ original.payment_order.admin_url }}">View Payment Order</a>{% endif %}
     </div>
+
+    {% include 'ui/receipt.html' with payment=original %}
 
 {% endblock %}
