@@ -82,8 +82,4 @@
 
 <hr>
 
-{% if permit.payment_order.payment.uploaded_receipt %}
-<embed src="{{ permit.payment_order.payment.uploaded_receipt.url }}" class="added-file"/>
-{% endif %}
-
 {% endblock content %}
