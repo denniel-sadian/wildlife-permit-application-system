@@ -240,6 +240,9 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
         if obj and obj.permit_type == PermitType.WCP:
             pass
 
+        if obj and obj.permit_type != PermitType.LTP:
+            fields.append('inspection_report')
+
         fieldsets = [
             ('Permit Application Data', {
                 'fields': fields,
