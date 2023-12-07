@@ -80,7 +80,8 @@ class PaymentType(models.TextChoices):
 
 class Payment(ModelMixin, models.Model):
     created_by = models.ForeignKey(
-        'users.User', on_delete=models.CASCADE, null=True,
+        'users.Cashier', on_delete=models.CASCADE,
+        null=True, blank=True,
         related_name='created_payments')
     created_at = models.DateTimeField(auto_now_add=True)
     receipt_no = models.CharField(max_length=255)
