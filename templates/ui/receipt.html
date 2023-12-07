@@ -1,0 +1,52 @@
+{% load static %}
+
+<div class="receipt">
+
+    {% if not payment.uploaded_receipt %}
+    <div>
+        <div class="header">
+            <span style="font-size:18px;">Your receipt from</span>
+            <span class="descriptor" style="font-size:30px; line-height:40px;">{{ payment.json_response.statement_descriptor }}</span>
+            <span style="font-size:18px; margin-top:20px;">Invoice #{{ payment.json_response.payments.0.id }}</span>
+        </div>
+        <div class="greetings">
+            <span>Hi {{ payment.payment_order.client.first_name }},</span>
+            <span style="color:gray; margin-top:10px;">Thank you for your payment. Here's a copy of your receipt.</span>
+        </div>
+        <div class="amount-cont">
+            <span style="color:rgb(185, 185, 185); font-size:14px;" class="label">Amount paid</span>
+            <span class="amount">₱ {{ payment.amount }}</span>
+        </div>
+        <div class="description">
+            <span style="color:rgb(185, 185, 185); font-size:14px;">Transaction description</span>
+            <span class="txt" style="font-size:18px; line-height:30px;">{{ payment.json_response.description }}</span>
+        </div>
+        <div class="billedto">
+            <span style="color:rgb(185, 185, 185); font-size:14px;">Billed to</span>
+            <span class="txt" style="font-size:18px; line-height:30px;">{{ payment.payment_order.client.name }}</span>
+        </div>
+        <div class="method">
+            <span style="color:rgb(185, 185, 185); font-size:14px;">Payment method</span>
+            <span class="txt" style="font-size:18px; line-height:30px;">GCash</span>
+        </div>
+        <div class="date">
+            <span style="color:rgb(185, 185, 185); font-size:14px;">Date paid</span>
+            <span class="txt" style="font-size:18px; line-height:30px;">{{ payment.created_at }}</span>
+        </div>
+        <div class="greetings">
+            <span style="color:gray; margin-top:10px;">If you have any questions about this payment, contact {{ payment.json_response.statement_descriptor }}.</span>
+        </div>
+        <div class="footer">
+            <span style="font-size:12px;">You're receiving this temporary receipt because you made a purchase at {{ payment.json_response.statement_descriptor }},
+                which partners with PayMongo to provide invoicing and payment processing.</span>
+            <img src="{% static 'img/paymongo.png' %}" style="width:100%; max-width:180px; height:auto; padding:10px 0px;">
+            <span style="font-size:12px;">PayMongo Philippines, Inc.<br>Bonifacio Global City, Taguig 1634</span>
+        </div>
+    </div>
+    {% else %}
+    <div>
+        <img src="{{ payment.uploaded_receipt.url }}" style="width:100%; height:auto;">
+    </div>
+    {% endif %}
+
+</div>
