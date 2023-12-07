@@ -1,5 +1,6 @@
 {% load static %}
 
+{% if payment.payment_order.paid %}
 <div class="receipt">
 
     {% if not payment.uploaded_receipt %}
@@ -50,3 +51,4 @@
     {% endif %}
 
 </div>
+{% endif %}
