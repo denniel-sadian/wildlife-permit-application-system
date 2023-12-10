@@ -146,3 +146,8 @@ class Validator(User):
     def save(self, *args, **kwargs):
         self.is_staff = True
         super().save(*args, **kwargs)
+
+
+class TransientNotification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
