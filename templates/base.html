@@ -87,7 +87,7 @@
             <div class="w3-panel w3-display-container {{ message.tags }} w3-round-large">
                 <span onclick="this.parentElement.style.display='none'" class="w3-button w3-large w3-display-topright w3-round-large"><i class="fa fa-close"></i></span>
                 <h3>{{ message.tags }}</h3>
-                <p>{{ message }}</p>
+                <p>{{ message|safe }}</p>
             </div>
             {% endfor %}
         </div>

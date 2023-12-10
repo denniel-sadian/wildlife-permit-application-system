@@ -5,8 +5,9 @@ from django.dispatch import Signal
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext as _
+from django.urls import reverse_lazy
 
-from users.models import User
+from users.models import User, TransientNotification
 
 from .models import (
     PermitApplication,
@@ -95,6 +96,13 @@ def receive_application_accepted(sender, application: PermitApplication, **kwarg
             change_message=_(message)
         )
 
+    url = reverse_lazy('update_application', args=[application.id])
+    message = f'''
+    Your permit application <a href="{url}">{application.no}</a> has been accepted.
+    '''
+    TransientNotification.objects.create(
+        user=application.client, message=message)
+
 
 @receiver(application_returned)
 def receive_application_returned(sender, application: PermitApplication, **kwargs):
@@ -113,6 +121,13 @@ def receive_application_returned(sender, application: PermitApplication, **kwarg
             change_message=_(message)
         )
 
+    url = reverse_lazy('update_application', args=[application.id])
+    message = f'''
+    Your permit application <a href="{url}">{application.no}</a> has been returned.
+    '''
+    TransientNotification.objects.create(
+        user=application.client, message=message)
+
 
 @receiver(inspection_scheduled)
 def receive_inspection_scheduled(sender, application: PermitApplication, **kwargs):
@@ -130,6 +145,14 @@ def receive_inspection_scheduled(sender, application: PermitApplication, **kwarg
             action_flag=CHANGE,
             change_message=_(message)
         )
+
+    url = reverse_lazy('update_application', args=[application.id])
+    message = f'''
+    The inspection for your permit application <a href="{url}">{application.no}</a>
+    has been scheduled on {application.inspection.scheduled_date}.
+    '''
+    TransientNotification.objects.create(
+        user=application.client, message=message)
 
 
 @receiver(inspection_signed)
@@ -211,6 +234,13 @@ def receive_permit_released(sender, permit: Permit, **kwargs):
                 change_message=_(message)
             )
 
+    url = reverse_lazy('permit_detail', args=[permit.id])
+    message = f'''
+    Your permit <a href="{url}">{permit.permit_no}</a> has been released!
+    '''
+    TransientNotification.objects.create(
+        user=permit.client, message=message)
+
 
 @receiver(permit_validated)
 def receive_permit_validated(sender, permit: Permit, **kwargs):
@@ -230,3 +260,10 @@ def receive_permit_validated(sender, permit: Permit, **kwargs):
                 action_flag=CHANGE,
                 change_message=_(message)
             )
+
+    url = reverse_lazy('permit_detail', args=[permit.id])
+    message = f'''
+    Your permit <a href="{url}">{permit.permit_no}</a> has been validated successfully.
+    '''
+    TransientNotification.objects.create(
+        user=permit.client, message=message)

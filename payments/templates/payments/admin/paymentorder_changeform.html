@@ -11,7 +11,7 @@
     {{ block.super }}
 
     <div class="submit-row custom-row">
-        {% if not original.payment%}
+        {% if not original.payment and user.type == 'Cashier' %}
         {% if user_has_edit_perm and user_has_edit_perm_payment %}<input type="submit" value="Create Payment" name="create_payment">{% endif %}
         {%  else %}
         {% if original.payment %}<a href="{{ original.payment.admin_url }}">View Payment</a>{% endif %}
@@ -25,7 +25,7 @@
         {% if user_has_edit_perm %}<input type="submit" value="Release" name="release">{% endif %}
         {% endif %}
 
-        {% if user_has_edit_perm and user.type != 'Cashier' %}
+        {% if user_has_edit_perm and user.type == 'Signatory' %}
             {% if current_user_has_signed %}
             <input type="submit" value="Remove Your Signature" name="remove_sign">
             {% else %}

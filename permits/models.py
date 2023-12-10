@@ -248,6 +248,10 @@ class PermitApplication(ModelMixin, models.Model):
     farm_name = models.CharField(max_length=255, null=True, blank=True)
     farm_address = models.CharField(max_length=255, null=True, blank=True)
 
+    accepted_by = models.ForeignKey(
+        'users.Admin', on_delete=models.SET_NULL, related_name='accepted_applications',
+        blank=True, null=True)
+
     # LTP
     transport_date = models.DateField(null=True, blank=True)
     transport_location = models.CharField(
@@ -258,6 +262,10 @@ class PermitApplication(ModelMixin, models.Model):
     # The permit created
     permit = models.ForeignKey(
         Permit, on_delete=models.SET_NULL, null=True, blank=True)
+
+    inspection_report = models.FileField(
+        upload_to='uploaded_inspections/', null=True, blank=True,
+        validators=[validate_file_size])
 
     @property
     def total_transport_quantity(self):

@@ -23,8 +23,15 @@ class PaymentOrder(ModelMixin, models.Model):
         'users.Client', on_delete=models.CASCADE, null=True, blank=True)
     permit_application = models.OneToOneField(
         PermitApplication, on_delete=models.CASCADE, null=True, blank=True)
+    created_by = models.ForeignKey(
+        'users.Admin', on_delete=models.CASCADE, related_name='created_payment_orders',
+        null=True)
     prepared_by = models.ForeignKey(
-        'users.Admin', on_delete=models.CASCADE, related_name='prepared_payment_orders')
+        'users.Signatory', on_delete=models.CASCADE, related_name='prepared_payment_orders',
+        null=True)
+    approved_by = models.ForeignKey(
+        'users.Signatory', verbose_name='Approval by', on_delete=models.CASCADE,
+        related_name='approved_payment_orders', null=True)
     paid = models.BooleanField(default=False)
     extra_data = models.JSONField(default=dict)
 
@@ -40,11 +47,11 @@ class PaymentOrder(ModelMixin, models.Model):
 
     @property
     def prepared_by_signature(self):
-        return self.signatures.filter(person=self.prepared_by).first()
+        return self.signatures.filter(object_id=self.id, person=self.prepared_by).first()
 
     @property
     def approved_by_signature(self):
-        return self.signatures.exclude(person=self.prepared_by).first()
+        return self.signatures.filter(object_id=self.id, person=self.approved_by).first()
 
     @property
     def ready(self):
@@ -73,7 +80,8 @@ class PaymentType(models.TextChoices):
 
 class Payment(ModelMixin, models.Model):
     created_by = models.ForeignKey(
-        'users.User', on_delete=models.CASCADE, null=True,
+        'users.Cashier', on_delete=models.CASCADE,
+        null=True, blank=True,
         related_name='created_payments')
     created_at = models.DateTimeField(auto_now_add=True)
     receipt_no = models.CharField(max_length=255)

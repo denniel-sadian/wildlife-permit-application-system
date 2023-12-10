@@ -5,7 +5,7 @@
 {% block title %}{{ object.no }}{% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=41" />
+<link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=42" />
 {% endblock %}
 
 {% block styles %}
@@ -55,18 +55,20 @@
             <p>You are editing your application for {{ object.get_permit_type_display }}.</p>
             {% csrf_token %}
 
-            {% if object.permit_type == 'LTP' %}
-            {% include 'ui/inputbox.html' with field=form.transport_date %}
-            {% include 'ui/inputbox.html' with field=form.transport_location %}
-            {% endif %}
+            <div id="main-form">
+                {% if object.permit_type == 'LTP' %}
+                {% include 'ui/inputbox.html' with field=form.transport_date %}
+                {% include 'ui/inputbox.html' with field=form.transport_location %}
+                {% endif %}
 
-            {% if object.permit_type == 'WCP' %}
-            {% endif %}
+                {% if object.permit_type == 'WCP' %}
+                {% endif %}
 
-            {% if object.permit_type in 'WCP WFP' %}
-            {% include 'ui/inputbox.html' with field=form.farm_name %}
-            {% include 'ui/inputbox.html' with field=form.farm_address %}
-            {% endif %}
+                {% if object.permit_type in 'WCP WFP' %}
+                {% include 'ui/inputbox.html' with field=form.farm_name %}
+                {% include 'ui/inputbox.html' with field=form.farm_address %}
+                {% endif %}
+            </div>
 
             <hr>
 
@@ -259,6 +261,11 @@
             <a href="{% url 'pay_via_gcash_redirect' pk=object.paymentorder.id %}" class="w3-btn w3-blue w3-round-xxlarge">Pay via GCash</a>
         </div>
         {% endif %}
+
+        {% if object.paymentorder.paid %}
+            {% include 'ui/receipt.html' with payment=object.paymentorder.payment %}
+        {% endif %}
+
         {% endif %}
 
         {% if object.remarks.count != 0 %}
@@ -302,4 +309,11 @@
 
     </div>
 </main>
+<script>
+    $(function() {
+        $("#main-form input").attr("required", "required");
+        $("#main-form textarea").attr("required", "required");
+    })
+</script>
+</script>
 {% endblock %}

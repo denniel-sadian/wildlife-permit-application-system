@@ -170,3 +170,86 @@
 .unpaid {
     color: #f44336;
 }
+
+
+.receipt {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.receipt > div {
+    max-width: 600px;
+    width: 100%;
+}
+.receipt .header {
+    display: flex;
+    flex-direction: column;
+    background-color: #24B47E;
+    color: #fff;
+    padding: 40px 20px 20px 20px;
+    border-radius: 20px 20px 0px 0px;
+}
+.receipt .descriptor {
+    font-family: "Roboto Slab", serif !important;
+    font-weight: bolder;
+}
+.receipt .greetings {
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+    padding: 20px;
+}
+.receipt .amount-cont {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: rgb(250, 250, 250);
+    margin-bottom: 5px;
+}
+.receipt .amount-cont .amount {
+    font-family: "Roboto Slab", serif !important;
+    font-weight: bolder;
+    font-size: 30px;
+    line-height: 30px;
+}
+.receipt .description {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: rgb(250, 250, 250);
+    margin-bottom: 5px;
+}
+.receipt .billedto {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: rgb(250, 250, 250);
+    margin-bottom: 5px;
+}
+.receipt .method {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: rgb(250, 250, 250);
+    margin-bottom: 5px;
+}
+.receipt .date {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: rgb(250, 250, 250);
+    margin-bottom: 5px;
+}
+.receipt .footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #24B47E;
+    color: #fff;
+    padding: 40px 20px 20px 20px;
+    border-radius: 0px 0px 20px 20px;
+}

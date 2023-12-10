@@ -6,8 +6,9 @@ from django.db import transaction
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext as _
+from django.urls import reverse_lazy
 
-from users.models import User
+from users.models import User, TransientNotification
 
 from permits.models import PermitApplication
 
@@ -90,6 +91,16 @@ def receive_payment_order_released(sender, payment_order: PaymentOrder, **kwargs
             action_flag=CHANGE,
             change_message=_(message)
         )
+
+    url = reverse_lazy(
+        'update_application', args=[payment_order.permit_application.id])
+    message = f'''
+    The payment order for your permit application
+    <a href="{url}">{payment_order.permit_application.no}</a>
+    has been released.
+    '''
+    TransientNotification.objects.create(
+        user=payment_order.client, message=message)
 
 
 @receiver(payment_order_paid)

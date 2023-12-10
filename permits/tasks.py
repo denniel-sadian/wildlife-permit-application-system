@@ -6,6 +6,7 @@ import io
 
 from django.contrib.auth.models import Group
 from django.db.models import Sum, F
+from django.urls import reverse_lazy
 
 from celery import shared_task
 
@@ -15,7 +16,8 @@ from openpyxl.styles import NamedStyle, Font, Border, Side, Alignment
 from users.models import (
     User,
     Admin,
-    Client
+    Client,
+    TransientNotification
 )
 
 from payments.models import PaymentOrder, PaymentOrderItem
@@ -184,6 +186,13 @@ def check_permit_validity():
         users.append(permit.client)
         for user in users:
             PermitExpiredEmailView(user, permit.subclass).send()
+
+        url = reverse_lazy('permit_detail', args=[permit.id])
+        message = f'''
+        Your permit <a href="{url}">{permit.permit_no}</a> has expired.
+        '''
+        TransientNotification.objects.create(
+            user=permit.client, message=message)
 
     logger.info('Done expiring permits.')
 
