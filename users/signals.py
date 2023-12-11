@@ -17,7 +17,7 @@ user_created = Signal()
 def handle_user_created(sender, user: User, **kwargs):
     # Set temporary password, and then send the registration email too
     with transaction.atomic():
-        temporary_password = str(uuid.uuid4())
+        temporary_password = str(uuid.uuid4())[:8]
         user.set_password(temporary_password)
         user.save()
 

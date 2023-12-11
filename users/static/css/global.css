@@ -117,6 +117,12 @@ footer .cont h2 {
     font-size: 20px;
 }
 
+footer .mission-vision {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+}
+
 /* UI */
 
 .w3-btn {
@@ -374,5 +380,9 @@ h1, h2, h3, h4, h5, h6 {
         font-weight: bold;
         background-color: #87ceeb;
         color: #2196f3;
+    }
+
+    footer .mission-vision {
+        display: block;
     }
 }
