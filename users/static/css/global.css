@@ -6,6 +6,10 @@ body {
     font-family: "Nunito", sans-serif !important;
 }
 
+.brand-font {
+    font-family: 'Lobster', sans-serif !important;
+}
+
 /* NAV BAR */
 
 nav {
@@ -48,8 +52,7 @@ nav a {
 }
 
 .nav-cont .brand span {
-    font-family: "Roboto Slab", serif !important;
-    font-weight: 800;
+    font-weight: 400;
     font-size: 25px;
     padding-left: 8px;
 }
@@ -248,7 +251,7 @@ table * {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Roboto Slab", serif !important;
+    font-family: "Roboto Slab", serif;
 }
 
 .messages {

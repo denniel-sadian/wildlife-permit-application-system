@@ -7,7 +7,8 @@
 {% block styles %}
 <style>
     header {
-        height: 500px;
+        height: 100%;
+        min-height: 550px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -36,11 +37,18 @@
         object-position: center;
     }
 
+    .landing-text {
+        padding: 0px 20px;
+    }
+
     .landing-text span {
         font-family: "Roboto Slab", serif !important;
         font-weight: 600;
         font-size: 25px;
         color: rgb(171, 171, 171);
+    }
+
+    .landing-text h1 b {
     }
 
     .landing-text h1 {
@@ -93,8 +101,8 @@
         </div>
         <div class="landing-text">
             <span>Welcome to DENR-PENRO's</span>
-            <h1 class="w3-text-blue">
-                PERMITOPIA – an online wildlife permitting system
+            <h1>
+                <b class="w3-text-blue">PERMITOPIA</b> <b style="color:#47cbff;">– an online wildlife permitting system</b>
             </h1>
             <p>
                 <i>... where streamlined permit application and monitoring is served to you.</i>
