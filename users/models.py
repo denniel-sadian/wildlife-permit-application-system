@@ -33,7 +33,7 @@ class ObjectManager(UserManager, InheritanceManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self._create_user(username, password=password, **extra_fields)
+        return self._create_user(username, email, password=password, **extra_fields)
 
     def get_by_natural_key(self, username):
         """Return `User` with matching natural key."""
