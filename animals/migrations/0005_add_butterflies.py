@@ -64,7 +64,11 @@ def add_butterflies(apps, schema_editor):
         ('Vendula Erota', 'v e', 'White Dragontail'),
         ('Vindula dejone', 'v d', 'Cruiser')
     ]
-    butterfly = Species.objects.filter(name__icontains='butterfly').first()
+    butterfly, created = (
+        Species
+        .objects
+        .get_or_create(name='butterfly',
+                       defaults={'type': 'FLORA'}))
 
     for i in butterflies:
         scientific_name, input_code, common_name = i
