@@ -105,8 +105,9 @@ class HomeView(TemplateView):
 
 class ProfileView(CustomLoginRequiredMixin, UpdateView):
     model = User
-    fields = ('first_name', 'last_name', 'gender', 'phone_number',
-              'title', 'signature_image')
+    fields = (
+        'username', 'email', 'first_name', 'last_name', 'gender',
+        'phone_number', 'title', 'signature_image')
     template_name = 'users/profile.html'
     success_url = reverse_lazy('profile')
 
