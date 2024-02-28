@@ -100,7 +100,7 @@ class PermitApplicationListView(CustomLoginRequiredMixin, ListView):
         qs = super().get_queryset()
         filters = PermitApplicationFilter(
             self.request.GET, request=self.request, queryset=qs)
-        return filters.qs.order_by('-created_at')
+        return filters.qs.order_by('-id')
 
 
 class PermitApplicationUpdateView(CustomLoginRequiredMixin, UpdateView):
@@ -325,7 +325,7 @@ class PermitListView(CustomLoginRequiredMixin, ListView):
         qs = super().get_queryset()
         filters = PermitFilter(
             self.request.GET, request=self.request, queryset=qs)
-        return filters.qs.order_by('-created_at')
+        return filters.qs.order_by('-id')
 
 
 class PermitApplicationItemDeleteView(CustomLoginRequiredMixin, DeleteView):
