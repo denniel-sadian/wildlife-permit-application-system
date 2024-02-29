@@ -243,7 +243,7 @@
             </div>
             {% if object.editable %}
             <div class="mini-form">
-                {% include 'ui/select.html' with field=requirement.requirement %}
+                {% include 'ui/select-normal.html' with field=requirement.requirement %}
                 {% include 'ui/fileinput.html' with field=requirement.uploaded_file %}
             </div>
             <div class="buttons">
