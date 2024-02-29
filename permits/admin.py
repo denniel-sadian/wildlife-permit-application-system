@@ -198,8 +198,7 @@ class RemarksInline(admin.TabularInline):
 
 @admin.register(PermitApplication)
 class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
-    list_display = ('no', 'permit_type', 'client', 'status',
-                    'acceptable', 'created_at')
+    list_display = ('no', 'permit_type', 'client', 'status', 'created_at')
     list_filter = ('permit_type', 'status',)
     search_fields = ('no', 'permit_type', 'client__first_name',
                      'client__last_name', 'status')
@@ -218,11 +217,6 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                             & Q(accepted_by__isnull=False))
 
         return qs
-
-    def acceptable(self, obj):
-        return obj.submittable
-
-    acceptable.boolean = True
 
     def get_readonly_fields(self, request, obj=None):
         # If obj is None, it means we are adding a new record
