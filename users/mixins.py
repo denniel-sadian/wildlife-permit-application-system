@@ -60,6 +60,14 @@ class AdminMixin:
 
         return super().response_change(request, obj)
 
+    def changeform_view(self, request, object_id=None, form_url='',
+                        extra_context=None):
+        extra_context['show_save'] = False
+        extra_context['show_save_as_new'] = False
+        extra_context['show_save_and_add_another'] = False
+        return super().changeform_view(request, object_id, form_url,
+                                       extra_context)
+
 
 class ModelMixin:
 
