@@ -113,8 +113,6 @@ def notify_client_and_officer_about_scheduled_inspection(application_id):
         id=application_id)
     ScheduledInspectionEmailView(
         application.client, application).send()
-    AssignedScheduledInspectionEmailView(
-        application.inspection.inspecting_officer, application).send()
 
 
 @shared_task
