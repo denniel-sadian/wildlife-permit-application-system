@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager
+from django.contrib.auth.models import Group
 
 from model_utils.managers import InheritanceManager
 from phonenumber_field.modelfields import PhoneNumberField
@@ -122,6 +123,13 @@ class Signatory(User):
     class Meta:
         verbose_name = 'Signatory'
         verbose_name_plural = 'Signatories'
+
+    @property
+    def signatory_type(self):
+        return (
+            self.groups.first().name
+            if self.groups.first()
+            else 'No type yet')
 
     def save(self, *args, **kwargs):
         self.is_staff = True
