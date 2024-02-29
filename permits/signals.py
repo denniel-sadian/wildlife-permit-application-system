@@ -159,7 +159,9 @@ def receive_inspection_scheduled(sender, application: PermitApplication, **kwarg
 def receive_inspection_signed(sender, application: PermitApplication, **kwargs):
     if application is None:
         return
-    message = f'Inspection for {application.no} has been signed by {application.inspection.inspecting_officer.name}.'
+    message = (
+        f'Inspection for {application.no} has been signed by '
+        f'{application.inspection.signatures[0].name}.')
     logger.info(message)
     notify_admins_about_signed_inspection.delay(
         application_id=application.id)
