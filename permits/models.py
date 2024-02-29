@@ -49,7 +49,7 @@ class Requirement(models.Model):
         validators=[validate_file_size])
 
     def __str__(self):
-        return str(self.label)
+        return str(self.code)
 
     def save(self, *args, **kwargs):
         self.code = self.code.upper().replace(' ', '')
