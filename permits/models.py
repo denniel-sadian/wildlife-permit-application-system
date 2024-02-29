@@ -406,8 +406,6 @@ class Inspection(ModelMixin, models.Model):
         PermitApplication, on_delete=models.CASCADE,
         null=True)
     scheduled_date = models.DateField(null=True)
-    inspecting_officer = models.ForeignKey(
-        'users.Admin', on_delete=models.CASCADE, null=True)
 
     @property
     def day(self):
