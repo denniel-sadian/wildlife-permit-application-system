@@ -71,7 +71,9 @@ class CashierAdmin(BaseUserAdmin):
 
 @admin.register(Signatory)
 class SignatoryAdmin(BaseUserAdmin):
-    pass
+    list_display = ('username', 'email', 'first_name', 'title',
+                    'signatory_type', 'last_name', 'is_active',
+                    'date_joined', 'last_login')
 
 
 @admin.register(Client)
