@@ -161,7 +161,7 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
 
 
 @admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
+class PaymentAdmin(AdminMixin, admin.ModelAdmin):
     exclude = ('json_response',)
     autocomplete_fields = ('payment_order',)
     change_form_template = 'payments/admin/payment_changeform.html'
