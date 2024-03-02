@@ -181,6 +181,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 USE_S3 = json.loads(os.getenv('USE_S3', 'false'))
+STATICFILES_DIRS = [
+    BASE_DIR / 'frontend/dist/'
+]
 if USE_S3:
     # aws settings
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -311,7 +314,8 @@ PAYMONGO = {
 
 
 DJANGO_VITE = {
-    "default": {
-        "dev_mode": True
+    'default': {
+        'dev_mode': True,
+        'manifest_path': BASE_DIR / 'frontend/dist/.vite/manifest.json'
     }
 }
