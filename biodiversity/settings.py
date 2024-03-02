@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'ajax_select',
     'django_filters',
     'storages',
+    'django_vite',
 
     'users',
     'animals',
@@ -306,4 +307,11 @@ VALIDITY = {
 PAYMONGO = {
     'SECRET_KEY': os.getenv('PAYMONGO_SECRET_KEY'),
     'STATEMENT_DESCRIPTOR': os.getenv('PAYMONGO_STATEMENT_DESCRIPTOR', 'DENR-PENRO')
+}
+
+
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": True
+    }
 }

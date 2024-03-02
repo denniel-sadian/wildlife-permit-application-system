@@ -1,5 +1,7 @@
 {% load static %}
 
+{% load django_vite %}
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -26,6 +28,9 @@
             crossorigin="anonymous"
         ></script>
         <script src="{% static 'js/jquery.js' %}"></script>
+
+        {% vite_hmr_client %}
+        {% vite_asset 'src/main.js' %}
 
         {% block links %}{% endblock %}
 
@@ -101,6 +106,10 @@
             {% endfor %}
         </div>
         {% endif %}
+
+        <div id="app">
+            <hello-world msg="hello"></hello-world>
+        </div>
 
         {% block scripts %}{% endblock %}
         <script>
