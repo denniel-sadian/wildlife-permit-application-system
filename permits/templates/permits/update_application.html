@@ -238,7 +238,7 @@
             <div class="list">
                 {% for i in object.requirements.all %}
                 <div class="list-item">
-                    <div><a href="{{ i.uploaded_file.url }}" target="_blank" class="w3-text-blue">{{ i.requirement.label }}</a></div>
+                    <div><a href="{% url 'view_uploaded_requirement' pk=i.id %}" target="_blank" class="w3-text-blue">{{ i.requirement.label }}</a></div>
                     {% if object.editable %}
                     <div><a href="{% url 'delete_uploaded_requirement' pk=i.id %}"><i class="fa fa-trash-o w3-text-red"></i></a></div>
                     {% endif %}
