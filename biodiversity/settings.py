@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'rest_framework',
     'phonenumber_field',
     'django_yubin',
     'dal',
@@ -318,4 +319,14 @@ DJANGO_VITE = {
         'dev_mode': True,
         'manifest_path': BASE_DIR / 'frontend/dist/.vite/manifest.json'
     }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # for browsable API
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': (
+        'rest_framework.pagination.LimitOffsetPagination'),
+    'PAGE_SIZE': 10,
 }
