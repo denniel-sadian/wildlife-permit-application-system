@@ -37,7 +37,8 @@
 
   {% if inline_admin_form.original %}
   <div class="form-row">
-    <a href="{% url 'view_uploaded_requirement' pk=inline_admin_form.original.id %}" target="_blank">Preview</a>
+    <a href="{% url 'view_uploaded_requirement' pk=inline_admin_form.original.id %}" target="_blank"
+    style="border-radius:8px; padding:10px; background:#2196F3; color:#fff">Preview</a>
   </div>
   {% endif %}
 
