@@ -53,6 +53,7 @@ class UploadedRequirementInline(admin.StackedInline):
     model = UploadedRequirement
     extra = 1
     autocomplete_fields = ('requirement',)
+    template = 'permits/admin/inlines/uploadedrequirement_inline.html'
 
 
 class TransportEntryInline(admin.TabularInline):
