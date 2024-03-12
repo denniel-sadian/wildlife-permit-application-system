@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "django-vite-plugin": "^4.0.0",
-    "vue": "^3.4.19"
+    "vue": "^3.4.19",
+    "vue-observe-visibility": "^1.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
