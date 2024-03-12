@@ -156,6 +156,11 @@ class Validator(User):
         super().save(*args, **kwargs)
 
 
-class TransientNotification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class Notification(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=True, null=True)
     message = models.TextField()
+    url = models.TextField(blank=True, null=True)
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
