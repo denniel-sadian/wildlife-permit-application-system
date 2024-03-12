@@ -398,3 +398,13 @@ class ValidateRedirectView(CustomLoginRequiredMixin, SingleObjectMixin, Redirect
         return reverse_lazy(
             'permit_detail',
             kwargs={'pk': permit.id}) + params
+
+
+class UploadedRequirementDetailView(CustomLoginRequiredMixin, DetailView):
+    model = UploadedRequirement
+
+    def get_queryset(self):
+        if isinstance(self.request.user.subclass, Client):
+            return super().get_queryset().filter(
+                permit_application__client=self.request.user)
+        return super().get_queryset()
