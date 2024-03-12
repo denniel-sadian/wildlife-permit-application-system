@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import NotificationItem from './NotificationItem.vue';
 
 const notifications = ref({});
-const showNotifs = ref(true);
+const showNotifs = ref(false);
 
 const unreadNotifCount = computed(() => {
     if (notifications.value.results) {
