@@ -73,7 +73,7 @@
                 </div>
             </div>
         </nav>
-        <div class="page">
+        <div class="page" id="app">
             <div class="content">
                 {% block content %}{% endblock %}
             </div>
@@ -93,22 +93,12 @@
                     </div>
                 </div>
             </footer>
-        </div>
 
-        {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-            <div class="w3-panel w3-display-container {{ message.tags }} w3-round-large">
-                <span onclick="this.parentElement.style.display='none'" class="w3-button w3-large w3-display-topright w3-round-large"><i class="fa fa-close"></i></span>
-                <h3>{{ message.tags }}</h3>
-                <p>{{ message|safe }}</p>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+            {% if user.is_authenticated %}
+            <notification-list></notification-list>
+            {% endif %}
 
-        <div id="app">
-            <hello-world msg="hello"></hello-world>
+            {% csrf_token %}
         </div>
 
         {% block scripts %}{% endblock %}
