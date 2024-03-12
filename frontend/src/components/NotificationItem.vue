@@ -44,21 +44,36 @@ onMounted(async () => {
 
 <template>
 <div class="notif-item" :class="{'unread': !data.read}" @click="markRead">
-    <i class="fa fa-info-circle"></i>
-    <span class="notif-msg">{{ data.message }}</span>
-    <span class="notif-date">{{ dateDisplay }}</span>
+    <div>
+        <i class="fa fa-info-circle info-icon"></i>
+    </div>
+    <div class="msg">
+        <span class="notif-msg">{{ data.message }}</span>
+        <span class="notif-date">{{ dateDisplay }}</span>
+    </div>
 </div>
 </template>
 
 <style scoped>
 .notif-item {
-    display: flex;
-    flex-direction: column;
-    margin: 0px 20px 10px 20px;
+    display: grid;
+    margin: 0px 20px 20px 20px;
     border-radius: 12px;
-    padding: 20px 10px 6px 10px;
+    padding: 15px 20px 20px 20px;
     transition: 0.3s;
     background-color: #f3f3f3;
+    grid-template-columns: auto 1fr;
+}
+
+.info-icon {
+    color: #2196F3;
+}
+
+
+.notif-item .msg {
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
 }
 
 .unread {
@@ -70,13 +85,10 @@ onMounted(async () => {
     cursor: pointer;
 }
 
-.notif-msg {
-    margin-top: 8px;
-}
-
 .notif-date {
     text-align: right;
     color: gray;
     font-size: 10px;
+    margin-top: 10px;
 }
 </style>
