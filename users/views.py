@@ -11,18 +11,10 @@ from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 
-from .models import User, Client, Notification
+from .models import User, Client
 from .forms import ClientRegistrationForm
 
 from .signals import user_created
-
-
-def display_transient_notifications(request):
-    if request.user.is_authenticated:
-        notifications = Notification.objects.filter(user=request.user)
-        for notification in notifications:
-            messages.info(request, notification.message)
-        notifications.delete()
 
 
 class CustomLoginRequiredMixin(LoginRequiredMixin):
