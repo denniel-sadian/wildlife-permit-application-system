@@ -388,7 +388,7 @@ class UploadedRequirement(models.Model):
         Requirement, on_delete=models.CASCADE)
     uploaded_file = models.FileField(
         upload_to='requirements/', null=False, blank=False,
-        validators=[validate_file_size])
+        validators=[validate_file_extension, validate_file_size])
 
     class Meta:
         unique_together = ('permit_application', 'requirement')
