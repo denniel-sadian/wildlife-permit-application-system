@@ -17,7 +17,7 @@ from users.models import (
     User,
     Admin,
     Client,
-    TransientNotification
+    Notification
 )
 
 from payments.models import PaymentOrder, PaymentOrderItem
@@ -189,7 +189,7 @@ def check_permit_validity():
         message = f'''
         Your permit <a href="{url}">{permit.permit_no}</a> has expired.
         '''
-        TransientNotification.objects.create(
+        Notification.objects.create(
             user=permit.client, message=message)
 
     logger.info('Done expiring permits.')

@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext as _
 from django.urls import reverse_lazy
 
-from users.models import User, TransientNotification
+from users.models import User, Notification
 
 from permits.models import PermitApplication
 
@@ -99,7 +99,7 @@ def receive_payment_order_released(sender, payment_order: PaymentOrder, **kwargs
     <a href="{url}">{payment_order.permit_application.no}</a>
     has been released.
     '''
-    TransientNotification.objects.create(
+    Notification.objects.create(
         user=payment_order.client, message=message)
 
 
