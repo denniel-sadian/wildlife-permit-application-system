@@ -18,7 +18,11 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+from rest_framework import routers
+
 from ajax_select import urls as ajax_select_urls
+
+from users import api_views as users_api_views
 
 TITLE = 'Biodiversity Administration'
 admin.site.site_header = TITLE
@@ -27,13 +31,18 @@ admin.site.index_title = TITLE
 
 admin.autodiscover()
 
+router = routers.DefaultRouter()
+router.register('notifications', users_api_views.NotificationViewSet)
+
 urlpatterns = [
     path('', include('users.urls')),
     path('', include('animals.urls')),
     path('', include('payments.urls')),
     path('', include('permits.urls')),
+    path('api/', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
-    path('ajax_select/', include(ajax_select_urls))
+    path('ajax_select/', include(ajax_select_urls)),
 ]
 
 if settings.DEBUG:
