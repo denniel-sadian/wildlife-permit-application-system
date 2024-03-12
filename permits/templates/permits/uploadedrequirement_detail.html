@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ object.requirement.label }}</title>
+    <style>
+        body {
+            text-align: center;
+        }
+        #preview-frame {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<iframe src="{{ object.uploaded_file.url }}" id="preview-frame"></iframe>
+<a href="{{ object.uploaded_file.url }}">{{ object.uploaded_file.url }}</a>
+
+</body>
+</html>
