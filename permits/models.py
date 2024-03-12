@@ -331,6 +331,12 @@ class PermitApplication(ModelMixin, models.Model):
 
         return True
 
+    @property
+    def client_url(self):
+        url = reverse_lazy(
+            'update_application', args=[self.id])
+        return url
+
     def __str__(self):
         return str(self.no)
 
