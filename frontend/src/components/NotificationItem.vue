@@ -46,7 +46,7 @@ onMounted(async () => {
 <div class="notif-item" :class="{'unread': !data.read}" @click="markRead">
     <i class="fa fa-info-circle"></i>
     <span class="notif-msg">{{ data.message }}</span>
-    <span class="notif-date">{{ dateDisplay }} - {{ data.url }}</span>
+    <span class="notif-date">{{ dateDisplay }}</span>
 </div>
 </template>
 
