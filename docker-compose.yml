@@ -31,6 +31,7 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       CELERY_BROKER_URL:
       PAYMONGO_SECRET_KEY:
+      DJANGO_VITE_DEV_MODE:
     depends_on:
       - db
       - mail
