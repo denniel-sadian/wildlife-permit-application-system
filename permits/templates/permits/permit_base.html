@@ -41,7 +41,7 @@
 
         #qrcode img {
             margin: 0px;
-            max-width: 120px;
+            max-width: 50px;
             width: 100%;
             height: auto;
         }
@@ -64,10 +64,10 @@
             border-radius: 8px;
         }
 
-        #print-btn {
+        #action-btns {
             position: fixed;
-            bottom: 0px;
-            right: 0px;
+            bottom: 20px;
+            right: 20px;
         }
     </style>
     {% endblock styles %}
@@ -120,7 +120,15 @@
         </div>
     </main>
 
-    <button id="print-btn" onclick="printToPdf()">Print to PDF</button>
+    <div id="action-btns">
+        <button id="print-btn" onclick="printToPdf()" class="w3-btn w3-blue w3-round-large">
+            <i class="fa fa-save"></i> Save to PDF</button>
+
+        {% if user.type == 'Validator' %}
+        <a href="{{ permit.validation_url }}" class="w3-btn w3-green w3-round-large">
+            <i class="fa fa-check-circle"></i> Validate</a>
+        {% endif %}
+    </div>
 
     <script>
         function printToPdf() {
@@ -139,7 +147,7 @@
         $(function () {
             var qrcodeEl = document.getElementById('qrcode');
             if (qrcodeEl) {
-                new QRCode(document.getElementById('qrcode'), '{{ DOMAIN }}{{ permit.validation_url }}');
+                new QRCode(qrcodeEl, '{{ DOMAIN }}{% url "permit_detail" pk=permit.id %}');
             }
         })
     </script>
