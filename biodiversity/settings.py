@@ -316,7 +316,7 @@ PAYMONGO = {
 
 DJANGO_VITE = {
     'default': {
-        'dev_mode': True,
+        'dev_mode': json.loads(os.getenv('DJANGO_VITE_DEV_MODE', 'false')),
         'manifest_path': BASE_DIR / 'frontend/dist/.vite/manifest.json'
     }
 }
