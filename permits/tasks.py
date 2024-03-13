@@ -185,12 +185,7 @@ def check_permit_validity():
         for user in users:
             PermitExpiredEmailView(user, permit.subclass).send()
 
-        url = reverse_lazy('permit_detail', args=[permit.id])
-        message = f'''
-        Your permit <a href="{url}">{permit.permit_no}</a> has expired.
-        '''
-        Notification.objects.create(
-            user=permit.client, message=message)
+        # TODO: Add again the notification
 
     logger.info('Done expiring permits.')
 

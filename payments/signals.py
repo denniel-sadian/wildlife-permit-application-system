@@ -92,16 +92,6 @@ def receive_payment_order_released(sender, payment_order: PaymentOrder, **kwargs
             change_message=_(message)
         )
 
-    url = reverse_lazy(
-        'update_application', args=[payment_order.permit_application.id])
-    message = f'''
-    The payment order for your permit application
-    <a href="{url}">{payment_order.permit_application.no}</a>
-    has been released.
-    '''
-    Notification.objects.create(
-        user=payment_order.client, message=message)
-
 
 @receiver(payment_order_paid)
 def receive_payment_order_paid(sender, payment_order: PaymentOrder, **kwargs):

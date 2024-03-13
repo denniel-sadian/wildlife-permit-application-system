@@ -281,13 +281,6 @@ def receive_permit_released(sender, permit: Permit, **kwargs):
                 change_message=_(message)
             )
 
-    url = reverse_lazy('permit_detail', args=[permit.id])
-    message = f'''
-    Your permit <a href="{url}">{permit.permit_no}</a> has been released!
-    '''
-    Notification.objects.create(
-        user=permit.client, message=message)
-
 
 @receiver(permit_validated)
 def receive_permit_validated(sender, permit: Permit, **kwargs):
@@ -307,10 +300,3 @@ def receive_permit_validated(sender, permit: Permit, **kwargs):
                 action_flag=CHANGE,
                 change_message=_(message)
             )
-
-    url = reverse_lazy('permit_detail', args=[permit.id])
-    message = f'''
-    Your permit <a href="{url}">{permit.permit_no}</a> has been validated successfully.
-    '''
-    Notification.objects.create(
-        user=permit.client, message=message)
