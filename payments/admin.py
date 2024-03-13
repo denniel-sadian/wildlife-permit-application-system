@@ -7,6 +7,7 @@ from django.db.models.query import QuerySet
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+from django.contrib.auth.models import Group
 from django.http.request import HttpRequest
 
 from users.mixins import AdminMixin
@@ -79,6 +80,20 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
         # Otherwise, when updating an existing record
         return fields
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name in ['prepared_by', 'approved_by']:
+            payment_order_signatory_group = (
+                Group
+                .objects
+                .filter(name__iexact='Payment Order Signatory')
+                .first())
+            if payment_order_signatory_group:
+                kwargs['queryset'] = (
+                    Signatory
+                    .objects
+                    .filter(groups__in=[payment_order_signatory_group]))
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def response_change(self, request, obj):
         if 'create_payment' in request.POST:
             if not hasattr(obj, 'payment') and obj.total != 0 and obj.released_at:
@@ -146,7 +161,7 @@ class PaymentOrderAdmin(AdminMixin, admin.ModelAdmin):
 
 
 @admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
+class PaymentAdmin(AdminMixin, admin.ModelAdmin):
     exclude = ('json_response',)
     autocomplete_fields = ('payment_order',)
     change_form_template = 'payments/admin/payment_changeform.html'

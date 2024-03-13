@@ -49,7 +49,7 @@ class Requirement(models.Model):
         validators=[validate_file_size])
 
     def __str__(self):
-        return str(self.label)
+        return str(self.code)
 
     def save(self, *args, **kwargs):
         self.code = self.code.upper().replace(' ', '')
@@ -331,6 +331,12 @@ class PermitApplication(ModelMixin, models.Model):
 
         return True
 
+    @property
+    def client_url(self):
+        url = reverse_lazy(
+            'update_application', args=[self.id])
+        return url
+
     def __str__(self):
         return str(self.no)
 
@@ -382,7 +388,7 @@ class UploadedRequirement(models.Model):
         Requirement, on_delete=models.CASCADE)
     uploaded_file = models.FileField(
         upload_to='requirements/', null=False, blank=False,
-        validators=[validate_file_size])
+        validators=[validate_file_extension, validate_file_size])
 
     class Meta:
         unique_together = ('permit_application', 'requirement')
@@ -406,8 +412,6 @@ class Inspection(ModelMixin, models.Model):
         PermitApplication, on_delete=models.CASCADE,
         null=True)
     scheduled_date = models.DateField(null=True)
-    inspecting_officer = models.ForeignKey(
-        'users.Admin', on_delete=models.CASCADE, null=True)
 
     @property
     def day(self):

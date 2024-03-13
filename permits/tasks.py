@@ -17,7 +17,7 @@ from users.models import (
     User,
     Admin,
     Client,
-    TransientNotification
+    Notification
 )
 
 from payments.models import PaymentOrder, PaymentOrderItem
@@ -113,8 +113,6 @@ def notify_client_and_officer_about_scheduled_inspection(application_id):
         id=application_id)
     ScheduledInspectionEmailView(
         application.client, application).send()
-    AssignedScheduledInspectionEmailView(
-        application.inspection.inspecting_officer, application).send()
 
 
 @shared_task
@@ -187,12 +185,7 @@ def check_permit_validity():
         for user in users:
             PermitExpiredEmailView(user, permit.subclass).send()
 
-        url = reverse_lazy('permit_detail', args=[permit.id])
-        message = f'''
-        Your permit <a href="{url}">{permit.permit_no}</a> has expired.
-        '''
-        TransientNotification.objects.create(
-            user=permit.client, message=message)
+        # TODO: Add again the notification
 
     logger.info('Done expiring permits.')
 

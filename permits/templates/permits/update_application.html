@@ -220,10 +220,14 @@
                 <h3>Needed Requirements:</h3>
                 <ul>
                     {% for i in needed_requirements %}
-                    <li>
-                        <i class="fa {% if i.submitted %}fa-check w3-text-green{% else %}fa-times w3-text-red{% endif %}"></i> {% if i.optional %}(Optional) {% endif %}{{ i.requirement.requirement.label }}
+                    <li class="w3-margin-top">
+                        <i class="fa {% if i.submitted %}fa-check w3-text-green{% else %}fa-times w3-text-red{% endif %}"></i> {% if i.optional %}(Optional) {% endif %}&nbsp;
+                        <b>{{ i.requirement.requirement.code }}</b>:
+                        <br>
+                        <span class="w3-text-gray">{{ i.requirement.requirement.label }}</span>
                         {% if i.requirement.requirement.example_file %}
-                        (<a href="{{ i.requirement.requirement.example_file.url }}" target="_blank" class="w3-text-blue">See example</a>)
+                        <br>
+                        (<a href="{{ i.requirement.requirement.example_file.url }}" target="_blank" class="w3-text-blue">See&nbsp;example</a>)
                         {% endif %}
                     </li>
                     {% endfor %}
@@ -234,7 +238,7 @@
             <div class="list">
                 {% for i in object.requirements.all %}
                 <div class="list-item">
-                    <div><a href="{{ i.uploaded_file.url }}" target="_blank" class="w3-text-blue">{{ i.requirement.label }}</a></div>
+                    <div><a href="{% url 'view_uploaded_requirement' pk=i.id %}" target="_blank" class="w3-text-blue">{{ i.requirement.label }}</a></div>
                     {% if object.editable %}
                     <div><a href="{% url 'delete_uploaded_requirement' pk=i.id %}"><i class="fa fa-trash-o w3-text-red"></i></a></div>
                     {% endif %}
@@ -243,7 +247,7 @@
             </div>
             {% if object.editable %}
             <div class="mini-form">
-                {% include 'ui/select.html' with field=requirement.requirement %}
+                {% include 'ui/select-normal.html' with field=requirement.requirement %}
                 {% include 'ui/fileinput.html' with field=requirement.uploaded_file %}
             </div>
             <div class="buttons">

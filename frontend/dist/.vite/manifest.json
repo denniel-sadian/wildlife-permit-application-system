@@ -1,0 +1,10 @@
+{
+  "src/main.js": {
+    "file": "assets/main-ChRqLiDM.js",
+    "src": "src/main.js",
+    "isEntry": true,
+    "css": [
+      "assets/main-CPD297_k.css"
+    ]
+  }
+}

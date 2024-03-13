@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'rest_framework',
     'phonenumber_field',
     'django_yubin',
     'dal',
@@ -63,6 +64,7 @@ INSTALLED_APPS = [
     'ajax_select',
     'django_filters',
     'storages',
+    'django_vite',
 
     'users',
     'animals',
@@ -180,6 +182,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 USE_S3 = json.loads(os.getenv('USE_S3', 'false'))
+STATICFILES_DIRS = [
+    BASE_DIR / 'frontend/dist/'
+]
 if USE_S3:
     # aws settings
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -306,4 +311,22 @@ VALIDITY = {
 PAYMONGO = {
     'SECRET_KEY': os.getenv('PAYMONGO_SECRET_KEY'),
     'STATEMENT_DESCRIPTOR': os.getenv('PAYMONGO_STATEMENT_DESCRIPTOR', 'DENR-PENRO')
+}
+
+
+DJANGO_VITE = {
+    'default': {
+        'dev_mode': json.loads(os.getenv('DJANGO_VITE_DEV_MODE', 'false')),
+        'manifest_path': BASE_DIR / 'frontend/dist/.vite/manifest.json'
+    }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # for browsable API
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': (
+        'rest_framework.pagination.LimitOffsetPagination'),
+    'PAGE_SIZE': 10,
 }

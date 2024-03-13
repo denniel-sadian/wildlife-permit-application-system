@@ -11,18 +11,10 @@ from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 
-from .models import User, Client, TransientNotification
+from .models import User, Client
 from .forms import ClientRegistrationForm
 
 from .signals import user_created
-
-
-def display_transient_notifications(request):
-    if request.user.is_authenticated:
-        notifications = TransientNotification.objects.filter(user=request.user)
-        for notification in notifications:
-            messages.info(request, notification.message)
-        notifications.delete()
 
 
 class CustomLoginRequiredMixin(LoginRequiredMixin):
@@ -32,8 +24,6 @@ class CustomLoginRequiredMixin(LoginRequiredMixin):
             return self.handle_no_permission()
         if not request.user.is_initial_password_changed:
             return redirect('password_change')
-
-        display_transient_notifications(request)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -97,8 +87,6 @@ class HomeView(TemplateView):
         user: User = request.user
         if user.is_authenticated and not user.is_initial_password_changed:
             return redirect('password_change')
-
-        display_transient_notifications(request)
 
         return super().get(request, *args, **kwargs)
 

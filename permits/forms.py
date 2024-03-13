@@ -75,8 +75,6 @@ class TransportEntryBaseForm(forms.ModelForm):
 
 
 class UploadedRequirementForm(forms.ModelForm):
-    requirement = AutoCompleteSelectField(
-        'needed-requirements', required=True, help_text=None)
 
     class Meta:
         model = UploadedRequirement

@@ -53,6 +53,7 @@ class UploadedRequirementInline(admin.StackedInline):
     model = UploadedRequirement
     extra = 1
     autocomplete_fields = ('requirement',)
+    template = 'permits/admin/inlines/uploadedrequirement_inline.html'
 
 
 class TransportEntryInline(admin.TabularInline):
@@ -198,8 +199,7 @@ class RemarksInline(admin.TabularInline):
 
 @admin.register(PermitApplication)
 class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
-    list_display = ('no', 'permit_type', 'client', 'status',
-                    'acceptable', 'created_at')
+    list_display = ('no', 'permit_type', 'client', 'status', 'created_at')
     list_filter = ('permit_type', 'status',)
     search_fields = ('no', 'permit_type', 'client__first_name',
                      'client__last_name', 'status')
@@ -218,11 +218,6 @@ class PermitApplicationAdmin(AdminMixin, admin.ModelAdmin):
                             & Q(accepted_by__isnull=False))
 
         return qs
-
-    def acceptable(self, obj):
-        return obj.submittable
-
-    acceptable.boolean = True
 
     def get_readonly_fields(self, request, obj=None):
         # If obj is None, it means we are adding a new record
@@ -499,10 +494,10 @@ class RequirementAdmin(admin.ModelAdmin):
 
 @admin.register(Inspection)
 class InspectionAdmin(AdminMixin, admin.ModelAdmin):
-    fields = ('no', 'scheduled_date', 'inspecting_officer')
+    fields = ('no', 'scheduled_date')
     list_display = ('no', 'scheduled_date')
     search_fields = ('no',)
-    autocomplete_fields = ('permit_application', 'inspecting_officer')
+    autocomplete_fields = ('permit_application',)
     change_form_template = 'permits/admin/inspection_changeform.html'
 
     def response_change(self, request, obj):
@@ -527,8 +522,8 @@ class InspectionAdmin(AdminMixin, admin.ModelAdmin):
                     changed_fields.add(field.name)
 
             # Now, 'changed_fields' contains the names of the fields that have been updated
-            if {'inspecting_officer', 'scheduled_date'}.issubset(changed_fields) \
-                    and obj.inspecting_officer is not None and obj.scheduled_date is not None:
+            if {'scheduled_date'}.issubset(changed_fields) \
+                    and obj.scheduled_date is not None:
                 inspection_scheduled.send(
                     sender=request.user, application=obj.permit_application)
 

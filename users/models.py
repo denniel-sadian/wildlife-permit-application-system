@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager
+from django.contrib.auth.models import Group
 
 from model_utils.managers import InheritanceManager
 from phonenumber_field.modelfields import PhoneNumberField
@@ -123,6 +124,13 @@ class Signatory(User):
         verbose_name = 'Signatory'
         verbose_name_plural = 'Signatories'
 
+    @property
+    def signatory_type(self):
+        return (
+            self.groups.first().name
+            if self.groups.first()
+            else 'No type yet')
+
     def save(self, *args, **kwargs):
         self.is_staff = True
         super().save(*args, **kwargs)
@@ -148,6 +156,11 @@ class Validator(User):
         super().save(*args, **kwargs)
 
 
-class TransientNotification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class Notification(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=True, null=True)
     message = models.TextField()
+    url = models.TextField(blank=True, null=True)
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)

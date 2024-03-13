@@ -31,9 +31,18 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       CELERY_BROKER_URL:
       PAYMONGO_SECRET_KEY:
+      DJANGO_VITE_DEV_MODE:
     depends_on:
       - db
       - mail
+
+  frontend:
+    build: frontend/.
+    volumes:
+      - ./frontend/vite.config.js:/app/vite.config.js
+      - ./frontend/src:/app/src
+    ports:
+      - 5173:5173
 
   worker:
     depends_on:
@@ -66,7 +75,6 @@ services:
     image: redis:6.2.6-alpine
     ports:
       - 6379:6379
-
 
 volumes:
   biodiversity_db:

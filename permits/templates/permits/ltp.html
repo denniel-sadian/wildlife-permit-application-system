@@ -16,6 +16,11 @@
         border-top: 2px dashed gray;
         border-bottom: 2px dashed gray;
     }
+
+    .added-file {
+        height: auto;
+        width: 100%;
+    }
 </style>
 {% endblock styles %}
 
@@ -66,20 +71,22 @@
 </p>
 {% include 'ui/signature_list.html' with signatures=permit.signatures %}
 
-<hr>
+<hr style="break-after: page;">
 
 {% include 'ui/inspection.html' with inspection=permit.inspection %}
 
+<hr style="break-after: page;">
+
 {% if permit.wfp.uploaded_file %}
-<embed src="{{ permit.wfp.uploaded_file.url }}" class="added-file"/>
+<img src="{{ permit.wfp.uploaded_file.url }}" class="added-file"/>
 {% endif %}
 
-<hr>
+<hr style="break-after: page;">
 
 {% if permit.wcp.uploaded_file %}
-<embed src="{{ permit.wcp.uploaded_file.url }}" class="added-file"/>
+<img src="{{ permit.wcp.uploaded_file.url }}" class="added-file"/>
 {% endif %}
 
-<hr>
+<hr style="break-after: page;">
 
 {% endblock content %}

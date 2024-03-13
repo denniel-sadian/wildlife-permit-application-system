@@ -71,16 +71,20 @@
         <tr>
             <th>
                 <div class="payment-sign">
+                    {% if paymentorder.prepared_by_signature %}
                     <img src="{{ paymentorder.prepared_by_signature.person.signature_image.url }}">
-                    <span>{{ paymentorder.prepared_by_signature.person.name }}</span>
-                    <span style="font-weight:normal; font-size:12px!important;">{{ paymentorder.prepared_by_signature.person.title }}</span>
+                    {% endif %}
+                    <span>{{ paymentorder.prepared_by.name }}</span>
+                    <span style="font-weight:normal; font-size:12px!important;">{{ paymentorder.prepared_by.title }}</span>
                 </div>
             </th>
             <th>
                 <div class="payment-sign">
+                    {% if paymentorder.approved_by_signature %}
                     <img src="{{ paymentorder.approved_by_signature.person.signature_image.url }}">
-                    <span>{{ paymentorder.approved_by_signature.person.name }}</span>
-                    <span style="font-weight:normal; font-size:12px!important;">{{ paymentorder.approved_by_signature.person.title }}</span>
+                    {% endif %}
+                    <span>{{ paymentorder.approved_by.name }}</span>
+                    <span style="font-weight:normal; font-size:12px!important;">{{ paymentorder.approved_by.title }}</span>
                 </div>
             </th>
         </tr>

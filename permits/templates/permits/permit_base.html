@@ -10,7 +10,8 @@
     <script src="https://kit.fontawesome.com/209b41c676.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto+Slab:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=37" />
+    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=100" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     {% block styles %}
     <style>
         body {
@@ -24,16 +25,12 @@
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
-            padding: 12px;
+            padding: 12px 12px 100px 12px;
         }
 
         embed {
             width: 100%;
             height: auto;
-        }
-
-        hr {
-            margin: 100px 0px;
         }
 
         .qrcode-cont {
@@ -44,7 +41,7 @@
 
         #qrcode img {
             margin: 0px;
-            max-width: 150px;
+            max-width: 50px;
             width: 100%;
             height: auto;
         }
@@ -66,18 +63,18 @@
             padding: 18px;
             border-radius: 8px;
         }
+
+        #action-btns {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
     </style>
     {% endblock styles %}
 </head>
 <body>
     <main>
         <div class="permit-info {{ status }}">
-            {% if permit.permit_type == 'Local Transport Permit' %}
-            <div class="qrcode-cont">
-                <div id="qrcode"></div>
-            </div>
-            {% endif %}
-
             {% if status == 'validated' %}
             <h3><i class="fa fa-check-circle w3-text-green"></i> Successfully Validated</h3>
             <p>
@@ -110,14 +107,48 @@
 
         <hr>
 
-        {% block content %}{% endblock content %}
+        <div id="permit-cont" onclick="printToPdf()">
+            {% if permit.permit_type == 'Local Transport Permit' %}
+            <div class="qrcode-cont">
+                <div id="qrcode"></div>
+            </div>
+            {% endif %}
 
-        {% include 'ui/receipt.html' with payment=permit.payment_order.payment %}
+            {% block content %}{% endblock content %}
+
+            {% include 'ui/receipt.html' with payment=permit.payment_order.payment %}
+        </div>
     </main>
 
+    <div id="action-btns">
+        <button id="print-btn" onclick="printToPdf()" class="w3-btn w3-blue w3-round-large">
+            <i class="fa fa-save"></i> Save to PDF</button>
+
+        {% if user.type == 'Validator' %}
+        <a href="{{ permit.validation_url }}" class="w3-btn w3-green w3-round-large">
+            <i class="fa fa-check-circle"></i> Validate</a>
+        {% endif %}
+    </div>
+
     <script>
+        function printToPdf() {
+            var element = document.getElementById('permit-cont');
+            html2pdf()
+            .set({
+                margin: 20,
+                filename: '{{ permit.permit_no }}',
+                image: { type: 'jpeg', quality: 0.20 },
+                html2canvas: {dpi: 300, letterRendering: true, useCORS: true}
+            })
+            .from(element)
+            .save();
+        }
+
         $(function () {
-            new QRCode(document.getElementById('qrcode'), '{{ DOMAIN }}{{ permit.validation_url }}');
+            var qrcodeEl = document.getElementById('qrcode');
+            if (qrcodeEl) {
+                new QRCode(qrcodeEl, '{{ DOMAIN }}{% url "permit_detail" pk=permit.id %}');
+            }
         })
     </script>
 </body>
