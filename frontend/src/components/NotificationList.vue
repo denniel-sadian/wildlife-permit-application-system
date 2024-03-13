@@ -68,6 +68,7 @@ onMounted(async () => {
     align-items: flex-end;
     box-sizing: border-box;
     padding: 20px;
+    z-index: 120;
 }
 
 .notification-cont h2 {
