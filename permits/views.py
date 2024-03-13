@@ -274,11 +274,12 @@ class UnsubmitRedirectView(SingleObjectMixin, RedirectView):
         return same_url
 
 
-class PermitDetailView(DetailView):
+class PermitDetailView(CustomLoginRequiredMixin, DetailView):
     model = Permit
 
     def get_queryset(self):
-        if isinstance(self.request.user.subclass, Client):
+        if (hasattr(self.request.user, 'subclass')
+                and isinstance(self.request.user.subclass, Client)):
             return super().get_queryset().filter(client=self.request.user)
         return super().get_queryset()
 
