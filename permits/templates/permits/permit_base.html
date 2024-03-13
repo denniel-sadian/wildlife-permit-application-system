@@ -136,9 +136,7 @@
             html2pdf()
             .set({
                 margin: 20,
-                filename: '{{ permit.permit_no }}',
-                image: { type: 'jpeg', quality: 0.20 },
-                html2canvas: {dpi: 300, letterRendering: true, useCORS: true}
+                filename: '{{ permit.permit_no }}'
             })
             .from(element)
             .save();
