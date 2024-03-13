@@ -214,7 +214,7 @@ def receive_inspection_signed(sender, application: PermitApplication, **kwargs):
         return
     message = (
         f'Inspection for {application.no} has been signed by '
-        f'{application.inspection.signatures[0].name}.')
+        f'{application.inspection.signatures[0].person.name}.')
     logger.info(message)
     notify_admins_about_signed_inspection.delay(
         application_id=application.id)
