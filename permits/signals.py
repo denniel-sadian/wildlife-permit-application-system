@@ -199,14 +199,6 @@ def receive_inspection_scheduled(sender, application: PermitApplication, **kwarg
             change_message=_(message)
         )
 
-    url = reverse_lazy('update_application', args=[application.id])
-    message = f'''
-    The inspection for your permit application <a href="{url}">{application.no}</a>
-    has been scheduled on {application.inspection.scheduled_date}.
-    '''
-    Notification.objects.create(
-        user=application.client, message=message)
-
 
 @receiver(inspection_signed)
 def receive_inspection_signed(sender, application: PermitApplication, **kwargs):
