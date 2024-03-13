@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto+Slab:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=37" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     {% block styles %}
     <style>
         body {
@@ -30,10 +31,6 @@
         embed {
             width: 100%;
             height: auto;
-        }
-
-        hr {
-            margin: 100px 0px;
         }
 
         .qrcode-cont {
@@ -65,6 +62,12 @@
         .permit-info {
             padding: 18px;
             border-radius: 8px;
+        }
+
+        #print-btn {
+            position: fixed;
+            bottom: 0px;
+            right: 0px;
         }
     </style>
     {% endblock styles %}
@@ -110,14 +113,36 @@
 
         <hr>
 
-        {% block content %}{% endblock content %}
+        <div id="permit-cont" onclick="printToPdf()">
+            {% block content %}{% endblock content %}
 
-        {% include 'ui/receipt.html' with payment=permit.payment_order.payment %}
+            {% include 'ui/receipt.html' with payment=permit.payment_order.payment %}
+        </div>
     </main>
 
+    <button id="print-btn" onclick="printToPdf()">Print to PDF</button>
+
     <script>
+        function printToPdf() {
+            console.log('Gaga first');
+            var element = document.getElementById('permit-cont');
+            html2pdf()
+            .set({
+                margin: 20,
+                filename: '{{ permit.permit_no }}',
+                image: { type: 'jpeg', quality: 0.20 },
+                html2canvas: {dpi: 300, letterRendering: true, useCORS: true}
+            })
+            .from(element)
+            .save();
+            console.log('Gaga');
+        }
+
         $(function () {
-            new QRCode(document.getElementById('qrcode'), '{{ DOMAIN }}{{ permit.validation_url }}');
+            var qrcodeEl = document.getElementById('qrcode');
+            if (qrcodeEl) {
+                new QRCode(document.getElementById('qrcode'), '{{ DOMAIN }}{{ permit.validation_url }}');
+            }
         })
     </script>
 </body>

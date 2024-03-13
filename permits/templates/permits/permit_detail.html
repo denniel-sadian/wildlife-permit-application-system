@@ -39,21 +39,10 @@
 {% block content %}
 <main>
     {% if permit.uploaded_file %}
-    <embed src="{{ permit.uploaded_file.url }}"/>
+    <img src="{{ permit.uploaded_file.url }}" style="width: 100%; height: auto;"/>
     {% else %}
     <p>No uploaded file!</p>
     {% endif %}
 </main>
 {% endblock content %}
 
-{% block side %}
-<div>
-    <h3>Permit Details</h3>
-    <p>No: {{ permit.permit_no }}</p>
-    <p>Status: {{ permit.get_status_display }}</p>
-    <p>Created at: {{ permit.created_at }}</p>
-    <p>Valid until: {{ permit.valid_until }}</p>
-    <p>Official receipt no: {{ permit.payment_order.payment.receipt_no }}</p>
-    <p>Payment amount: Php {{ permit.payment_order.payment.amount }}</p>
-</div>
-{% endblock side %}
