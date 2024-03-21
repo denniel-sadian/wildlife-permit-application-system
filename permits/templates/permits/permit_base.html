@@ -84,20 +84,6 @@
             align-items: center;
         }
 
-        .page-footer, .page-footer-space {
-          height: 80px;
-          display: none;
-        }
-
-        .page-footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            color: gray;
-            font-size: 10px;
-        }
-
         .page-header {
             position: fixed;
             top: 0mm;
@@ -106,16 +92,20 @@
             border-bottom: 3px solid #800000;
         }
 
+        #permit-cont {
+            position: relative;
+        }
+
         @media print {
            thead {display: table-header-group;}
            tfoot {display: table-footer-group;}
            body {margin: 0;}
            .permit-info, #action-btns {display: none;}
            #or {width: 370px !important; height: auto;}
-           .page-footer-space, .page-header-space {
+           .page-header-space {
                 display: block;
            }
-           .page-footer, .page-header {
+           .page-header {
                 display: block;
            }
         }
@@ -139,14 +129,6 @@
         </div>
     </div>
 
-    <div class="page-footer">
-        <span>
-            Capitol Compound, Barangay Bangbangalon, Boac, Marinduque <br>
-            Telephone Nos.: (042) 332-1490/(042) 332-0727/(042) 332-1913; VOIP: 2705 <br>
-            Website: https://penromarinduque.gov.ph/ <br>
-            Email: penromarinduque@denr.gov.ph <br>
-        </span>
-    </div>
     <main>
         <table>
             <thead>
@@ -200,16 +182,6 @@
                     </td>
                 </tr>
             </tbody>
-
-        <tfoot>
-          <tr>
-            <td>
-              <!--place holder for the fixed-position footer-->
-              <div class="page-footer-space"></div>
-            </td>
-          </tr>
-        </tfoot>
-
         </table>
     </main>
 

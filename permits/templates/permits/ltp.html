@@ -21,15 +21,13 @@
         width: 100%;
     }
 
-    .qrcode-cont {
-        display: flex;
-        justify-content: right;
-        width: 100%;
+    #qrcode {
+        position: absolute;
+        top: 0px;
+        right: 0px;
     }
-
     #qrcode img {
-        margin: 20px 0px 0px 0px;
-        max-width: 125px;
+        max-width: 85px;
         width: 100%;
         height: auto;
     }
@@ -37,6 +35,8 @@
 {% endblock styles %}
 
 {% block content %}
+<div id="qrcode"></div>
+
 <h4>Wildlife Transport <br>
     Permit No: {{ permit.permit_no }}</h4>
 <h2 style="text-align: center">LOCAL TRANSPORT PERMIT</h2>
@@ -82,10 +82,6 @@
     Resources.</span>
 </p>
 {% include 'ui/signature_list.html' with signatures=permit.signatures %}
-
-<div class="qrcode-cont">
-    <div id="qrcode"></div>
-</div>
 
 <div style="break-after: page;"></div>
 
