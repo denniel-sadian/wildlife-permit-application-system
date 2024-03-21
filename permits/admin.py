@@ -57,7 +57,7 @@ class UploadedRequirementInline(admin.StackedInline):
 
 
 class TransportEntryInline(admin.TabularInline):
-    fields = ('sub_species', 'quantity')
+    fields = ('sub_species', 'quantity', 'description')
     model = TransportEntry
     extra = 1
     autocomplete_fields = ('sub_species',)
