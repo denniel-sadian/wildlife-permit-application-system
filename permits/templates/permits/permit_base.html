@@ -10,8 +10,7 @@
     <script src="https://kit.fontawesome.com/209b41c676.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto+Slab:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=100" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=102" />
     {% block styles %}
     <style>
         body {
@@ -30,19 +29,6 @@
         }
 
         embed {
-            width: 100%;
-            height: auto;
-        }
-
-        .qrcode-cont {
-            display: flex;
-            justify-content: right;
-            width: 100%;
-        }
-
-        #qrcode img {
-            margin: 0px;
-            max-width: 125px;
             width: 100%;
             height: auto;
         }
@@ -71,53 +57,160 @@
             bottom: 20px;
             right: 20px;
         }
+
+        .page-header, .page-header-space {
+            height: 100px;
+            display: none;
+        }
+
+        .page-header > div {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            max-width: 800px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bagong-logo img, .denr-logo img {
+            width: 90px;
+            height: 90px;
+        }
+
+        .head-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page-footer, .page-footer-space {
+          height: 80px;
+          display: none;
+        }
+
+        .page-footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            color: gray;
+            font-size: 10px;
+        }
+
+        .page-header {
+            position: fixed;
+            top: 0mm;
+            box-sizing: border-box;
+            width: 100%;
+            border-bottom: 3px solid #800000;
+        }
+
+        @media print {
+           thead {display: table-header-group;}
+           tfoot {display: table-footer-group;}
+           body {margin: 0;}
+           .permit-info, #action-btns {display: none;}
+           #or {width: 370px !important; height: auto;}
+           .page-footer-space, .page-header-space {
+                display: block;
+           }
+           .page-footer, .page-header {
+                display: block;
+           }
+        }
     </style>
     {% endblock styles %}
 </head>
 <body>
+    <div class="page-header">
+        <div>
+            <div class="denr-logo">
+                <img src="{% static 'img/denr-doc-logo.png' %}">
+            </div>
+            <div class="head-text">
+                <b>DEPARTMENT OF ENVIRONMENT AND NATURAL RESOURCES</b>
+                <span>KAGAWARAN NG KAPALIGIRAN AT LIKAS NA YAMAN</span>
+                <b>PENRO MARINDUQUE</b>
+            </div>
+            <div class="bagong-logo">
+                <img src="{% static 'img/bagong-ph-logo.png' %}">
+            </div>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <span>
+            Capitol Compound, Barangay Bangbangalon, Boac, Marinduque <br>
+            Telephone Nos.: (042) 332-1490/(042) 332-0727/(042) 332-1913; VOIP: 2705 <br>
+            Website: https://penromarinduque.gov.ph/ <br>
+            Email: penromarinduque@denr.gov.ph <br>
+        </span>
+    </div>
     <main>
-        <div class="permit-info {{ status }}">
-            {% if status == 'validated' %}
-            <h3><i class="fa fa-check-circle w3-text-green"></i> Successfully Validated</h3>
-            <p>
-                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" has been validated successfully.
-            </p>
-            {% elif status == 'used' %}
-            <h3><i class="fa fa-info-circle w3-text-orange"></i> Already Used</h3>
-            <p>
-                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" has been used already.
-            </p>
-            {% elif status == 'expired' %}
-            <h3><i class="fa fa-exclamation-circle w3-text-pink"></i> Already Expired</h3>
-            <p>
-                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" is already expired and can no longer be used.
-            </p>
-            {% else %}
-            <h3><i class="fa fa-info-circle w3-text-blue"></i> Permit Info</h3>
-            <p>
-                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" currently has the status "{{ permit.current_status }}"
-                and waiting to get validated. It was issued on {{ permit.issued_date }} and is valid until {{ permit.valid_until }}.
-            </p>
-            {% endif %}
+        <table>
+            <thead>
+              <tr>
+                <td>
+                  <!--place holder for the fixed-position header-->
+                  <div class="page-header-space"></div>
+                </td>
+              </tr>
+            </thead>
 
-            {% if permit.validation %}
-            <div>
-                <p>This permit has been validated by {{ permit.validation.validator.name }} on {{ permit.validation.validated_at }}</p>
-            </div>
-            {% endif %}
-        </div>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="permit-info {{ status }}">
+                            {% if status == 'validated' %}
+                            <h3><i class="fa fa-check-circle w3-text-green"></i> Successfully Validated</h3>
+                            <p>
+                                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" has been validated successfully.
+                            </p>
+                            {% elif status == 'used' %}
+                            <h3><i class="fa fa-info-circle w3-text-orange"></i> Already Used</h3>
+                            <p>
+                                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" has been used already.
+                            </p>
+                            {% elif status == 'expired' %}
+                            <h3><i class="fa fa-exclamation-circle w3-text-pink"></i> Already Expired</h3>
+                            <p>
+                                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" is already expired and can no longer be used.
+                            </p>
+                            {% else %}
+                            <h3><i class="fa fa-info-circle w3-text-blue"></i> Permit Info</h3>
+                            <p>
+                                This {{ permit.subclass.permit_type }} with number "{{ permit.permit_no }}" currently has the status "{{ permit.current_status }}"
+                                and waiting to get validated. It was issued on {{ permit.issued_date }} and is valid until {{ permit.valid_until }}.
+                            </p>
+                            {% endif %}
 
-        <div id="permit-cont">
-            {% if permit.permit_type == 'Local Transport Permit' %}
-            <div class="qrcode-cont">
-                <div id="qrcode"></div>
-            </div>
-            {% endif %}
+                            {% if permit.validation %}
+                            <div>
+                                <p>This permit has been validated by {{ permit.validation.validator.name }} on {{ permit.validation.validated_at }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
 
-            {% block content %}{% endblock content %}
+                        <div id="permit-cont">
+                            {% block content %}{% endblock content %}
 
-            {% include 'ui/receipt.html' with payment=permit.payment_order.payment %}
-        </div>
+                            {% include 'ui/receipt.html' with payment=permit.payment_order.payment %}
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+
+        <tfoot>
+          <tr>
+            <td>
+              <!--place holder for the fixed-position footer-->
+              <div class="page-footer-space"></div>
+            </td>
+          </tr>
+        </tfoot>
+
+        </table>
     </main>
 
     <div id="action-btns">
@@ -129,14 +222,5 @@
             <i class="fa fa-check-circle"></i> Validate</a>
         {% endif %}
     </div>
-
-    <script>
-        $(function () {
-            var qrcodeEl = document.getElementById('qrcode');
-            if (qrcodeEl) {
-                new QRCode(qrcodeEl, '{{ DOMAIN }}{% url "permit_detail" pk=permit.id %}');
-            }
-        })
-    </script>
 </body>
 </html>
