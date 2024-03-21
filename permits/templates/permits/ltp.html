@@ -10,7 +10,7 @@
         text-decoration: underline;
     }
 
-    table {
+    .transport-tb {
         width: 100%;
         text-align: center;
         border-top: 2px dashed gray;
@@ -31,7 +31,7 @@
 <p style="text-indent: 50px;">
     Pursuant ot Republic Act 9147 dated July 30, 2001, <span class="underlined">{{ permit.client.name }}</span> of <span class="underlined">{{ permit.client.address }}</span>
     is authorized to transport to <span class="underlined">{{ permit.transport_location }}</span> the following wildlife for <span class="underlined">export</span> purpose.</p>
-<table>
+<table class="transport-tb">
     <tr>
         <th>Common/Scientific Name</th>
         <th>Description</th>
