@@ -43,6 +43,7 @@
     padding: 0px 20px;
     font-weight: bold;
     white-space: nowrap;
+    text-transform: uppercase;
 }
 .sign .title {
     font-style: italic;
