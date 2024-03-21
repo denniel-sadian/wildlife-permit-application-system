@@ -19,9 +19,9 @@
 .signatures {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 50px;
     gap: 8px;
     justify-content: end;
+    break-inside: avoid;
 }
 .sign {
     width: 100%;
