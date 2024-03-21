@@ -4,7 +4,6 @@
 
 {% block styles %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/extraadmin.css' %}?v=39" />
 <style>
     strong {
         text-decoration: underline;
@@ -20,6 +19,19 @@
     .added-file {
         height: auto;
         width: 100%;
+    }
+
+    .qrcode-cont {
+        display: flex;
+        justify-content: right;
+        width: 100%;
+    }
+
+    #qrcode img {
+        margin: 20px 0px 0px 0px;
+        max-width: 125px;
+        width: 100%;
+        height: auto;
     }
 </style>
 {% endblock styles %}
@@ -71,18 +83,23 @@
 </p>
 {% include 'ui/signature_list.html' with signatures=permit.signatures %}
 
+<div class="qrcode-cont">
+    <div id="qrcode"></div>
+</div>
+
 <div style="break-after: page;"></div>
 
 {% include 'ui/inspection.html' with inspection=permit.inspection %}
 
 <div style="break-after: page;"></div>
 
-{% if permit.wfp.uploaded_file %}
-<img src="{{ permit.wfp.uploaded_file.url }}" class="added-file"/>
-{% endif %}
-
-{% if permit.wcp.uploaded_file %}
-<img src="{{ permit.wcp.uploaded_file.url }}" class="added-file"/>
-{% endif %}
+<script>
+    $(function () {
+        var qrcodeEl = document.getElementById('qrcode');
+        if (qrcodeEl) {
+            new QRCode(qrcodeEl, '{{ DOMAIN }}{% url "permit_detail" pk=permit.id %}');
+        }
+    })
+</script>
 
 {% endblock content %}
