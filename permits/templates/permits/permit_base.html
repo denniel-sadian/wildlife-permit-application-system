@@ -122,8 +122,8 @@
     </main>
 
     <div id="action-btns">
-        <button id="print-btn" onclick="printToPdf()" class="w3-btn w3-blue w3-round-large">
-            <i class="fa fa-save"></i> Save to PDF</button>
+        <button id="print-btn" onclick="print()" class="w3-btn w3-blue w3-round-large">
+            <i class="fa fa-save"></i> Print</button>
 
         {% if user.type == 'Validator' %}
         <a href="{{ permit.validation_url }}" class="w3-btn w3-green w3-round-large">
@@ -132,17 +132,6 @@
     </div>
 
     <script>
-        function printToPdf() {
-            var element = document.getElementById('permit-cont');
-            html2pdf()
-            .set({
-                margin: 20,
-                filename: '{{ permit.permit_no }}'
-            })
-            .from(element)
-            .save();
-        }
-
         $(function () {
             var qrcodeEl = document.getElementById('qrcode');
             if (qrcodeEl) {
